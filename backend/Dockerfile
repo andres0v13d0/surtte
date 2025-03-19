@@ -1,23 +1,24 @@
-# Usa una imagen base de Node.js
-FROM node:18
+# Usar la misma versión de Node.js que en tu máquina local
+FROM node:21
 
-# Establece el directorio de trabajo dentro del contenedor
+# Establece el directorio de trabajo en el contenedor
 WORKDIR /app
 
-# Copia los archivos necesarios primero para aprovechar la caché de Docker
+# Copia solo los archivos de dependencias primero (para aprovechar la caché de Docker)
 COPY package*.json ./
 
 # Instala las dependencias
 RUN npm install
 
-# Copia todo el código del proyecto
+# Copia el resto del código
 COPY . .
 
-# Compila el código TypeScript a JavaScript
+# Compila TypeScript a JavaScript
 RUN npm run build
 
-# Expone el puerto en el que corre NestJS
+# Expone el puerto 3000
 EXPOSE 3000
 
 # Comando para ejecutar la aplicación
 CMD ["node", "dist/main.js"]
+
