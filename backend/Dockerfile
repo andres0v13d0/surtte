@@ -13,6 +13,9 @@ RUN npm install
 # Copia el resto del código
 COPY . .
 
+#Copiar el certificado SSL dentro del contenedor
+COPY rds-ca.pem /app/rds-ca.pem
+
 # Compila TypeScript a JavaScript
 RUN npm run build
 
