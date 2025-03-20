@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import *  as AWS from '@aws-sdk/client-secrets-manager';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import * as fs from 'fs';
 
 async function getDatabaseSecrets() {
-  const client = new AWS.SecretsManagerClient({ region: 'us-east-2' });
+  const client = new SecretsManagerClient({ region: 'us-east-2' });
   
   try{
     const response = await client.send(
-      new AWS.GetSecretValueCommand({ 
+      new GetSecretValueCommand({ 
         SecretId: 'CredencialesBD',
         VersionStage: 'AWSCURRENT',
       })
