@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { User } from './entity/user.entity';
+import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -16,6 +17,14 @@ export class UsersController {
     async getUserById(@Param('id') id: number): Promise<User> {
         return await this.usersService.getUserById(id);
     }
+
+    @UseGuards(FirebaseAuthGuard)
+    @Get('me')
+    async getMyProfile(@Req() req) {
+        const firebaseUid = req.user.uid;
+        return this.usersService.getUserByFirebaseUid(firebaseUid);
+    }
+
 
     @Put(':id')
     async updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto): Promise<User> {

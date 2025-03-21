@@ -5,6 +5,7 @@ import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-sec
 import * as fs from 'fs';
 import { UsersModule } from './modules/users/users.module';
 import { ProvidersModule } from './modules/providers/providers.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 async function getDatabaseSecrets() {
   const client = new SecretsManagerClient({ region: 'us-east-2' });
@@ -52,7 +53,8 @@ async function getDatabaseSecrets() {
       },
     }),
     UsersModule,
-    ProvidersModule
+    ProvidersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
