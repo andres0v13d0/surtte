@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: ./front
+        working-directory: /front
 
       - name: Build project
         run: npm run build
