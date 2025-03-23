@@ -20,11 +20,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: /front
+        working-directory: front
 
       - name: Build project
         run: npm run build
-        working-directory: /front
+        working-directory: front
 
       - name: Sync to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
