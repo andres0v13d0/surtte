@@ -38,7 +38,7 @@ jobs:
           SOURCE_DIR: frontend/build
 
       - name: Invalidate CloudFront cache
-        uses: chetan/invalidate-cloudfront-action@v2
+        uses: aws-actions/aws-cloudfront-invalidate-cache@v1
         with:
           distribution-id: ${{ secrets.DISTRIBUTION_ID }}
           paths: '/*'
