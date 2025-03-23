@@ -38,7 +38,10 @@ jobs:
           SOURCE_DIR: frontend/build
 
       - name: Invalidate CloudFront cache
-        uses: aws-actions/aws-cloudfront-invalidate-cache@v1
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.DISTRIBUTION_ID }} \
+            --paths "/*"
         with:
           distribution-id: ${{ secrets.DISTRIBUTION_ID }}
           paths: '/*'
