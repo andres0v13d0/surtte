@@ -27,7 +27,6 @@ const Login = () => {
       console.log('Usuario autenticado:', userData);
       alert(`Bienvenido, ${userData.nombre}`);
 
-      // Aquí puedes guardar en localStorage o context
       localStorage.setItem('usuario', JSON.stringify(userData));
 
     } catch (error) {
