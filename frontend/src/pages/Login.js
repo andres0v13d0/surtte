@@ -15,12 +15,7 @@ const Login = () => {
     try {
       const response = await axios.post(
         'https://api.surtte.com/auth/login',
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { token }
       );
 
       const userData = response.data;
