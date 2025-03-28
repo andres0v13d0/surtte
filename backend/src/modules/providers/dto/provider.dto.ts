@@ -1,5 +1,6 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsBoolean, IsIn, IsInt, IsPositive } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { EstadoVerificacion } from '../entity/provider.entity';
 
 export class CreateProviderDto {
   @IsNumber()
@@ -21,6 +22,30 @@ export class CreateProviderDto {
   @IsString()
   @IsOptional()
   descripcion?: string;
+
+  @IsOptional()
+  @IsIn(['pendiente', 'en_revision', 'verificado', 'rechazado'])
+  estadoVerificacion?: EstadoVerificacion;
+
+  @IsOptional()
+  @IsBoolean()
+  pagoVerificacion?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  documentosCompletos?: boolean;
+
+  @IsOptional()
+  @IsPositive()
+  calificacion?: number;
+
+  @IsOptional()
+  @IsInt()
+  cantidadPedidos?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  proveedorConfiable?: boolean;
 }
 
 export class UpdateProviderDto extends PartialType(CreateProviderDto) {}

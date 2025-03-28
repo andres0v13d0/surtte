@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Provider } from './entity/provider.entity';
 import { CreateProviderDto, UpdateProviderDto } from './dto/provider.dto';
-import { User } from '../users/entity/user.entity';
+import { User, RolUsuario } from '../users/entity/user.entity';
 
 @Injectable()
 export class ProvidersService {
@@ -22,7 +22,7 @@ export class ProvidersService {
       throw new NotFoundException(`Usuario con ID ${usuario_id} no encontrado`);
     }
 
-    if (user.proveedor) {
+    if (user.rol === RolUsuario.PROVEEDOR) {
       throw new ConflictException(`El usuario con ID ${usuario_id} ya es proveedor`);
     }
 
@@ -31,10 +31,21 @@ export class ProvidersService {
       throw new ConflictException(`El RUT ${rut} ya está registrado en otro proveedor`);
     }
 
-    const provider = this.providerRepository.create({ ...createProviderDto, usuario: user });
-    user.proveedor = true; 
+    const provider = this.providerRepository.create({
+      ...createProviderDto,
+      usuario: user,
+      estadoVerificacion: 'pendiente',
+      pagoVerificacion: false,
+      documentosCompletos: false,
+      calificacion: 0,
+      cantidadPedidos: 0,
+      proveedorConfiable: false,
+    });
+
+    user.rol = RolUsuario.PROVEEDOR;
     await this.userRepository.save(user);
-    return this.providerRepository.save(provider);
+
+    return await this.providerRepository.save(provider);
   }
 
   async findAll(): Promise<Provider[]> {
@@ -42,7 +53,10 @@ export class ProvidersService {
   }
 
   async findOne(id: number): Promise<Provider> {
-    const provider = await this.providerRepository.findOne({ where: { id }, relations: ['usuario'] });
+    const provider = await this.providerRepository.findOne({
+      where: { id },
+      relations: ['usuario'],
+    });
     if (!provider) {
       throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
     }
@@ -50,6 +64,11 @@ export class ProvidersService {
   }
 
   async update(id: number, updateProviderDto: UpdateProviderDto): Promise<Provider> {
+    const provider = await this.findOne(id);
+    if (!provider) {
+      throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
+    }
+
     await this.providerRepository.update(id, updateProviderDto);
     return this.findOne(id);
   }
@@ -59,8 +78,8 @@ export class ProvidersService {
     if (!provider) throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
 
     const user = await this.userRepository.findOne({ where: { id: provider.usuario.id } });
-    if (user) {
-      user.proveedor = false;
+    if (user && user.rol === RolUsuario.PROVEEDOR) {
+      user.rol = RolUsuario.COMERCIANTE;
       await this.userRepository.save(user);
     }
 
@@ -68,10 +87,17 @@ export class ProvidersService {
   }
 
   async findByUserId(usuario_id: number): Promise<Provider> {
-    const provider = await this.providerRepository.findOne({ where: { usuario: { id: usuario_id } }, relations: ['usuario'] });
+    const provider = await this.providerRepository.findOne({
+      where: { usuario: { id: usuario_id } },
+      relations: ['usuario'],
+    });
+
     if (!provider) {
-      throw new NotFoundException(`No se encontró un proveedor para el usuario con ID ${usuario_id}`);
+      throw new NotFoundException(
+        `No se encontró un proveedor para el usuario con ID ${usuario_id}`,
+      );
     }
+
     return provider;
   }
 
@@ -79,5 +105,22 @@ export class ProvidersService {
     const provider = await this.providerRepository.findOne({ where: { rut } });
     return !!provider;
   }
-}
 
+  async updateEstadoVerificacion(id: number, estado: Provider['estadoVerificacion']): Promise<Provider> {
+    const provider = await this.findOne(id);
+    provider.estadoVerificacion = estado;
+    return this.providerRepository.save(provider);
+  }
+
+  async marcarPago(id: number): Promise<Provider> {
+    const provider = await this.findOne(id);
+    provider.pagoVerificacion = true;
+    return this.providerRepository.save(provider);
+  }
+
+  async marcarDocumentosCompletos(id: number): Promise<Provider> {
+    const provider = await this.findOne(id);
+    provider.documentosCompletos = true;
+    return this.providerRepository.save(provider);
+  }
+}
