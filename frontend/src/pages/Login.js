@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../config/firebase';
 import {
   signInWithPopup,
@@ -6,10 +7,16 @@ import {
 } from 'firebase/auth';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import './Login.css';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const sendTokenToBackend = async (token) => {
     try {
@@ -19,14 +26,19 @@ const Login = () => {
       );
 
       const userData = response.data;
-      console.log('Usuario autenticado:', userData);
-      alert(`Bienvenido, ${userData.nombre}`);
 
       localStorage.setItem('usuario', JSON.stringify(userData));
+      localStorage.setItem('token', token);
 
+      console.log('Usuario autenticado:', userData);
+      navigate('/');
     } catch (error) {
       console.error('Error desde el backend:', error);
-      alert('No se pudo autenticar con el servidor');
+      if (error.response?.status === 401) {
+        alert('Token inválido o usuario no autorizado');
+      } else {
+        alert('No se pudo autenticar con el servidor');
+      }
     }
   };
 
@@ -54,68 +66,43 @@ const Login = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '0 auto', padding: '1rem' }}>
-      <h2 style={{ textAlign: 'center' }}>Iniciar sesión</h2>
+    <>
+      <Header minimal={true}/>
+      <div className="login-section">
+        <h2 id='h-login'>Iniciar sesión</h2>
 
-      <button
-        onClick={loginWithGoogle}
-        style={{
-          width: '100%',
-          padding: '0.5rem',
-          marginBottom: '1rem',
-          backgroundColor: '#4285F4',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '5px',
-          fontSize: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '10px',
-        }}
-      >
-        <FontAwesomeIcon icon="fa-brands fa-google" />
-        Iniciar con Google
-      </button>
-
-      <form onSubmit={loginWithEmail}>
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '0.5rem' }}
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
-        />
-        <button
-          type="submit"
-          style={{
-            width: '100%',
-            padding: '0.5rem',
-            backgroundColor: '#333',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '5px',
-            fontSize: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '10px',
-          }}
+        <button className='btn-google'
+          onClick={loginWithGoogle}
         >
-          <FontAwesomeIcon icon="fa-solid fa-envelope" />
-          Iniciar con Correo
+          <FontAwesomeIcon icon={faGoogle} />
+          Iniciar con Google
         </button>
-      </form>
-    </div>
+
+        <form className="data-cont" onSubmit={loginWithEmail}>
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button className='btn-send'
+            type="submit"
+          >
+            <FontAwesomeIcon icon={faEnvelope} />
+            Iniciar con Correo
+          </button>
+        </form>
+      </div>
+      <Footer />
+    </>
   );
 };
 

@@ -1,0 +1,24 @@
+.bar-sup{
+    display: flex;
+    color: white;
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 60px;
+    align-items: center;
+    width: 100vw;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.bar-sup::-webkit-scrollbar {
+    display: none;
+  }
+
+.bar-sup #link-sup{
+    text-decoration: none;
+    color: white;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    margin-left: 20px;
+}

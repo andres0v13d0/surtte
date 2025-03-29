@@ -1,0 +1,44 @@
+.login-section{
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.login-section #h-login{
+    text-align: center;
+}
+
+.login-section .btn-google{
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    background-color: #4285F4;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.data-cont input{
+    width: 86vw;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.data-cont .btn-send{
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}

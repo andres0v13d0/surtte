@@ -1,0 +1,58 @@
+.header.minimal{
+    height: 10vh;
+    align-items: start;
+    justify-content: center;
+}
+
+.header.minimal #h-title{
+    margin: 0;
+    width: auto;
+}
+
+.header{
+    display: flex;
+    background-color: #001634;
+    height: 23vh;
+    width: 100vw;
+    align-items: center;
+    flex-direction: column;
+}
+
+.header #h-title{
+    color: white;
+    font-family: 'Sugo', sans-serif;
+    font-weight: normal;
+    font-size: 40px;
+    width: 70vw;
+    text-align: center;
+}
+
+.header .buttons{
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+}
+
+.buttons button{
+    background-color: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+.header #h-title b{
+    color: #fa7e17;
+    font-weight: normal;
+}
+
+.header .buttons #icons{
+    color: white;
+}
+
+.header .buttons #icons:nth-child(1){
+    height: 40px;
+}
+
+.header .buttons #icons{
+    height: 25px;
+}

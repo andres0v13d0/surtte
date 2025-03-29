@@ -1,0 +1,14 @@
+.cart #icon-cart{
+    height: 20px;
+    color: white;
+    margin: 0 15px;
+}
+
+.cart #number{
+    color: #fa7e17;
+    font-size: 15px;
+    font-weight: bold;
+    position: absolute;
+    right: 25px;
+    top: 20px;
+}

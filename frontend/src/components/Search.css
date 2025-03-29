@@ -1,0 +1,19 @@
+.search{
+    width: 90vw;
+    background-color: white;
+    height: 30px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.search #search-input{
+    font-family: 'Ubuntu', sans-serif;
+    outline: none;
+    border: none;
+    margin-left: 5px;
+    height: 80%;
+    font-size: 15px;
+    width: 90%;
+    font-weight: normal;
+}
