@@ -6,16 +6,18 @@ import {
   signInWithEmailAndPassword
 } from 'firebase/auth';
 import axios from 'axios';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './Login.css';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import BrandLogo from '../components/BrandLogo';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [showPass, setShowPass] = useState(false);
   const navigate = useNavigate();
 
   const sendTokenToBackend = async (token) => {
@@ -53,6 +55,23 @@ const Login = () => {
     }
   };
 
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, 'fakepassword123');
+    } catch (err) {
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+        localStorage.setItem('registerEmail', email);
+        navigate('/register');
+      } else if (err.code === 'auth/wrong-password') {
+        setShowPasswordSection(true);
+      } else {
+        alert('Error al verificar el correo');
+        console.error('Firebase auth error:', err);
+      }
+    }
+  };
+
   const loginWithEmail = async (e) => {
     e.preventDefault();
     try {
@@ -67,40 +86,74 @@ const Login = () => {
 
   return (
     <>
-      <Header minimal={true}/>
-      <div className="login-section">
-        <h2 id='h-login'>Iniciar sesión</h2>
+      <Header minimal={true} />
 
-        <button className='btn-google'
-          onClick={loginWithGoogle}
-        >
-          <FontAwesomeIcon icon={faGoogle} />
-          Iniciar con Google
-        </button>
+      {!showPasswordSection && (
+        <div className="login-section">
+          <h2 id='h-login'>Inicia sesión o crea tu cuenta</h2>
 
-        <form className="data-cont" onSubmit={loginWithEmail}>
-          <input
-            type="email"
-            placeholder="Correo electrónico"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button className='btn-send'
-            type="submit"
-          >
-            <FontAwesomeIcon icon={faEnvelope} />
-            Iniciar con Correo
+          <button className='btn-login' onClick={loginWithGoogle}>
+            <BrandLogo name="google" size={20} />
+            Continuar con Google
           </button>
-        </form>
-      </div>
+
+          <button className='btn-login' onClick={loginWithGoogle}>
+            <BrandLogo name="facebook" size={20} />
+            Continuar con Facebook
+          </button>
+
+          <button className='btn-login' onClick={loginWithGoogle}>
+            <BrandLogo name="apple" size={20} />
+            Continuar con Apple
+          </button>
+
+          <div className='line-bw'>
+            <div className='line'></div>
+            <span>O</span>
+            <div className='line'></div>
+          </div>
+
+          <p id='p-login'>Usa tu correo electrónico para iniciar sesión</p>
+
+          <form className="data-cont" onSubmit={handleEmailSubmit}>
+            <input
+              type="email"
+              placeholder="Correo electrónico"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <button className='btn-login' type="submit">Continuar</button>
+          </form>
+        </div>
+      )}
+
+      {showPasswordSection && (
+        <div className="login-password">
+          <h2>Introduce tu contraseña</h2>
+          <form onSubmit={loginWithEmail}>
+            <input
+              type="email"
+              value={email}
+              disabled
+            />
+            <div className="pass-wrapper">
+              <input
+                type={showPass ? 'text' : 'password'}
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <span className="toggle-pass" onClick={() => setShowPass(!showPass)}>
+                <FontAwesomeIcon icon={showPass ? faEyeSlash : faEye} />
+              </span>
+            </div>
+            <button className='btn-login' type="submit">Iniciar sesión</button>
+          </form>
+        </div>
+      )}
+
       <Footer />
     </>
   );
