@@ -1,8 +1,10 @@
 .register-container{
     display: flex;
     flex-direction: column;
-    padding: 0 2rem;
+    padding: 0 1rem;
     background-color: #f5f5f5;
+    height: 70vh;
+    overflow: hidden;
 }
 
 .register-container #r-title{
@@ -18,11 +20,12 @@
     border: 1px solid #ccc;
     border-radius: 10px;
     background-color: white;
+    font-family: 'Ubuntu', sans-serif;
 }
 
 .step .step-sup{
-    font-family: 'Ubuntu', sans-serif;
     margin-left: 20px;
+    display: flex;
 }
 
 .step .step-sup h1{
@@ -36,6 +39,83 @@
     font-size: 20px;
     margin: 0 0 10px 0;
     font-weight: normal;
+}
+
+.step .step-sup #btn-back{
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    color: #fa7e17;
+    font-size: 40px;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step label{
+    font-size: 12px;
+    margin: 50px 0 5px 20px;
+    font-weight: bold;
+}
+
+.step input{
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    font-size: 15px;
+    margin: 0 20px;
+}
+
+.step button{
+    margin: 20px 20px 0 20px;
+    padding: 1rem;
+    background-color: #fa7e17;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
+    cursor: pointer;
+    border-radius: 25px;
+}
+
+.step #link-terms{
+    font-size: 12px;
+    margin: 10px 20px;
+}
+
+.step #link-terms a{
+    text-decoration: none;
+    color: #fa7e17;
+}
+
+.step #link-terms a:hover{
+    text-decoration: underline;
+}
+
+.step .line{
+    height: 2px;
+    background-color: #ccc;
+    margin: 20px 20px 0 20px;
+}
+
+.step #link-login{
+    font-size: 15px;
+    margin: 20px;
+    text-align: center;
+}
+
+.step #link-login a{
+    text-decoration: none;
+    color: #fa7e17;
+}
+
+.step #link-login a:hover{
+    text-decoration: underline;
 }
 
 .slide-in {
@@ -52,29 +132,34 @@
 }
 
 .pass-wrapper {
-    position: relative;
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 20px;
+    width: 90%;
 }
 
 .pass-wrapper input {
-    width: 100%;
-    padding: 0.7rem;
-    padding-right: 2.5rem;
-    margin: 0.5rem 0;
-    font-size: 1rem;
+    width: 80%;
+    margin: 0;
+    padding: 1rem 0 1rem 0.5rem;
+    font-size: 15px;
+    border: none;
+    outline: none;
+}
+
+.step label:nth-of-type(2){
+    margin: 20px 0 5px 20px;
 }
 
 .toggle-pass {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
     cursor: pointer;
-    color: #666;
+    margin: 0;
+    padding: 0;
 }
 
 .password-checklist p {
-    margin: 0.2rem 0;
-    font-size: 0.9rem;
+    font-size: 15px;
     color: #999;
     transition: color 0.3s;
 }
@@ -82,24 +167,14 @@
 .password-checklist p.valid {
     color: green;
     font-weight: bold;
+    margin: 0.5rem 1.5rem;
 }
 
-.buttons {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: space-between;
-}
-
-button {
-    padding: 0.6rem 1.2rem;
-    background-color: #2b2bff;
-    border: none;
-    color: white;
+.password-checklist p.invalid {
+    margin: 0.5rem 2.5rem;
     font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
-button:hover {
-    opacity: 0.9;
+.step #last-btn{
+    margin-bottom: 30px;
 }

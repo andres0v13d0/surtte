@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -82,7 +82,16 @@ const Register = () => {
     e.preventDefault();
     try {
       const result = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      const token = await result.user.getIdToken();
+      
+      await updateProfile(result.user, {
+        displayName: `${formData.firstName} ${formData.lastName}`
+      });
+
+      await result.user.reload();
+      
+      const refreshedUser = auth.currentUser;
+      const token = await refreshedUser.getIdToken();
+
       await sendTokenToBackend(token);
     } catch (err) {
       console.error('Error al registrar:', err);
@@ -100,29 +109,43 @@ const Register = () => {
           {step === 1 && (
             <div className="step slide-in">
               <div className='step-sup'>
-                <h1>Paso 1 de 3</h1>
-                <h2>Ingresa tu correo</h2>
+                <div>
+                  <h1>Paso 1 de 3</h1>
+                  <h2>Ingresa tu correo</h2>
+                </div>
               </div>
+              <label htmlFor="email">Dirección de correo electrónico</label>
               <input
                 type="email"
                 name="email"
-                placeholder="Correo electrónico"
+                placeholder="nombre@dominio.com"
                 value={formData.email}
                 onChange={handleChange}
               />
               <button type="button" onClick={nextStep}>Siguiente</button>
+              <span id='link-terms'>Al continuar, aceptas los <a href="/">Términos y condiciones</a></span>
+              <div className='line'></div>
+              <span id='link-login'>¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></span>  
             </div>
           )}
 
           {step === 2 && (
             <div className="step slide-in">
-              <h2>Paso 2: Crea una contraseña</h2>
+              <div className='step-sup'>
+                <button id="btn-back" type="button" onClick={prevStep}>
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </button>
+                <div>
+                  <h1>Paso 2 de 3</h1>
+                  <h2>Crea una contraseña</h2>
+                </div>
+              </div>
 
+              <label htmlFor="password">Contraseña</label>
               <div className="pass-wrapper">
                 <input
                   type={showPass ? 'text' : 'password'}
                   name="password"
-                  placeholder="Contraseña"
                   value={formData.password}
                   onChange={handleChange}
                 />
@@ -131,11 +154,11 @@ const Register = () => {
                 </span>
               </div>
 
+              <label htmlFor="repeatPassword">Repetir contraseña</label>
               <div className="pass-wrapper">
                 <input
                   type={showRepeat ? 'text' : 'password'}
                   name="repeatPassword"
-                  placeholder="Repetir contraseña"
                   value={formData.repeatPassword}
                   onChange={handleChange}
                 />
@@ -145,29 +168,34 @@ const Register = () => {
               </div>
 
               <div className="password-checklist">
-                <p className={passwordValidation.hasLetter ? 'valid' : ''}>
-                  {passwordValidation.hasLetter ? '●' : '◯'} Al menos 1 letra
+                <p className={passwordValidation.hasLetter ? 'valid' : 'invalid'}>
+                  {passwordValidation.hasLetter ? ' ✔ ' : ''} Al menos 1 letra
                 </p>
-                <p className={passwordValidation.hasNumberOrSymbol ? 'valid' : ''}>
-                  {passwordValidation.hasNumberOrSymbol ? '●' : '◯'} Número o carácter especial
+                <p className={passwordValidation.hasNumberOrSymbol ? 'valid' : 'invalid'}>
+                  {passwordValidation.hasNumberOrSymbol ? ' ✔ ' : ''} Número o carácter especial
                 </p>
-                <p className={passwordValidation.hasMinLength ? 'valid' : ''}>
-                  {passwordValidation.hasMinLength ? '●' : '◯'} Mínimo 10 caracteres
+                <p className={passwordValidation.hasMinLength ? 'valid' : 'invalid'}>
+                  {passwordValidation.hasMinLength ? ' ✔ ' : ''} Mínimo 10 caracteres
                 </p>
               </div>
+              <button id="last-btn" type="button" onClick={nextStep}>Siguiente</button>
 
-              <div className="buttons">
-                <button type="button" onClick={prevStep}>
-                  <FontAwesomeIcon icon={faChevronLeft} /> Atrás
-                </button>
-                <button type="button" onClick={nextStep}>Siguiente</button>
-              </div>
             </div>
           )}
 
           {step === 3 && (
             <div className="step slide-in">
-              <h2>Paso 3: Información personal</h2>
+              <div className='step-sup'>
+                <button id="btn-back" type="button" onClick={prevStep}>
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </button>
+                <div>
+                  <h1>Paso 3 de 3</h1>
+                  <h2>Información personal</h2>
+                </div>
+              </div>
+
+              <label htmlFor="firstName">Nombre</label>
               <input
                 type="text"
                 name="firstName"
@@ -175,6 +203,8 @@ const Register = () => {
                 value={formData.firstName}
                 onChange={handleChange}
               />
+
+              <label htmlFor="lastName">Apellido</label>
               <input
                 type="text"
                 name="lastName"
@@ -182,12 +212,7 @@ const Register = () => {
                 value={formData.lastName}
                 onChange={handleChange}
               />
-              <div className="buttons">
-                <button type="button" onClick={prevStep}>
-                  <FontAwesomeIcon icon={faChevronLeft} /> Atrás
-                </button>
-                <button type="submit" onClick={handleSubmit}>Registrarme</button>
-              </div>
+              <button id="last-btn" type="submit" onClick={handleSubmit}>Registrarme</button>
             </div>
           )}
         </form>

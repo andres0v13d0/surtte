@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../config/firebase';
 import {
   signInWithPopup,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
 } from 'firebase/auth';
 import axios from 'axios';
 import './Login.css';
@@ -58,13 +58,14 @@ const Login = () => {
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, 'fakepassword123');
+      await signInWithEmailAndPassword(auth, email, '');
     } catch (err) {
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+      if (err.code === 'auth/user-not-found') {
         localStorage.setItem('registerEmail', email);
         navigate('/register');
-      } else if (err.code === 'auth/wrong-password') {
+      } else if (err.code === 'auth/missing-password' || err.code === 'auth/wrong-password') {
         setShowPasswordSection(true);
+        console.log(err.code);
       } else {
         alert('Error al verificar el correo');
         console.error('Firebase auth error:', err);
