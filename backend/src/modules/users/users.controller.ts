@@ -54,4 +54,14 @@ export class UsersController {
     async findAll(): Promise<User[]> {
         return this.usersService.findAll();
     }
+
+    @Post('check-email')
+    async checkIfUserExists(@Body('email') email: string): Promise<{ exists: boolean }> {
+        try {
+            await this.usersService.getUserByEmail(email);
+            return { exists: true };
+        } catch (err) {
+            return { exists: false };
+        }
+    }
 }
