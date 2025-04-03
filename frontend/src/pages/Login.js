@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../config/firebase';
 import {
   signInWithPopup,
@@ -32,7 +32,6 @@ const Login = () => {
       localStorage.setItem('usuario', JSON.stringify(userData));
       localStorage.setItem('token', token);
 
-      console.log('Usuario autenticado:', userData);
       navigate('/');
     } catch (error) {
       console.error('Error desde el backend:', error);
@@ -129,15 +128,19 @@ const Login = () => {
       )}
 
       {showPasswordSection && (
-        <div className="login-password">
-          <h2>Introduce tu contraseña</h2>
+        <div className="login-ps-cont">
+          <h2>Iniciar sesión</h2>
           <form onSubmit={loginWithEmail}>
             <input
               type="email"
               value={email}
               disabled
             />
-            <div className="pass-wrapper">
+            <Link onClick={() => {
+              setShowPasswordSection(false);
+              setPassword('');
+            }}> Cambiar correo</Link> 
+            <div className="pass-input-lg">
               <input
                 type={showPass ? 'text' : 'password'}
                 placeholder="Contraseña"

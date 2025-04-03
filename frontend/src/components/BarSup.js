@@ -4,16 +4,16 @@ import './BarSup.css';
 const BarSup = () => {
     return (
         <div className='bar-sup'>
-            <a href="/" id='link-sup'>Opcion ssss sss </a>
-            <a href="/" id='link-sup'>Opcion 2</a>
-            <a href="/" id='link-sup'>Opcion 3</a>
-            <a href="/" id='link-sup'>Opcion 4</a>
-            <a href="/" id='link-sup'>Opcion 5</a>
-            <a href="/" id='link-sup'>Opcion 6</a>
-            <a href="/" id='link-sup'>Opcion 7</a>
-            <a href="/" id='link-sup'>Opcion 8</a>
-            <a href="/" id='link-sup'>Opcion 9</a>
-            <a href="/" id='link-sup'>Opcion 10</a>
+            <a href="/" id='link-sup'>Todos</a>
+            <a href="/" id='link-sup'>Mujer</a>
+            <a href="/" id='link-sup'>Hombre</a>
+            <a href="/" id='link-sup'>Hogar</a>
+            <a href="/" id='link-sup'>Niños</a>
+            <a href="/" id='link-sup'>Deportes</a>
+            <a href="/" id='link-sup'>Tecnología</a>
+            <a href="/" id='link-sup'>Belleza</a>
+            <a href="/" id='link-sup'>Salud</a>
+            <a href="/" id='link-sup'>Accesorios</a>
         </div>
     );
 }

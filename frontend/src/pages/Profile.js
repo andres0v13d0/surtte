@@ -27,35 +27,64 @@ const Profile = () => {
                             ¡Bienvenido,<span className='user-name'>{usuario.nombre}</span>!
                         </div>
                         <div className='user-buttons'>
-                            <Link to="/profile" className='user-button mg'>
-                                <FontAwesomeIcon icon={faMessage} />
-                                    Mensajes
-                                <FontAwesomeIcon icon={faChevronRight} />
+                            <Link to="/profile" className="user-button mg">
+                                <span className="icon-left">
+                                    <FontAwesomeIcon icon={faMessage} />
+                                </span>
+                                <span className="text">Mensajes</span>
+                                <span className="icon-right">
+                                    <FontAwesomeIcon icon={faChevronRight} />
+                                </span>
                             </Link>
-                            <Link to="/profile" className='user-button'>
-                                <FontAwesomeIcon icon={faReceipt} />
-                                    Mis pedidos
-                                <FontAwesomeIcon icon={faChevronRight} />
+
+                            <Link to="/profile" className="user-button">
+                                <span className="icon-left">
+                                    <FontAwesomeIcon icon={faReceipt} />
+                                </span>
+                                <span className="text">Mis pedidos</span>
+                                <span className="icon-right">
+                                    <FontAwesomeIcon icon={faChevronRight} />
+                                </span>
                             </Link>
-                            <Link to="/profile" className='user-button'>
-                                <FontAwesomeIcon icon={faStar} />
-                                    Favoritos
-                                <FontAwesomeIcon icon={faChevronRight} />
+
+                            <Link to="/profile" className="user-button">
+                                <span className="icon-left">
+                                    <FontAwesomeIcon icon={faStar} />
+                                </span>
+                                <span className="text">Favoritos</span>
+                                <span className="icon-right">
+                                    <FontAwesomeIcon icon={faChevronRight} />
+                                </span>
                             </Link>
-                            <Link to="/profile" className='user-button'>
-                                <FontAwesomeIcon icon={faGear} />
-                                    Configuración
-                                <FontAwesomeIcon icon={faChevronRight} />
+
+                            <Link to="/profile" className="user-button">
+                                <span className="icon-left">
+                                    <FontAwesomeIcon icon={faGear} />
+                                </span>
+                                <span className="text">Configuración</span>
+                                <span className="icon-right">
+                                    <FontAwesomeIcon icon={faChevronRight} />
+                                </span>
                             </Link>
-                            <Link to="/profile" className='user-button'>
-                                <FontAwesomeIcon icon={faHeadset} />
-                                    Atención al cliente
-                                <FontAwesomeIcon icon={faChevronRight} />
+
+                            <Link to="/profile" className="user-button">
+                                <span className="icon-left">
+                                    <FontAwesomeIcon icon={faHeadset} />
+                                </span>
+                                <span className="text">Atención al cliente</span>
+                                <span className="icon-right">
+                                    <FontAwesomeIcon icon={faChevronRight} />
+                                </span>
                             </Link>
-                            <Link to="/logout" className='user-button logout'>
-                                <FontAwesomeIcon icon={faRightFromBracket} />
-                                    Cerrar sesión
-                                <FontAwesomeIcon icon={faChevronRight} />
+
+                            <Link to="/logout" className="user-button logout">
+                                <span className="icon-left">
+                                    <FontAwesomeIcon icon={faRightFromBracket} />
+                                </span>
+                                <span className="text">Cerrar sesión</span>
+                                <span className="icon-right">
+                                    <FontAwesomeIcon icon={faChevronRight} />
+                                </span>
                             </Link>
                         </div>
                     </div>

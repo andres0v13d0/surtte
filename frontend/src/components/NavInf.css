@@ -10,7 +10,7 @@
     align-items: center;
     padding: 10px 0;
     z-index: 1000;
-    height: 50px;
+    height: 40px;
 }
 
 .navInf ul {
@@ -31,11 +31,10 @@
     align-items: center;
     text-decoration: none;
     color: white;
-    font-size: 16px;
     padding: 5px 10px;
     transition: background-color 0.3s;
     font-family: 'Ubuntu', sans-serif;
-    font-size: 15px;
+    font-size: 12px;
 }
 
 .navInf a:hover {
@@ -44,7 +43,7 @@
 }
 
 .navInf a span {
-    font-size: 25px;
+    font-size: 20px;
     margin-top: 5px;
 }
 

@@ -137,10 +137,11 @@
     border-radius: 5px;
     margin: 0 20px;
     width: 90%;
+    align-items: center;
 }
 
 .pass-wrapper input {
-    width: 80%;
+    width: 90%;
     margin: 0;
     padding: 1rem 0 1rem 0.5rem;
     font-size: 15px;
