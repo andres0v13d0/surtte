@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Profile.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMessage, faReceipt, faStar, faGear, faHeadset, faRightFromBracket, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingBasket, faReceipt, faStar, faGear, faHeadset, faRightFromBracket, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import NavInf from '../components/NavInf';
@@ -24,14 +24,16 @@ const Profile = () => {
                 {usuario ? (
                     <div className='user-container'>
                         <div className='user-info'>
-                            ¡Bienvenido,<span className='user-name'>{usuario.nombre}</span>!
+                            ¡Bienvenido,<span className='user-name'>
+                                {usuario.nombre.split(' ')[0].slice(0, 15)}
+                                </span>!
                         </div>
                         <div className='user-buttons'>
                             <Link to="/profile" className="user-button mg">
                                 <span className="icon-left">
-                                    <FontAwesomeIcon icon={faMessage} />
+                                    <FontAwesomeIcon icon={faShoppingBasket} />
                                 </span>
-                                <span className="text">Mensajes</span>
+                                <span className="text">Mis productos</span>
                                 <span className="icon-right">
                                     <FontAwesomeIcon icon={faChevronRight} />
                                 </span>

@@ -96,3 +96,7 @@
 .user-button:hover svg {
   color: white;
 }
+
+.user-button.mg{
+  margin-bottom: 1rem;
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './NavInf.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHouse, faList, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faList, faUser, faComments } from '@fortawesome/free-solid-svg-icons';
 
 const NavInf = ({ selected }) => {
     return (
@@ -30,6 +30,14 @@ const NavInf = ({ selected }) => {
                             <FontAwesomeIcon icon={faUser} />
                         </span>
                         Perfil
+                    </Link>
+                </li>
+                <li>
+                    <Link to="/messages" className={selected === 'messages' ? 'selected' : ''}>
+                        <span className='navInf-icon'>
+                            <FontAwesomeIcon icon={faComments} />
+                        </span>
+                        Mensajes
                     </Link>
                 </li>
             </ul>

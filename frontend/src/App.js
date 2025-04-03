@@ -5,6 +5,8 @@ import Login from './pages/Login'
 import Home from './pages/Home';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import Categories from './pages/Categories';
+import Chat from './pages/Chat';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Route path="/logout" element={<Logout   />} />
         <Route path="/register" element={<Register   />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/messages" element={<Chat />} />
       </Routes>
     </Router>
   );
