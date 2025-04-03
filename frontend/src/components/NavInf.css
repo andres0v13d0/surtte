@@ -1,0 +1,53 @@
+.navInf {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #001634; 
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    z-index: 1000;
+    height: 50px;
+}
+
+.navInf ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 50px;
+}
+
+.navInf li {
+    display: inline-block;
+}
+
+.navInf a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    padding: 5px 10px;
+    transition: background-color 0.3s;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 15px;
+}
+
+.navInf a:hover {
+    background-color: transparent; 
+    color: #fa7e17;
+}
+
+.navInf a span {
+    font-size: 25px;
+    margin-top: 5px;
+}
+
+.navInf a.selected {
+    color: #fa7e17;
+}

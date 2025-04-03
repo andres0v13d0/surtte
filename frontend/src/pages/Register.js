@@ -89,8 +89,7 @@ const Register = () => {
 
       await result.user.reload();
       
-      const refreshedUser = auth.currentUser;
-      const token = await refreshedUser.getIdToken();
+      const token = await result.user.getIdToken(true);
 
       await sendTokenToBackend(token);
     } catch (err) {

@@ -58,18 +58,17 @@ const Login = () => {
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, '');
-    } catch (err) {
-      if (err.code === 'auth/user-not-found') {
+      const { data } = await axios.post('https://api.surtte.com/users/check-email', { email });
+  
+      if (data.exists) {
+        setShowPasswordSection(true);
+      } else {
         localStorage.setItem('registerEmail', email);
         navigate('/register');
-      } else if (err.code === 'auth/missing-password' || err.code === 'auth/wrong-password') {
-        setShowPasswordSection(true);
-        console.log(err.code);
-      } else {
-        alert('Error al verificar el correo');
-        console.error('Firebase auth error:', err);
       }
+    } catch (err) {
+      console.error('Error al verificar el correo en el backend:', err);
+      alert('No se pudo verificar el correo. Intenta más tarde.');
     }
   };
 
