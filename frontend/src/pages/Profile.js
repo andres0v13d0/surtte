@@ -29,7 +29,7 @@ const Profile = () => {
                                 </span>!
                         </div>
                         <div className='user-buttons'>
-                            <Link to="/profile" className="user-button mg">
+                            <Link to="/my-products" className="user-button mg">
                                 <span className="icon-left">
                                     <FontAwesomeIcon icon={faShoppingBasket} />
                                 </span>

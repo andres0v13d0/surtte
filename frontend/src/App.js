@@ -7,6 +7,8 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Categories from './pages/Categories';
 import Chat from './pages/Chat';
+import MyProducts from './pages/MyProducts';
+import AddProduct from './pages/AddProduct';
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/messages" element={<Chat />} />
+        <Route path="/my-products" element={<MyProducts />} />
+        <Route path="/add-product" element={<AddProduct />} />
       </Routes>
     </Router>
   );
