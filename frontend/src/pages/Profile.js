@@ -23,27 +23,39 @@ const Profile = () => {
             <div className='profile-container'>   
                 {usuario ? (
                     <div className='user-container'>
-                        ¡Bienvenido , <span className='user-name'>{usuario.nombre}</span>!
+                        <div className='user-info'>
+                            ¡Bienvenido,<span className='user-name'>{usuario.nombre}</span>!
+                        </div>
                         <div className='user-buttons'>
-                            <Link to="/profile" className='user-button'>
+                            <Link to="/profile" className='user-button mg'>
                                 <FontAwesomeIcon icon={faMessage} />
                                     Mensajes
-                                <FontAwesomeIcon icon={faChevronRight} id='' />
+                                <FontAwesomeIcon icon={faChevronRight} />
                             </Link>
                             <Link to="/profile" className='user-button'>
-                                <FontAwesomeIcon icon={faReceipt} /> Mis pedidos
+                                <FontAwesomeIcon icon={faReceipt} />
+                                    Mis pedidos
+                                <FontAwesomeIcon icon={faChevronRight} />
                             </Link>
                             <Link to="/profile" className='user-button'>
-                                <FontAwesomeIcon icon={faStar} /> Favoritos
+                                <FontAwesomeIcon icon={faStar} />
+                                    Favoritos
+                                <FontAwesomeIcon icon={faChevronRight} />
                             </Link>
                             <Link to="/profile" className='user-button'>
-                                <FontAwesomeIcon icon={faGear} /> Configuración
+                                <FontAwesomeIcon icon={faGear} />
+                                    Configuración
+                                <FontAwesomeIcon icon={faChevronRight} />
                             </Link>
                             <Link to="/profile" className='user-button'>
-                                <FontAwesomeIcon icon={faHeadset} /> Atención al cliente
+                                <FontAwesomeIcon icon={faHeadset} />
+                                    Atención al cliente
+                                <FontAwesomeIcon icon={faChevronRight} />
                             </Link>
-                            <Link to="/logout" className='user-button'>
-                                <FontAwesomeIcon icon={faRightFromBracket} /> Cerrar sesión
+                            <Link to="/logout" className='user-button logout'>
+                                <FontAwesomeIcon icon={faRightFromBracket} />
+                                    Cerrar sesión
+                                <FontAwesomeIcon icon={faChevronRight} />
                             </Link>
                         </div>
                     </div>

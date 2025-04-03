@@ -1,5 +1,6 @@
 .profile-container{
     font-family: 'Ubuntu', sans-serif;
+    background-color: #f5f5f5;
 }
 
 .no-user-container{
@@ -7,6 +8,7 @@
     justify-content: center;
     flex-direction: column;
     padding: 2rem;
+    background-color: white;
 }
 
 .no-user-container h2{
@@ -30,11 +32,61 @@
 }
 
 .user-container{
-    padding: 2rem;
     font-size: 25px;
+}
+
+.user-container .user-info{
+    background-color: white;
+    width: 100vw;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .user-container .user-name{
     font-weight: bold;
     color: #fa7e17;
+    margin-left: 0.5rem;
+}
+
+.user-buttons{
+    display: flex;
+    margin-top: 1rem;
+    flex-direction: column;
+}
+
+.user-buttons .user-button{
+    text-decoration: none;
+    background-color: white;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    color: black;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    gap: 1rem;
+}
+
+.user-button svg:last-of-type{
+    margin-left: auto;
+}
+
+.user-buttons .user-button.mg{
+    margin-bottom: 1rem;
+}
+
+.user-buttons .user-button.logout{
+    margin: 1rem 0;
+    background-color: red;
+    color: white;
+}
+
+.user-buttons .user-button:hover{
+    background-color: #fa7e17;
+    color: white;
+}
+.user-buttons .user-button:hover svg{
+    color: white;
 }
