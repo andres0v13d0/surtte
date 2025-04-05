@@ -1,0 +1,140 @@
+.add-product-container {
+    display: flex;
+    flex-direction: column;
+    padding: 0 1rem;
+    background-color: #f5f5f5;
+    min-height: 75vh;
+    font-family: 'Ubuntu', sans-serif;
+  }
+  
+  .add-title {
+    font-size: 22px;
+    margin: 1rem 0;
+    font-family: 'Ubuntu', sans-serif;
+  }
+  
+  .step-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .step {
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.3s ease forwards;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: white;
+  }
+  
+  .step-sup {
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .step-sup h1 {
+    font-size: 15px;
+    margin: 10px 0;
+    font-weight: normal;
+    color: gray;
+  }
+  
+  .step-sup h2 {
+    font-size: 20px;
+    margin: 0 0 10px 0;
+    font-weight: normal;
+  }
+  
+  #btn-back {
+    background-color: transparent;
+    border: none;
+    color: #fa7e17;
+    font-size: 40px;
+    cursor: pointer;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .step label {
+    font-size: 13px;
+    margin: 30px 0 5px 20px;
+    font-weight: bold;
+  }
+  
+  .step input,
+  .step textarea {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 20px 1rem 20px;
+    font-size: 15px;
+  }
+  
+  .step textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .step button {
+    margin: 20px 20px 30px 20px;
+    padding: 1rem;
+    background-color: #fa7e17;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  
+  .image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin: 10px 20px;
+  }
+  
+  .preview-box {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .preview-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .price-list {
+    margin: 0 20px;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .price-list li {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .slide-in {
+    opacity: 0;
+    transform: translateX(100%);
+    animation: slideIn 0.3s forwards;
+  }
+  
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  

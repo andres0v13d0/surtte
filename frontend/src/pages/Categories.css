@@ -1,0 +1,85 @@
+.categories-container {
+    display: flex;
+    background-color: #f5f5f5;
+    font-family: 'Ubuntu', sans-serif;
+    height: auto;
+  }
+  
+  .sidebar {
+    width: 20%;
+    padding: 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .sidebar h3 {
+    font-size: 18px;
+    color: #fa7e17;
+    margin-bottom: 1rem;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar ul li {
+    padding: 0.5rem 0;
+    font-size: 15px;
+    color: #333;
+  }
+  
+  .categories-main {
+    flex: 1;
+    padding: 1rem;
+  }
+  
+  .main-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+  }
+  
+  .category-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .category-item {
+    width: 100px;
+    text-align: center;
+    font-size: 13px;
+    color: #333;
+    position: relative;
+  }
+  
+  .circle-image {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 0.5rem;
+    position: relative;
+    border: 1px solid #ccc;
+  }
+  
+  .circle-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .hot-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #fa7e17;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-weight: bold;
+  }
+  
