@@ -30,7 +30,7 @@ const Categories = () => {
                 <aside className="sidebar">
                     <h3>Destacado</h3>
                     <ul>
-                        <li>Hogar y cocina</li>
+                        <li>Hogar</li>
                         <li>Ropa de mujer</li>
                         <li>Mujer curvy</li>
                         <li>Calzado de mujer</li>
