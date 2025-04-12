@@ -31,6 +31,7 @@ const AddProduct = () => {
         if (!isNaN(numericPrice)) {
             const updatedPrices = [...prices, numericPrice].sort((a, b) => b - a);
             setPrices(updatedPrices);
+            console.log(direction);
         }
     };
 
