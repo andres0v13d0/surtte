@@ -16,8 +16,8 @@ const AddProduct = () => {
 
     const handleImageUpload = (event) => {
         const files = Array.from(event.target.files);
-        if (files.length + images.length > 5) {
-            alert('Puedes subir hasta 5 imágenes máximo.');
+        if (files.length + images.length > 6) {
+            alert('Puedes subir hasta 6 imágenes máximo.');
             return;
         }
 
@@ -56,29 +56,42 @@ const AddProduct = () => {
                             </div>
                             <div className="image-preview-container">
                                 {previews.map((src, index) => (
-                                    <div key={index} className="preview-box">
-                                        <img src={src} alt={`preview-${index}`} />
-                                    </div>
+                                    <>
+                                        <div key={index} className="preview-box">
+                                            <img src={src} alt={`preview-${index}`} />
+                                        </div>
+                                    </>
                                 ))}
 
-                                {images.length < 5 && (
-                                    <div className="preview-box" onClick={() => document.getElementById('hidden-file-input').click()}>
-                                        <span className="add-image">
-                                            <FontAwesomeIcon icon={faPlus} />
-                                        </span>
-                                        <input
-                                            id="hidden-file-input"
-                                            type="file"
-                                            accept="image/png, image/jpeg"
-                                            multiple
-                                            onChange={handleImageUpload}
-                                            style={{ display: 'none' }}
-                                        />
-                                    </div>
+                                {images.length < 6 && (
+                                    <>
+                                        <div className="preview-box" onClick={() => document.getElementById('hidden-file-input').click()}>
+                                            <span className="add-image">
+                                                <FontAwesomeIcon icon={faPlus} />
+                                            </span>
+                                            <input
+                                                id="hidden-file-input"
+                                                type="file"
+                                                accept="image/png, image/jpeg"
+                                                multiple
+                                                onChange={handleImageUpload}
+                                                style={{ display: 'none' }}
+                                            />
+                                        </div>
+                                        <div className="preview-box empty">
+                                            
+                                        </div>
+                                    </>                                    
                                 )}
 
                             </div>
-                            <button type="button" onClick={() => goToStep(1)}>Siguiente</button>
+                            <button
+                                type="button"
+                                className={images.length % 2 !== 0 ? 'number-image' : ''}
+                                onClick={() => goToStep(1)}
+                            >
+                                Siguiente
+                            </button>
                         </div>
                     )}
 

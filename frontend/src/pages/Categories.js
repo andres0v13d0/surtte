@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
 import NavInf from '../components/NavInf';
 import Footer from '../components/Footer';
@@ -22,23 +22,46 @@ const categories = [
     "Calzado deportivo para mujer"
 ];
 
+const sidebarItems = [
+    "Destacado",
+    "Hogar",
+    "Ropa de mujer",
+    "Mujer curvy",
+    "Calzado de mujer",
+    "Lencería y pijamas",
+    "Ropa de hombre",
+    "Calzado de hombre",
+    "Deporte y aire libre",
+    "Joyería y accesorios",
+    "Joyería y accesorios",
+    "Joyería y accesorios",
+    "Joyería y accesorios",
+    "Joyería y accesorios",
+    "Joyería y accesorios",
+    "Joyería y accesorios",
+    "Joyería y accesorios",
+    "Joyería y accesorios",
+    "Joyería y accesorios"
+];
+
 const Categories = () => {
+    const [selected, setSelected] = useState("Destacado");
+
     return (
         <>
             <Header />
             <div className="categories-container">
                 <aside className="sidebar">
-                    <h3>Destacado</h3>
                     <ul>
-                        <li>Hogar</li>
-                        <li>Ropa de mujer</li>
-                        <li>Mujer curvy</li>
-                        <li>Calzado de mujer</li>
-                        <li>Lencería y pijamas</li>
-                        <li>Ropa de hombre</li>
-                        <li>Calzado de hombre</li>
-                        <li>Deporte y aire libre</li>
-                        <li>Joyería y accesorios</li>
+                        {sidebarItems.map((item, i) => (
+                            <li
+                                key={i}
+                                id={selected === item ? 'selected-cat' : undefined}
+                                onClick={() => setSelected(item)}
+                            >
+                                {item}
+                            </li>
+                        ))}
                     </ul>
                 </aside>
                 <section className="categories-main">

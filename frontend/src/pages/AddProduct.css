@@ -88,23 +88,32 @@
     font-size: 15px;
     cursor: pointer;
   }
+
+  .step button.number-image{
+    margin-top: -160px;
+  }
   
   .image-preview-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 25px;
+    gap: 30px;
     margin: 10px 20px;
+    justify-content: space-around;
   }
   
   .preview-box {
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid #ccc;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .preview-box.empty{
+    border: none;
   }
   
   .preview-box img {
