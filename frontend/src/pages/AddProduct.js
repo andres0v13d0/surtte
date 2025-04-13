@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faPlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import './AddProduct.css';
 
 const AddProduct = () => {
@@ -13,6 +13,17 @@ const AddProduct = () => {
     const [prices, setPrices] = useState([]);
     const [step, setStep] = useState(0);
     const [direction, setDirection] = useState('right');
+    const [priceBlocks, setPriceBlocks] = useState([{ id: Date.now() }]);
+
+    const handleAddPriceBlock = () => {
+        if (priceBlocks.length < 3) {
+            setPriceBlocks([...priceBlocks, { id: Date.now() + Math.random() }]);
+        }
+    };
+    
+    const handleRemovePriceBlock = (id) => {
+        setPriceBlocks(priceBlocks.filter(block => block.id !== id));
+    };
 
     const handleImageUpload = (event) => {
         const files = Array.from(event.target.files);
@@ -59,6 +70,10 @@ const AddProduct = () => {
                                     <>
                                         <div key={index} className="preview-box">
                                             <img src={src} alt={`preview-${index}`} />
+                                            <FontAwesomeIcon icon={faCircleXmark} className="delete-icon" onClick={() => {
+                                                setPreviews(previews.filter((_, i) => i !== index));
+                                                setImages(images.filter((_, i) => i !== index));
+                                            }} />
                                         </div>
                                     </>
                                 ))}
@@ -106,18 +121,27 @@ const AddProduct = () => {
                                     <h2>Información del producto</h2>
                                 </div>
                             </div>
-                            <label>Nombre del producto (máx 20 palabras)</label>
+                            <label>Nombre del producto</label>
                             <input
                                 type="text"
                                 value={productName}
-                                maxLength={100}
+                                maxLength={50}
                                 onChange={(e) => setProductName(e.target.value)}
+                                placeholder="Ej: Vestido floral de verano para mujer"
                             />
+                            <p className="input-length">
+                                <b>Caracteres:</b> {productName.length} / 50
+                            </p>
                             <label>Descripción</label>
                             <textarea
                                 value={description}
-                                onChange={(e) => setDescription(e.target.value)}
+                                onChange={(e) =>    setDescription(e.target.value)}
+                                maxLength={200}
+                                placeholder="Ej: Vestido casual con estampado floral, ideal para días soleados. Tela ligera y fresca. Disponible en varias tallas y colores."
                             />
+                            <p className="input-length">
+                                <b>Caracteres:</b> {description.length} / 200
+                            </p>
                             <button type="button" onClick={() => goToStep(2)}>Siguiente</button>
                         </div>
                     )}
@@ -133,22 +157,57 @@ const AddProduct = () => {
                                     <h2>Precios del producto</h2>
                                 </div>
                             </div>
-                            <label>Agregar precio</label>
-                            <input
-                                type="number"
-                                placeholder="Agrega un precio"
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        handleAddPrice(e.target.value);
-                                        e.target.value = '';
-                                    }
-                                }}
-                            />
-                            <ul className="price-list">
-                                {prices.map((price, index) => (
-                                    <li key={index}>${price.toFixed(2)}</li>
-                                ))}
-                            </ul>
+                            {priceBlocks.map((block, index) => (
+                                <div key={block.id}>
+                                    <fieldset className="price-fieldset">
+                                    <label>Cantidad</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Ej: 9 o más unidades, 1 a 3 docenas"
+                                        onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            handleAddPrice(e.target.value);
+                                            e.target.value = '';
+                                        }
+                                        }}
+                                    />
+                                    <label>Precio</label>
+                                    <div className="price-input">
+                                        <span className="currency-symbol">COP</span>
+                                        <input
+                                        type="number"
+                                        placeholder="Ej: 50.000"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                            handleAddPrice(e.target.value);
+                                            e.target.value = '';
+                                            }
+                                        }}
+                                        />
+                                    </div>
+                                    </fieldset>
+
+                                    {priceBlocks.length > 1 && (
+                                    <button
+                                        type="button"
+                                        className="add-price delete"
+                                        onClick={() => handleRemovePriceBlock(block.id)}
+                                    >
+                                        Eliminar
+                                    </button>
+                                    )}
+                                </div>
+                            ))}
+
+                            {priceBlocks.length < 3 && (
+                                <button
+                                    type="button"
+                                    className="add-price"
+                                    onClick={handleAddPriceBlock}
+                                >
+                                    Agregar precio
+                                </button>
+                            )}
                             <button type="submit">Guardar producto</button>
                         </div>
                     )}
