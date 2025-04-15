@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import './Profile.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBasket, faReceipt, faStar, faGear, faHeadset, faRightFromBracket, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import NavInf from '../components/NavInf';
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
+import NavInf from '../../components/NavInf/NavInf';
 import { Link } from 'react-router-dom';
 
 const Profile = () => {

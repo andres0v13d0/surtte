@@ -1,14 +1,14 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Logout from './pages/Logout';
-import Login from './pages/Login'
-import Home from './pages/Home';
-import Register from './pages/Register';
-import Profile from './pages/Profile';
-import Categories from './pages/Categories';
-import Chat from './pages/Chat';
-import MyProducts from './pages/MyProducts';
-import AddProduct from './pages/AddProduct';
+import Logout from './pages/Logout/Logout';
+import Login from './pages/Login/Login'
+import Home from './pages/Home/Home';
+import Register from './pages/Register/Register';
+import Profile from './pages/Profile/Profile';
+import Categories from './pages/Categories/Categories';
+import Chat from './pages/Chat/Chat';
+import MyProducts from './pages/MyProducts/MyProducts';
+import AddProduct from './pages/AddProduct/AddProduct';
 
 function App() {
   return (

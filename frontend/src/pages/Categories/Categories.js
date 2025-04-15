@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Header from '../components/Header';
-import NavInf from '../components/NavInf';
-import Footer from '../components/Footer';
+import Header from '../../components/Header/Header';
+import NavInf from '../../components/NavInf/NavInf';
+import Footer from '../../components/Footer/Footer';
 import './Categories.css';
 
 const categories = [

@@ -1,8 +1,8 @@
 import React from 'react';
 import './Header.css';
-import Cart from './Cart';
-import Search from './Search';
-import BarSup from './BarSup'; 
+import Cart from '../Cart/Cart';
+import Search from '../Search/Search';
+import BarSup from '../BarSup/BarSup'; 
 
 const Header = ({ minimal = false }) => {
 

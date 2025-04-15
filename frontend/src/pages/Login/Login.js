@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { auth, googleProvider } from '../config/firebase';
+import { auth, googleProvider } from '../../config/firebase';
 import {
   signInWithPopup,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import axios from 'axios';
 import './Login.css';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
-import BrandLogo from '../components/BrandLogo';
+import Footer from '../../components/Footer/Footer';
+import Header from '../../components/Header/Header';
+import BrandLogo from '../../components/BrandLogo/BrandLogo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 

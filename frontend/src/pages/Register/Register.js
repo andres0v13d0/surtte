@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth } from '../../config/firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import './Register.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
 
 const Register = () => {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
-import Footer from '../components/Footer';
-import Header from '../components/Header';
-import NavInf from '../components/NavInf';
-import Product from '../components/Product';
+import Footer from '../../components/Footer/Footer';
+import Header from '../../components/Header/Header';
+import NavInf from '../../components/NavInf/NavInf';
+import Product from '../../components/Product/Product';
 import './MyProducts.css';
 import { useNavigate } from 'react-router-dom';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';

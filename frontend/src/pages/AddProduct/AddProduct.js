@@ -1,9 +1,63 @@
 import React, { useState } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Select from 'react-select';
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faPlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import './AddProduct.css';
+
+const categorias = [
+    {
+      label: 'Vestidos',
+      options: [
+        { value: 'Casual', label: 'Casual' },
+        { value: 'De noche', label: 'De noche' },
+        { value: 'De playa', label: 'De playa' },
+        { value: 'De oficina', label: 'De oficina' },
+        { value: 'De fiesta', label: 'De fiesta' }
+      ]
+    },
+    {
+      label: 'Camisas',
+      options: [
+        { value: 'Manga corta', label: 'Manga corta' },
+        { value: 'Manga larga', label: 'Manga larga' },
+        { value: 'Casual', label: 'Casual' },
+        { value: 'De oficina', label: 'De oficina' },
+        { value: 'De deporte', label: 'De deporte' }
+      ]
+    },
+    {
+      label: 'Pantalones',
+      options: [
+        { value: 'Jeans', label: 'Jeans' },
+        { value: 'De vestir', label: 'De vestir' },
+        { value: 'Cortos', label: 'Cortos' },
+        { value: 'Cargo', label: 'Cargo' },
+        { value: 'Joggers', label: 'Joggers' }
+      ]
+    },
+    {
+      label: 'Zapatos',
+      options: [
+        { value: 'Deportivos', label: 'Deportivos' },
+        { value: 'Formales', label: 'Formales' },
+        { value: 'Casuales', label: 'Casuales' },
+        { value: 'Botas', label: 'Botas' },
+        { value: 'Sandalias', label: 'Sandalias' }
+      ]
+    },
+    {
+      label: 'Accesorios',
+      options: [
+        { value: 'Collares', label: 'Collares' },
+        { value: 'Pulseras', label: 'Pulseras' },
+        { value: 'Sombreros', label: 'Sombreros' },
+        { value: 'Cinturones', label: 'Cinturones' },
+        { value: 'Aretes', label: 'Aretes' }
+      ]
+    }
+];
 
 const AddProduct = () => {
     const [images, setImages] = useState([]);
@@ -14,6 +68,12 @@ const AddProduct = () => {
     const [step, setStep] = useState(0);
     const [direction, setDirection] = useState('right');
     const [priceBlocks, setPriceBlocks] = useState([{ id: Date.now() }]);
+    const [categoria, setCategoria] = useState(null);
+    const [subcategoria, setSubcategoria] = useState(null);
+  
+    const subcategorias = categoria
+      ? categorias.find(c => c.label === categoria.label)?.options || []
+      : [];
 
     const handleAddPriceBlock = () => {
         if (priceBlocks.length < 3) {
@@ -142,6 +202,31 @@ const AddProduct = () => {
                             <p className="input-length">
                                 <b>Caracteres:</b> {description.length} / 200
                             </p>
+                            <div className='category-container'>
+                                <label>Categoría</label>
+                                <Select
+                                    classNamePrefix="mi"
+                                    options={categorias.map(cat => ({ value: cat.label, label: cat.label }))}
+                                    placeholder="Seleccionar categoría..."
+                                    value={categoria}
+                                    onChange={(selected) => {
+                                        setCategoria(selected);
+                                        setSubcategoria(null);
+                                        }}
+                                    isClearable
+                                />
+
+                                <label>Subcategoría</label>
+                                <Select
+                                    classNamePrefix="mi"   
+                                    options={subcategorias}
+                                    placeholder="Seleccionar subcategoría..."
+                                    value={subcategoria}
+                                    onChange={setSubcategoria}
+                                    isDisabled={!categoria}
+                                    isClearable
+                                />
+                            </div>
                             <button type="button" onClick={() => goToStep(2)}>Siguiente</button>
                         </div>
                     )}

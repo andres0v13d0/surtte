@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import NavInf from '../components/NavInf';
-import Footer from '../components/Footer';
-import './Chat.css'; // <--- Estilos separados
+import Header from '../../components/Header/Header';
+import NavInf from '../../components/NavInf/NavInf';
+import Footer from '../../components/Footer/Footer';
+import './Chat.css'; 
 
 const Chat = () => {
     const [chats, setChats] = useState([]);
