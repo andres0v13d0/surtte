@@ -5,6 +5,7 @@ import { slugify } from 'transliteration';
 import { SubCategory } from '../entities/sub-category.entity';
 import { Category } from '../entities/category.entity';
 import { CreateSubCategoryDto } from '../dtos/create-sub-category.dto';
+import { Product, ProductStatus } from 'src/modules/products/entities/product.entity';
 
 @Injectable()
 export class SubCategoriesService {
@@ -14,6 +15,9 @@ export class SubCategoriesService {
 
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
+
+    @InjectRepository(Product)
+    private readonly productRepo: Repository<Product>,
   ) {}
 
   async create(dto: CreateSubCategoryDto): Promise<SubCategory> {
@@ -105,12 +109,32 @@ export class SubCategoriesService {
 
   async remove(id: string): Promise<void> {
     const subCategory = await this.subCategoryRepo.findOne({ where: { id } });
-  
+
     if (!subCategory) {
       throw new NotFoundException('Subcategoría no encontrada.');
     }
-  
+
     await this.subCategoryRepo.remove(subCategory);
   }
-  
+
+  async getSubCategoriesWithImage() {
+    const subCategories = await this.subCategoryRepo.find({ relations: ['category'] });
+
+    const result = await Promise.all(subCategories.map(async (sub) => {
+      const product = await this.productRepo.findOne({
+        where: { subCategory: { id: sub.id }, status: ProductStatus.ACTIVE },
+        relations: ['images'],
+        order: { createdAt: 'DESC' },
+      });
+
+      return {
+        id: sub.id,
+        name: sub.name,
+        slug: sub.slug,
+        imageUrl: product?.images?.[0]?.imageUrl || '/camiseta.avif',
+      };
+    }));
+
+    return result;
+  }
 }

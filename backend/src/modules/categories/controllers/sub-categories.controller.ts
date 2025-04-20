@@ -47,4 +47,9 @@ export class SubCategoriesController {
     remove(@Param('id', ParseUUIDPipe) id: string) {
         return this.subCategoriesService.remove(id);
     }
+
+    @Get('/with-image')
+    getAllWithImage() {
+        return this.subCategoriesService.getSubCategoriesWithImage();
+    }
 }
