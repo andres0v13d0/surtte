@@ -6,22 +6,36 @@ import Footer from '../../components/Footer/Footer';
 import NavInf from '../../components/NavInf/NavInf';
 
 const CategoryPage = () => {
-  const { id } = useParams();
   const [products, setProducts] = useState([]);
+  const { categoryId, subCategoryId } = useParams();
 
   useEffect(() => {
     const fetchProducts = async () => {
+      if (!categoryId && !subCategoryId) return;
+      const params = new URLSearchParams();
+  
+      if (subCategoryId) {
+        params.append('subCategoryId', subCategoryId);
+      }
+  
+      if (categoryId) {
+        params.append('categoryId', categoryId);
+      }
+  
+      const url = `https://api.surtte.com/products/filter?${params.toString()}`;
+  
       try {
-        const res = await fetch(`https://api.surtte.com/products/filter?categoryId=dummy&subCategoryId=${id}`);
+        const res = await fetch(url);
         const data = await res.json();
         setProducts(data);
       } catch (err) {
-        console.error('Error al cargar productos:', err);
+        console.error('Error cargando productos', err);
       }
     };
-
+  
     fetchProducts();
-  }, [id]);
+  }, [categoryId, subCategoryId]);
+  
 
   return (
     <>
