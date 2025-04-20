@@ -8,6 +8,7 @@ import { UsersModule } from './modules/users/users.module';
 import { ProvidersModule } from './modules/providers/providers.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProductsModule } from './modules/products/products.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 async function getDatabaseSecrets() {
   const client = new SecretsManagerClient({ region: 'us-east-2' });
@@ -58,6 +59,7 @@ async function getDatabaseSecrets() {
     ProvidersModule,
     AuthModule,
     ProductsModule,
+    CategoriesModule,
   ],
 })
 export class AppModule {}
