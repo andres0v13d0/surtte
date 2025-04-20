@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsUUID, IsInt, Min, IsDecimal } from 'class-validator';
+import { IsNotEmpty, IsUUID, IsString, MaxLength, IsDecimal } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateProductPriceDto {
@@ -7,10 +7,10 @@ export class CreateProductPriceDto {
   productId: string;
 
   @IsNotEmpty()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  minQuantity: number;
+  @IsString()
+  @MaxLength(100)
+  minQuantity: string;
+
 
   @IsNotEmpty()
   @Type(() => Number)

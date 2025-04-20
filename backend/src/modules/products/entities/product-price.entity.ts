@@ -15,8 +15,8 @@ import {
     @ManyToOne(() => Product, { nullable: false, onDelete: 'CASCADE' })
     product: Product;
   
-    @Column({ type: 'int' })
-    minQuantity: number;
+    @Column({ type: 'varchar', length: 100 })
+    minQuantity: string;
   
     @Column({ type: 'decimal', precision: 10, scale: 2 })
     pricePerUnit: number;
