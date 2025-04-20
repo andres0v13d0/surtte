@@ -6,6 +6,7 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { Provider } from 'src/modules/providers/entity/provider.entity';
 import { Category } from 'src/modules/categories/entities/category.entity';
@@ -24,6 +25,7 @@ export class Product {
   id: string;
 
   @ManyToOne(() => Provider, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'providerId' })
   provider: Provider;
 
   @Column({ type: 'varchar', length: 255 })
@@ -31,6 +33,9 @@ export class Product {
 
   @Column({ type: 'text' })
   description: string;
+
+  @Column()
+  providerId: number;
 
   @ManyToOne(() => Category, { nullable: false })
   category: Category;
