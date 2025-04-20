@@ -90,21 +90,26 @@ export class ProductsService {
   }
 
   async filterByCategory(
-    categoryId: string,
+    categoryId?: string,
     subCategoryId?: string,
   ): Promise<Product[]> {
     const qb = this.productRepo.createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category')
       .leftJoinAndSelect('product.subCategory', 'subCategory')
       .leftJoinAndSelect('product.provider', 'provider')
-      .where('product.category.id = :categoryId', { categoryId });
-
+      .leftJoinAndSelect('product.prices', 'prices')
+      .leftJoinAndSelect('product.images', 'images')
+      .where('product.status = :status', { status: 'active' });
+  
     if (subCategoryId) {
-      qb.andWhere('product.subCategory.id = :subCategoryId', { subCategoryId });
+      qb.andWhere('subCategory.id = :subCategoryId', { subCategoryId });
+    } else if (categoryId) {
+      qb.andWhere('category.id = :categoryId', { categoryId });
     }
-
+  
     return qb.orderBy('product.createdAt', 'DESC').getMany();
   }
+  
 
   async getPublicProducts(): Promise<Product[]> {
     return this.productRepo.find({
