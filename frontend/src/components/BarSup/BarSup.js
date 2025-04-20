@@ -23,7 +23,7 @@ const BarSup = () => {
     <div className='bar-sup'>
       <Link to="/" id="link-sup">Todos</Link>
       {subcategorias.map((sub) => (
-        <Link key={sub.id} to={`/category/${sub.slug}`} id="link-sup">
+        <Link key={sub.id} to={`/sub-category/${sub.slug}`} id="link-sup">
           {sub.name}
         </Link>
       ))}

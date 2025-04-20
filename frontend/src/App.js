@@ -24,7 +24,8 @@ function App() {
         <Route path="/messages" element={<Chat />} />
         <Route path="/my-products" element={<MyProducts />} />
         <Route path="/add-product" element={<AddProduct />} />
-        <Route path="/category/:id" element={<CategoryPage />} />
+        <Route path="/sub-category/:subCategorySlug" element={<CategoryPage />} />
+        <Route path="/category/:categorySlug" element={<CategoryPage />} />
       </Routes>
     </Router>
   );
