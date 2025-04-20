@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
@@ -6,60 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faPlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import './AddProduct.css';
 
-const categorias = [
-    {
-      label: 'Vestidos',
-      options: [
-        { value: 'Casual', label: 'Casual' },
-        { value: 'De noche', label: 'De noche' },
-        { value: 'De playa', label: 'De playa' },
-        { value: 'De oficina', label: 'De oficina' },
-        { value: 'De fiesta', label: 'De fiesta' }
-      ]
-    },
-    {
-      label: 'Camisas',
-      options: [
-        { value: 'Manga corta', label: 'Manga corta' },
-        { value: 'Manga larga', label: 'Manga larga' },
-        { value: 'Casual', label: 'Casual' },
-        { value: 'De oficina', label: 'De oficina' },
-        { value: 'De deporte', label: 'De deporte' }
-      ]
-    },
-    {
-      label: 'Pantalones',
-      options: [
-        { value: 'Jeans', label: 'Jeans' },
-        { value: 'De vestir', label: 'De vestir' },
-        { value: 'Cortos', label: 'Cortos' },
-        { value: 'Cargo', label: 'Cargo' },
-        { value: 'Joggers', label: 'Joggers' }
-      ]
-    },
-    {
-      label: 'Zapatos',
-      options: [
-        { value: 'Deportivos', label: 'Deportivos' },
-        { value: 'Formales', label: 'Formales' },
-        { value: 'Casuales', label: 'Casuales' },
-        { value: 'Botas', label: 'Botas' },
-        { value: 'Sandalias', label: 'Sandalias' }
-      ]
-    },
-    {
-      label: 'Accesorios',
-      options: [
-        { value: 'Collares', label: 'Collares' },
-        { value: 'Pulseras', label: 'Pulseras' },
-        { value: 'Sombreros', label: 'Sombreros' },
-        { value: 'Cinturones', label: 'Cinturones' },
-        { value: 'Aretes', label: 'Aretes' }
-      ]
-    }
-];
-
 const AddProduct = () => {
+    const navigate = useNavigate();
     const [images, setImages] = useState([]);
     const [previews, setPreviews] = useState([]);
     const [productName, setProductName] = useState('');
@@ -70,10 +19,120 @@ const AddProduct = () => {
     const [priceBlocks, setPriceBlocks] = useState([{ id: Date.now() }]);
     const [categoria, setCategoria] = useState(null);
     const [subcategoria, setSubcategoria] = useState(null);
-  
-    const subcategorias = categoria
-      ? categorias.find(c => c.label === categoria.label)?.options || []
-      : [];
+    const [categorias, setCategorias] = useState([]);
+
+    useEffect(() => {
+        const fetchCategorias = async () => {
+          try {
+            const res = await fetch('https://api.surtte.com/categories/with/sub-categories');
+            const data = await res.json();
+      
+            const formatted = data.map(cat => ({
+              label: cat.name,
+              options: cat.subCategories.map(sub => ({
+                value: sub.id,
+                label: sub.name
+              }))
+            }));
+      
+            setCategorias(formatted);
+          } catch (error) {
+            console.error('Error al cargar categorías:', error);
+          }
+        };
+      
+        fetchCategorias();
+    }, []);
+
+    
+    console.log(direction);
+
+    const subcategorias = categoria ? categorias.find(c => c.label === categoria.label)?.options || [] : [];
+
+    const goToStep = (newStep) => {
+        setDirection(newStep > step ? 'right' : 'left');
+        setStep(newStep);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const user = JSON.parse(localStorage.getItem('usuario'));
+            if (!user || user.rol !== 'proveedor' || !user.proveedorInfo?.id) {
+                alert('Solo los proveedores pueden agregar productos.');
+                return;
+            }
+
+            const providerId = user.proveedorInfo.id;
+            if (!images.length) return alert('Debes subir al menos una imagen.');
+            if (!productName.trim() || !description.trim() || !categoria || !prices.length) {
+                return alert('Completa todos los campos requeridos.');
+            }
+
+            const searchRes = await fetch(`https://api.surtte.com/products/search/${productName}`);
+            const searchJson = await searchRes.json();
+            if (searchJson.length > 0) return alert('Ya existe un producto con ese nombre.');
+
+            const createRes = await fetch('https://api.surtte.com/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    providerId,
+                    name: productName,
+                    description,
+                    categoryId: categoria.value,
+                    subCategoryId: subcategoria?.value,
+                })
+            });
+            const product = await createRes.json();
+            const productId = product.id;
+
+        for (let i = 0; i < images.length; i++) {
+            const file = images[i];
+            const mimeType = file.type;
+            const filename = file.name;
+
+            const signedRes = await fetch('https://api.surtte.com/images/signed-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mimeType, filename, productId })
+            });
+            const { signedUrl, finalUrl } = await signedRes.json();
+
+            await fetch(signedUrl, { method: 'PUT', body: file });
+
+            await fetch('https://api.surtte.com/images/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, imageUrl: finalUrl, temporal: false })
+            });
+        }
+
+            for (let i = 0; i < prices.length; i++) {
+                await fetch('https://api.surtte.com/product-prices', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, price: prices[i] })
+                });
+            }
+
+            setImages([]);
+            setPreviews([]);
+            setProductName('');
+            setDescription('');
+            setPrices([]);
+            setCategoria(null);
+            setSubcategoria(null);
+            setStep(0);
+            setPriceBlocks([{ id: Date.now() }]);
+
+            alert('Producto guardado exitosamente.');
+            navigate('/my-products');
+        } catch (err) {
+            console.error(err);
+            alert('Error al guardar el producto.');
+        }
+    };
 
     const handleAddPriceBlock = () => {
         if (priceBlocks.length < 3) {
@@ -106,17 +165,13 @@ const AddProduct = () => {
         }
     };
 
-    const goToStep = (newStep) => {
-        setDirection(newStep > step ? 'right' : 'left');
-        setStep(newStep);
-    };
 
     return (
         <>
             <Header minimal={true} />
             <div className="add-product-container">
                 <h2 className="add-title">Agrega tu producto</h2>
-                <form className={`step-wrapper step-${step}`}>
+                <form className={`step-wrapper step-${step}`} onSubmit={handleSubmit}>
                     {step === 0 && (
                         <div className="step slide-in">
                             <div className="step-sup">
@@ -206,7 +261,7 @@ const AddProduct = () => {
                                 <label>Categoría</label>
                                 <Select
                                     classNamePrefix="mi"
-                                    options={categorias.map(cat => ({ value: cat.label, label: cat.label }))}
+                                    options={categorias.map(cat => ({ value: cat.id, label: cat.label }))}
                                     placeholder="Seleccionar categoría..."
                                     value={categoria}
                                     onChange={(selected) => {
