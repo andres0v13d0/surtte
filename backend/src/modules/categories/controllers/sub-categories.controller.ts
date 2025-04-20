@@ -14,6 +14,11 @@ import { CreateSubCategoryDto } from '../dtos/create-sub-category.dto';
 @Controller('sub-categories')
 export class SubCategoriesController {
     constructor(private readonly subCategoriesService: SubCategoriesService) {}
+    
+    @Get('/with-image')
+    getAllWithImage() {
+        return this.subCategoriesService.getSubCategoriesWithImage();
+    }
 
     @Post()
     create(@Body() dto: CreateSubCategoryDto) {
@@ -46,10 +51,5 @@ export class SubCategoriesController {
     @Delete(':id')
     remove(@Param('id', ParseUUIDPipe) id: string) {
         return this.subCategoriesService.remove(id);
-    }
-
-    @Get('/with-image')
-    getAllWithImage() {
-        return this.subCategoriesService.getSubCategoriesWithImage();
     }
 }
