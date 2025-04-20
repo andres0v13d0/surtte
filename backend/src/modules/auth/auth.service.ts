@@ -25,7 +25,7 @@ export class AuthService {
         rol: RolUsuario.COMERCIANTE,
       });
 
-      return user;
+      return this.usersService.getUserByFirebaseUid(uid);
     } catch (error) {
       throw new UnauthorizedException('Token inválido o expirado');
     }
