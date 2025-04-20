@@ -50,7 +50,7 @@ import {
   
     @Get('/filter')
     filter(
-      @Query('categoryId', ParseUUIDPipe) categoryId?: string,
+      @Query('categoryId') categoryId?: string,
       @Query('subCategoryId') subCategoryId?: string,
     ) {
       return this.productsService.filterByCategory(categoryId, subCategoryId);

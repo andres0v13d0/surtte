@@ -101,11 +101,14 @@ export class ProductsService {
       .leftJoinAndSelect('product.images', 'images')
       .where('product.status = :status', { status: 'active' });
   
-    if (subCategoryId) {
-      qb.andWhere('subCategory.id = :subCategoryId', { subCategoryId });
-    } else if (categoryId) {
+    if (categoryId) {
       qb.andWhere('category.id = :categoryId', { categoryId });
     }
+    
+    if (subCategoryId) {
+      qb.andWhere('subCategory.id = :subCategoryId', { subCategoryId });
+    }
+      
   
     return qb.orderBy('product.createdAt', 'DESC').getMany();
   }
