@@ -13,10 +13,11 @@ const AddProduct = () => {
     const [previews, setPreviews] = useState([]);
     const [productName, setProductName] = useState('');
     const [description, setDescription] = useState('');
-    const [prices, setPrices] = useState([]);
     const [step, setStep] = useState(0);
     const [direction, setDirection] = useState('right');
-    const [priceBlocks, setPriceBlocks] = useState([{ id: Date.now() }]);
+    const [priceBlocks, setPriceBlocks] = useState([
+        { id: Date.now(), cantidad: '', precio: '' }
+    ]);
     const [categoria, setCategoria] = useState(null);
     const [subcategoria, setSubcategoria] = useState(null);
     const [categorias, setCategorias] = useState([]);
@@ -65,9 +66,23 @@ const AddProduct = () => {
                 return;
             }
 
+            console.log('🧪 Validación campos:');
+            console.log('Nombre:', productName);
+            console.log('Descripción:', description);
+            console.log('Categoría:', categoria);
+            console.log('Subcategoría:', subcategoria);
+            console.log('Precios:', priceBlocks);
+            console.log('Imágenes:', images);
+
             const providerId = user.proveedorInfo.id;
             if (!images.length) return alert('Debes subir al menos una imagen.');
-            if (!productName.trim() || !description.trim() || !categoria || !prices.length) {
+            const preciosValidos = priceBlocks
+                .map(p => parseFloat(p.precio))
+                .filter(p => !isNaN(p) && p > 0);
+
+            if (!preciosValidos.length) return alert('Agrega al menos un precio válido.');
+
+            if (!productName.trim() || !description.trim() || !categoria) {
                 return alert('Completa todos los campos requeridos.');
             }
 
@@ -110,11 +125,11 @@ const AddProduct = () => {
             });
         }
 
-            for (let i = 0; i < prices.length; i++) {
+            for (let i = 0; i < preciosValidos.length; i++) {
                 await fetch('https://api.surtte.com/product-prices', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, price: prices[i] })
+                body: JSON.stringify({ productId, price: preciosValidos[i] })
                 });
             }
 
@@ -122,7 +137,6 @@ const AddProduct = () => {
             setPreviews([]);
             setProductName('');
             setDescription('');
-            setPrices([]);
             setCategoria(null);
             setSubcategoria(null);
             setStep(0);
@@ -135,6 +149,15 @@ const AddProduct = () => {
             alert('Error al guardar el producto.');
         }
     };
+
+    const updatePriceBlock = (id, field, value) => {
+        setPriceBlocks(prev =>
+          prev.map(block =>
+            block.id === id ? { ...block, [field]: value } : block
+          )
+        );
+    };
+      
 
     const handleAddPriceBlock = () => {
         if (priceBlocks.length < 3) {
@@ -157,16 +180,6 @@ const AddProduct = () => {
         setPreviews(prev => [...prev, ...newPreviews]);
         setImages(prev => [...prev, ...files]);
     };
-
-    const handleAddPrice = (price) => {
-        const numericPrice = parseFloat(price);
-        if (!isNaN(numericPrice)) {
-            const updatedPrices = [...prices, numericPrice].sort((a, b) => b - a);
-            setPrices(updatedPrices);
-            console.log(direction);
-        }
-    };
-
 
     return (
         <>
@@ -306,25 +319,17 @@ const AddProduct = () => {
                                     <input
                                         type="text"
                                         placeholder="Ej: 9 o más unidades, 1 a 3 docenas"
-                                        onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            handleAddPrice(e.target.value);
-                                            e.target.value = '';
-                                        }
-                                        }}
+                                        value={block.cantidad}
+                                        onChange={(e) => updatePriceBlock(block.id, 'cantidad', e.target.value)}
                                     />
                                     <label>Precio</label>
                                     <div className="price-input">
                                         <span className="currency-symbol">COP</span>
                                         <input
                                         type="number"
-                                        placeholder="Ej: 50.000"
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                            handleAddPrice(e.target.value);
-                                            e.target.value = '';
-                                            }
-                                        }}
+                                        placeholder="Ej: 50000"
+                                        value={block.precio}
+                                        onChange={(e) => updatePriceBlock(block.id, 'precio', e.target.value)}
                                         />
                                     </div>
                                     </fieldset>
@@ -340,6 +345,7 @@ const AddProduct = () => {
                                     )}
                                 </div>
                             ))}
+
 
                             {priceBlocks.length < 3 && (
                                 <button
