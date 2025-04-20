@@ -100,19 +100,13 @@ export class SubCategoriesService {
   }
 
   async remove(id: string): Promise<void> {
-    const subCategory = await this.findOneById(id);
-
-    const hasChildren = await this.subCategoryRepo
-      .createQueryBuilder('sc')
-      .leftJoin('sc.subSubCategories', 'ssc')
-      .where('sc.id = :id', { id })
-      .andWhere('ssc.id IS NOT NULL')
-      .getOne();
-
-    if (hasChildren) {
-      throw new ConflictException('No se puede eliminar una subcategoría con sub-subcategorías asociadas.');
+    const subCategory = await this.subCategoryRepo.findOne({ where: { id } });
+  
+    if (!subCategory) {
+      throw new NotFoundException('Subcategoría no encontrada.');
     }
-
+  
     await this.subCategoryRepo.remove(subCategory);
   }
+  
 }
