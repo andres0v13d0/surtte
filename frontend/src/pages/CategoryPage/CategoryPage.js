@@ -7,35 +7,35 @@ import NavInf from '../../components/NavInf/NavInf';
 
 const CategoryPage = () => {
   const [products, setProducts] = useState([]);
-  const { categoryId, subCategoryId } = useParams();
+  const { categorySlug, subCategorySlug } = useParams();
 
   useEffect(() => {
     const fetchProducts = async () => {
-      if (!categoryId && !subCategoryId) return;
+      if (!categorySlug && !subCategorySlug) return;
+
       const params = new URLSearchParams();
-  
-      if (subCategoryId) {
-        params.append('subCategoryId', subCategoryId);
+
+      if (subCategorySlug) {
+        params.append('subCategorySlug', subCategorySlug);
       }
-  
-      if (categoryId) {
-        params.append('categoryId', categoryId);
+
+      if (categorySlug) {
+        params.append('categorySlug', categorySlug);
       }
-  
-      const url = `https://api.surtte.com/products/filter?${params.toString()}`;
-  
+
+      const url = `https://api.surtte.com/products/filter/slug?${params.toString()}`;
+
       try {
         const res = await fetch(url);
         const data = await res.json();
         setProducts(data);
       } catch (err) {
-        console.error('Error cargando productos', err);
+        console.error('Error cargando productos por slug:', err);
       }
     };
-  
+
     fetchProducts();
-  }, [categoryId, subCategoryId]);
-  
+  }, [categorySlug, subCategorySlug]);
 
   return (
     <>
