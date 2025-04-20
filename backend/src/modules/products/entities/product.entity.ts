@@ -12,6 +12,7 @@ import { Provider } from 'src/modules/providers/entity/provider.entity';
 import { Category } from 'src/modules/categories/entities/category.entity';
 import { SubCategory } from 'src/modules/categories/entities/sub-category.entity';
 import { ProductImage } from './product-image.entity';
+import { ProductPrice } from './product-price.entity';
 
 export enum ProductStatus {
   ACTIVE = 'active',
@@ -58,4 +59,7 @@ export class Product {
 
   @OneToMany(() => ProductImage, (img) => img.product)
   images: ProductImage[];
+
+  @OneToMany(() => ProductPrice, (price) => price.product)
+  prices: ProductPrice[];
 }
