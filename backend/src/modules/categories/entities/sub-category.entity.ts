@@ -19,7 +19,7 @@ export class SubCategory {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
   slug: string;
 
   @CreateDateColumn({ name: 'created_at' })
