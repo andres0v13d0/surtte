@@ -1,21 +1,34 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './BarSup.css';
 
 const BarSup = () => {
-    return (
-        <div className='bar-sup'>
-            <a href="/" id='link-sup'>Todos</a>
-            <a href="/" id='link-sup'>Mujer</a>
-            <a href="/" id='link-sup'>Hombre</a>
-            <a href="/" id='link-sup'>Hogar</a>
-            <a href="/" id='link-sup'>Niños</a>
-            <a href="/" id='link-sup'>Deportes</a>
-            <a href="/" id='link-sup'>Tecnología</a>
-            <a href="/" id='link-sup'>Belleza</a>
-            <a href="/" id='link-sup'>Salud</a>
-            <a href="/" id='link-sup'>Accesorios</a>
-        </div>
-    );
-}
+  const [subcategorias, setSubcategorias] = useState([]);
+
+  useEffect(() => {
+    const fetchSubcategorias = async () => {
+      try {
+        const res = await fetch('https://api.surtte.com/sub-categories');
+        const data = await res.json();
+        setSubcategorias(data);
+      } catch (err) {
+        console.error('Error al cargar subcategorías:', err);
+      }
+    };
+
+    fetchSubcategorias();
+  }, []);
+
+  return (
+    <div className='bar-sup'>
+      <Link to="/" id="link-sup">Todos</Link>
+      {subcategorias.map((sub) => (
+        <Link key={sub.id} to={`/category/${sub.id}`} id="link-sup">
+          {sub.name}
+        </Link>
+      ))}
+    </div>
+  );
+};
 
 export default BarSup;

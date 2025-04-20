@@ -9,6 +9,7 @@ import Categories from './pages/Categories/Categories';
 import Chat from './pages/Chat/Chat';
 import MyProducts from './pages/MyProducts/MyProducts';
 import AddProduct from './pages/AddProduct/AddProduct';
+import CategoryPage from './pages/CategoryPage/CategoryPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/messages" element={<Chat />} />
         <Route path="/my-products" element={<MyProducts />} />
         <Route path="/add-product" element={<AddProduct />} />
+        <Route path="/category/:id" element={<CategoryPage />} />
       </Routes>
     </Router>
   );

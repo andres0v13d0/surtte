@@ -66,14 +66,6 @@ const AddProduct = () => {
                 return;
             }
 
-            console.log('🧪 Validación campos:');
-            console.log('Nombre:', productName);
-            console.log('Descripción:', description);
-            console.log('Categoría:', categoria);
-            console.log('Subcategoría:', subcategoria);
-            console.log('Precios:', priceBlocks);
-            console.log('Imágenes:', images);
-
             const providerId = user.proveedorInfo.id;
             if (!images.length) return alert('Debes subir al menos una imagen.');
             const preciosValidos = priceBlocks
@@ -104,33 +96,42 @@ const AddProduct = () => {
             const product = await createRes.json();
             const productId = product.id;
 
-        for (let i = 0; i < images.length; i++) {
-            const file = images[i];
-            const mimeType = file.type;
-            const filename = file.name;
+            for (let i = 0; i < images.length; i++) {
+                const file = images[i];
+                const mimeType = file.type;
+                const filename = file.name;
 
-            const signedRes = await fetch('https://api.surtte.com/images/signed-url', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mimeType, filename, productId })
-            });
-            const { signedUrl, finalUrl } = await signedRes.json();
+                const signedRes = await fetch('https://api.surtte.com/images/signed-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mimeType, filename, productId })
+                });
+                const { signedUrl, finalUrl } = await signedRes.json();
 
-            await fetch(signedUrl, { method: 'PUT', body: file });
+                await fetch(signedUrl, { method: 'PUT', body: file });
 
-            await fetch('https://api.surtte.com/images/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId, imageUrl: finalUrl, temporal: false })
-            });
-        }
+                await fetch('https://api.surtte.com/images/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId, imageUrl: finalUrl, temporal: false })
+                });
+            }
 
             for (let i = 0; i < preciosValidos.length; i++) {
-                await fetch('https://api.surtte.com/product-prices', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, price: preciosValidos[i] })
-                });
+                const block = priceBlocks[i];
+                const rawPrice = block.precio.replace(/\./g, '');
+                const parsedPrice = parseFloat(rawPrice);
+                if (!isNaN(parsedPrice) && parsedPrice > 0) {
+                    await fetch('https://api.surtte.com/product-prices', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            productId,
+                            minQuantity: block.cantidad,
+                            pricePerUnit: parsedPrice
+                        })
+                    });
+                }
             }
 
             setImages([]);
@@ -322,12 +323,12 @@ const AddProduct = () => {
                                         value={block.cantidad}
                                         onChange={(e) => updatePriceBlock(block.id, 'cantidad', e.target.value)}
                                     />
-                                    <label>Precio</label>
+                                    <label>Precio por unidad</label>
                                     <div className="price-input">
                                         <span className="currency-symbol">COP</span>
                                         <input
                                         type="number"
-                                        placeholder="Ej: 50000"
+                                        placeholder="Ej: 50.000"
                                         value={block.precio}
                                         onChange={(e) => updatePriceBlock(block.id, 'precio', e.target.value)}
                                         />
