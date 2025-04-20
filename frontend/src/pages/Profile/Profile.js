@@ -29,15 +29,17 @@ const Profile = () => {
                                 </span>!
                         </div>
                         <div className='user-buttons'>
-                            <Link to="/my-products" className="user-button mg">
-                                <span className="icon-left">
-                                    <FontAwesomeIcon icon={faShoppingBasket} />
-                                </span>
-                                <span className="text">Mis productos</span>
-                                <span className="icon-right">
-                                    <FontAwesomeIcon icon={faChevronRight} />
-                                </span>
-                            </Link>
+                            {usuario.rol === 'proveedor' && (
+                                <Link to="/my-products" className="user-button mg">
+                                    <span className="icon-left">
+                                        <FontAwesomeIcon icon={faShoppingBasket} />
+                                    </span>
+                                    <span className="text">Mis productos</span>
+                                    <span className="icon-right">
+                                        <FontAwesomeIcon icon={faChevronRight} />
+                                    </span>
+                                </Link>
+                            )}
 
                             <Link to="/profile" className="user-button">
                                 <span className="icon-left">

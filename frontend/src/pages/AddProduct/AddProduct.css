@@ -132,6 +132,7 @@
 
   .preview-box.empty{
     border: none;
+    z-index: -9999;
   }
   
   .preview-box img {

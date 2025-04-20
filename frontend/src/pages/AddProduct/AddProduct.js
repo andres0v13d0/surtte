@@ -54,10 +54,12 @@ const AddProduct = () => {
         setStep(newStep);
     };
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const user = JSON.parse(localStorage.getItem('usuario'));
+            console.log('Usuario logueado:', user);
             if (!user || user.rol !== 'proveedor' || !user.proveedorInfo?.id) {
                 alert('Solo los proveedores pueden agregar productos.');
                 return;
