@@ -55,6 +55,14 @@ import {
     ) {
       return this.productsService.filterByCategory(categoryId, subCategoryId);
     }
+
+    @Get('/filter/slug')
+    filterBySlug(
+      @Query('category') categorySlug?: string,
+      @Query('subCategory') subCategorySlug?: string,
+    ) {
+      return this.productsService.findBySlug(categorySlug, subCategorySlug);
+    }
   
     @Patch('/:id/status')
     updateStatus(

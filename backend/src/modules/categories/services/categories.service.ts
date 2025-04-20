@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
 import { Category } from '../entities/category.entity';
 import { CreateCategoryDto } from '../dtos/create-category.dto';
+import { slugify } from 'transliteration';
 
 @Injectable()
 export class CategoriesService {
@@ -12,8 +13,10 @@ export class CategoriesService {
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+    const nombre = createCategoryDto.name.trim();
+
     const existing = await this.categoryRepo.findOne({
-      where: { name: ILike(createCategoryDto.name.trim()) },
+      where: { name: ILike(nombre) },
     });
 
     if (existing) {
@@ -21,7 +24,8 @@ export class CategoriesService {
     }
 
     const newCategory = this.categoryRepo.create({
-      name: createCategoryDto.name.trim(),
+      name: nombre,
+      slug: slugify(nombre),
     });
 
     return this.categoryRepo.save(newCategory);

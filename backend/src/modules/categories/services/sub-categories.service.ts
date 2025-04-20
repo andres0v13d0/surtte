@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
+import { slugify } from 'transliteration';
 import { SubCategory } from '../entities/sub-category.entity';
 import { Category } from '../entities/category.entity';
 import { CreateSubCategoryDto } from '../dtos/create-sub-category.dto';
@@ -16,6 +17,8 @@ export class SubCategoriesService {
   ) {}
 
   async create(dto: CreateSubCategoryDto): Promise<SubCategory> {
+    const nombre = dto.name.trim();
+
     const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
     if (!category) {
       throw new NotFoundException('Categoría no encontrada.');
@@ -23,7 +26,7 @@ export class SubCategoriesService {
 
     const duplicate = await this.subCategoryRepo.findOne({
       where: {
-        name: ILike(dto.name.trim()),
+        name: ILike(nombre),
         category: { id: dto.categoryId },
       },
       relations: ['category'],
@@ -34,8 +37,9 @@ export class SubCategoriesService {
     }
 
     const subCategory = this.subCategoryRepo.create({
-      name: dto.name.trim(),
+      name: nombre,
       category,
+      slug: slugify(nombre.toLowerCase()),
     });
 
     return this.subCategoryRepo.save(subCategory);

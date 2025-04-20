@@ -9,6 +9,9 @@ export class Category {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
+  @Column({ type: 'varchar', length: 255, unique: true })
+  slug: string;
+
   @OneToMany(() => SubCategory, subCategory => subCategory.category, { cascade: true })
   subCategories: SubCategory[];
 

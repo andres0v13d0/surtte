@@ -112,7 +112,29 @@ export class ProductsService {
   
     return qb.orderBy('product.createdAt', 'DESC').getMany();
   }
-  
+
+  async findBySlug(
+    categorySlug?: string,
+    subCategorySlug?: string,
+  ): Promise<Product[]> {
+    const qb = this.productRepo.createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.subCategory', 'subCategory')
+      .leftJoinAndSelect('product.provider', 'provider')
+      .leftJoinAndSelect('product.prices', 'prices')
+      .leftJoinAndSelect('product.images', 'images')
+      .where('product.status = :status', { status: 'active' });
+
+    if (categorySlug) {
+      qb.andWhere('category.slug = :categorySlug', { categorySlug });
+    }
+
+    if (subCategorySlug) {
+      qb.andWhere('subCategory.slug = :subCategorySlug', { subCategorySlug });
+    }
+
+    return qb.orderBy('product.createdAt', 'DESC').getMany();
+  }
 
   async getPublicProducts(): Promise<Product[]> {
     return this.productRepo.find({
