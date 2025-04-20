@@ -1,6 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Category } from './category.entity';
-import { SubSubCategory } from './sub-sub-category.entity';
 
 @Entity('sub_categories')
 export class SubCategory {
@@ -12,9 +18,6 @@ export class SubCategory {
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
-
-  @OneToMany(() => SubSubCategory, subSub => subSub.subCategory, { cascade: true })
-  subSubCategories: SubSubCategory[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -16,7 +16,6 @@ import { ProductImage } from './entities/product-image.entity';
 import { Provider } from '../providers/entity/provider.entity';
 import { Category } from 'src/modules/categories/entities/category.entity';
 import { SubCategory } from 'src/modules/categories/entities/sub-category.entity';
-import { SubSubCategory } from 'src/modules/categories/entities/sub-sub-category.entity';
 
 @Module({
   imports: [
@@ -27,7 +26,6 @@ import { SubSubCategory } from 'src/modules/categories/entities/sub-sub-category
       Provider,
       Category,
       SubCategory,
-      SubSubCategory,
     ]),
   ],
   controllers: [
