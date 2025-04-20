@@ -1,51 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header/Header';
 import NavInf from '../../components/NavInf/NavInf';
 import Footer from '../../components/Footer/Footer';
 import './Categories.css';
 
-const categories = [
-    "Vestidos de mujer",
-    "Camisetas de mujer",
-    "Joyas para mujer",
-    "Blusas y camisas para mujer",
-    "Fundas y estuches",
-    "Decoración del hogar",
-    "Conjuntos para mujer",
-    "Pijamas para mujer",
-    "Ropa deportiva de hombre",
-    "Ropa deportiva para mujer",
-    "Auriculares y accesorios",
-    "Ropa de cama",
-    "Panties para mujer",
-    "Motocicletas",
-    "Calzado deportivo para mujer"
-];
-
-const sidebarItems = [
-    "Destacado",
-    "Hogar",
-    "Ropa de mujer",
-    "Mujer curvy",
-    "Calzado de mujer",
-    "Lencería y pijamas",
-    "Ropa de hombre",
-    "Calzado de hombre",
-    "Deporte y aire libre",
-    "Joyería y accesorios",
-    "Joyería y accesorios",
-    "Joyería y accesorios",
-    "Joyería y accesorios",
-    "Joyería y accesorios",
-    "Joyería y accesorios",
-    "Joyería y accesorios",
-    "Joyería y accesorios",
-    "Joyería y accesorios",
-    "Joyería y accesorios"
-];
-
 const Categories = () => {
-    const [selected, setSelected] = useState("Destacado");
+    const [subCategories, setSubCategories] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [subsRes, imagesRes] = await Promise.all([
+                    fetch('https://api.surtte.com/sub-categories'),
+                    fetch('https://api.surtte.com/sub-categories/with-image'),
+                ]);
+
+                const subData = await subsRes.json();
+
+                // Revisar qué devuelve realmente la otra API
+                const raw = await imagesRes.text();
+                console.log('Respuesta de with-image:', raw);
+
+                const imagesData = JSON.parse(raw); // Solo si sabemos que es JSON válido
+                console.log('Parsed imageData:', imagesData);
+
+                // Unimos las imágenes con las subcategorías
+                const mergedSubCategories = subData.map(sub => {
+                    const imageMatch = imagesData.find(img => img.id === sub.id);
+                    return {
+                        ...sub,
+                        imageUrl: imageMatch?.imageUrl || '/camiseta.avif',
+                    };
+                });
+
+                setSubCategories(mergedSubCategories);
+
+                // Extraemos categorías únicas
+                const uniqueCategories = [];
+                mergedSubCategories.forEach(sub => {
+                    if (!uniqueCategories.find(cat => cat.id === sub.category.id)) {
+                        uniqueCategories.push(sub.category);
+                    }
+                });
+
+                setCategories(uniqueCategories);
+                if (uniqueCategories.length > 0) {
+                    setSelectedCategoryId(uniqueCategories[0].id);
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <>
@@ -53,27 +63,29 @@ const Categories = () => {
             <div className="categories-container">
                 <aside className="sidebar">
                     <ul>
-                        {sidebarItems.map((item, i) => (
+                        {categories.map((cat) => (
                             <li
-                                key={i}
-                                id={selected === item ? 'selected-cat' : undefined}
-                                onClick={() => setSelected(item)}
+                                key={cat.id}
+                                id={selectedCategoryId === cat.id ? 'selected-cat' : undefined}
+                                onClick={() => setSelectedCategoryId(cat.id)}
                             >
-                                {item}
+                                {cat.name}
                             </li>
                         ))}
                     </ul>
                 </aside>
                 <section className="categories-main">
                     <div className="category-grid">
-                        {categories.map((label, i) => (
-                            <div className="category-item" key={i}>
-                                <div className="circle-image">
-                                    <img src="/camiseta.avif" alt={label} />
+                        {subCategories
+                            .filter((sub) => sub.category.id === selectedCategoryId)
+                            .map((sub) => (
+                                <div className="category-item" key={sub.id}>
+                                    <div className="circle-image">
+                                        <img src={sub.imageUrl} alt={sub.name} />
+                                    </div>
+                                    <span>{sub.name}</span>
                                 </div>
-                                <span>{label}</span>
-                            </div>
-                        ))}
+                            ))}
                     </div>
                 </section>
             </div>
