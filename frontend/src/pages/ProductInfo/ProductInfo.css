@@ -42,14 +42,14 @@
 }
 
 .product-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   margin-bottom: 4px;
 }
 
 .product-description {
   color: #666;
-  font-size: 13px;
+  font-size: 15px;
   margin-bottom: 12px;
 }
 
@@ -64,18 +64,19 @@
 }
 
 .dynamic-price-highlight h3 {
-  font-size: 40px;
+  font-size: 60px;
   color: #222;
   margin: 0;
   display: flex;
   align-items: start;
+  font-weight: 500;
 }
 
 .dynamic-price-highlight b {
-  font-size: 12px;
+  font-size: 20px;
   height: 100%;
-  margin: 4px 4px 0 0;
   font-weight: normal;
+  margin: 10px 5px 0 0;
 }
 
 .dynamic-price-highlight p {
@@ -83,41 +84,47 @@
   color: #555;
 }
 
-/* Lista horizontal de precios */
 .price-scroll-list {
   display: flex;
   overflow-x: auto;
-  gap: 10px;
+  gap: 5px;
   padding-bottom: 12px;
   margin-bottom: 16px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.price-scroll-list::-webkit-scrollbar {
+  display: none;
+}
+
+.product-details .p-info-prices{
+  font-size: 12px;
 }
 
 .price-block {
-  min-width: 150px;
-  padding: 10px;
-  border: 1px solid #ccc;
+  font-size: 12px;
+  min-width: 100px;
   border-radius: 8px;
-  background-color: #f9f9f9;
   text-align: center;
-  flex-shrink: 0;
+ opacity: 60%;
 }
 
 .price-block.active {
-  border: 2px solid #007bff;
-  background-color: #e6f0ff;
+  opacity: 100%;
 }
 
 .price-block .price-amount {
   font-weight: bold;
-  font-size: 1rem;
+  margin: 0;
 }
 
 .price-block .price-condition {
-  font-size: 0.85rem;
+
   color: #555;
+  margin: 0;
 }
 
-/* Selectores */
 .selectors {
   display: flex;
   gap: 10px;
@@ -147,30 +154,17 @@
   border: 1px solid #ccc;
 }
 
-/* Total y botón juntos */
-.total-and-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.total-price {
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
 .add-to-cart {
-  flex: 1;
-  padding: 12px;
-  background-color: #222;
-  color: #fff;
-  font-size: 1rem;
+  margin-top: 10px;
+  padding: 1rem 1rem;
+  background-color: #fa7e17;
+  color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 25px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background-color 0.2s;
+  width: 100%;
+  font-size: 1.2rem;
 }
 
 .add-to-cart:hover {
@@ -179,18 +173,37 @@
 
 /* Info proveedor */
 .product-provider-info {
-  font-size: 0.9rem;
-  color: #444;
-  background: #f4f4f4;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 0;
+}
+
+.product-provider-info h1 {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0;
 }
 
 .product-provider-info p {
+  font-size: 14px;
   margin: 4px 0;
 }
 
-/* Alerta útil */
+.product-provider-info .p-name-provider {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+.product-provider-info .p-calf-provider {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.product-provider-info .p-desc-provider {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
 .warning-text {
   margin-top: 10px;
   font-size: 0.85rem;
@@ -201,7 +214,12 @@
   border-radius: 6px;
 }
 
-/* Responsive para tablets y arriba */
+.more-products-title {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+}
+
 @media (min-width: 768px) {
   .product-container {
     flex-direction: row;

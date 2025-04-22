@@ -37,7 +37,6 @@ const ProductInfo = () => {
     setUsedDocenaMatch(bestPrice.condition.includes('docena'));
   }, [quantity, unitType]);
 
-  const total = totalUnits * applicablePrice.amount;
 
   return (
     <>
@@ -58,9 +57,8 @@ const ProductInfo = () => {
           <div className="line"></div>
           <div className="dynamic-price-highlight">
             <h3><b>COP</b>{applicablePrice.amount.toLocaleString()}</h3>
-            <p>{applicablePrice.condition}</p>
           </div>
-          <div className="line"></div>
+          <p className='p-info-prices'>Este producto tiene precios escalonados según la cantidad. Mira las tarifas disponibles:</p>
           <div className="price-scroll-list">
             {pricesMock.map((price, i) => (
               <div key={i} className={`price-block ${price.condition === applicablePrice.condition ? 'active' : ''}`}>
@@ -92,17 +90,19 @@ const ProductInfo = () => {
           {unitType === 'units' && usedDocenaMatch && (totalUnits % 12 === 0) && (
             <p className="warning-text">💡 Podrías ahorrar más si seleccionas "Docenas" en vez de "Unidades".</p>
           )}
-
-          <div className="total-and-button">
-            <p className="total-price">Total: <strong>COP {total.toLocaleString()}</strong></p>
-            <button className="add-to-cart">Añadir al carrito</button>
-          </div>
+        
+        
+         <button className="add-to-cart">Añadir al carrito</button>
+         <div className="line"></div>
 
           <div className="product-provider-info">
-            <p><strong>Proveedor:</strong> Distribuciones el Paisa</p>
-            <p>⭐ 4.8 / 5.0</p>
-            <p>📍 Medellín, Colombia</p>
+            <h1>Información del proveedor</h1>
+            <p className='p-name-provider'>Distribuciones el Paisa</p>
+            <p className='p-calf-provider'><strong>Calificación: </strong>⭐ ⭐ ⭐ ⭐ ⭐ </p>
+            <p className='p-desc-provider'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vehicula vitae orci id vestibulum. Phasellus mollis molestie ante nec venenatis. Sed in urna sed lectus elementum scelerisque.</p>
           </div>
+          <div className="line"></div>
+          <h2 className="more-products-title">Más productos del proveedor</h2>
         </div>
       </div>
       <NavInf />
