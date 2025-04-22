@@ -68,11 +68,16 @@ const AddProduct = () => {
 
             const providerId = user.proveedorInfo.id;
             if (!images.length) return alert('Debes subir al menos una imagen.');
-            const preciosValidos = priceBlocks
-                .map(p => parseFloat(p.precio))
-                .filter(p => !isNaN(p) && p > 0);
+            const preciosValidos = priceBlocks.filter(p => {
+                const precio = parseFloat((p.precio || '').toString().replace(/\./g, ''));
+                return !isNaN(precio) && precio > 0 && p.cantidad?.trim();
+            });
+            
 
-            if (!preciosValidos.length) return alert('Agrega al menos un precio válido.');
+            if (!preciosValidos.length) {
+                return alert('Agrega al menos un bloque de precio con cantidad y precio válido.');
+            }
+            
 
             if (!productName.trim() || !description.trim() || !categoria) {
                 return alert('Completa todos los campos requeridos.');
@@ -117,22 +122,19 @@ const AddProduct = () => {
                 });
             }
 
-            for (let i = 0; i < preciosValidos.length; i++) {
-                const block = priceBlocks[i];
-                const rawPrice = block.precio.replace(/\./g, '');
-                const parsedPrice = parseFloat(rawPrice);
-                if (!isNaN(parsedPrice) && parsedPrice > 0) {
-                    await fetch('https://api.surtte.com/product-prices', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            productId,
-                            minQuantity: block.cantidad,
-                            pricePerUnit: parsedPrice
-                        })
-                    });
-                }
+            for (const block of preciosValidos) {
+                const parsedPrice = parseFloat((block.precio || '').toString().replace(/\./g, ''));
+                await fetch('https://api.surtte.com/product-prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId,
+                        minQuantity: block.cantidad,
+                        pricePerUnit: parsedPrice
+                    })
+                });
             }
+            
 
             setImages([]);
             setPreviews([]);

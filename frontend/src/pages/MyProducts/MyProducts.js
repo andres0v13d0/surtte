@@ -24,29 +24,31 @@ function MyProducts() {
         const res = await fetch(`https://api.surtte.com/products/by-provider/${user.proveedorInfo.id}`);
         const data = await res.json();
 
-        // Mapear estructura al formato esperado por el componente <Product />
         const parsed = await Promise.all(data.map(async (prod) => {
-          // Obtener imágenes
           const imgRes = await fetch(`https://api.surtte.com/images/by-product/${prod.id}`);
           const images = await imgRes.json();
 
-          // Obtener precios
           const priceRes = await fetch(`https://api.surtte.com/product-prices/product/${prod.id}`);
           const prices = await priceRes.json();
 
           return {
-            uuid: prod.id,
-            name: prod.name,
-            provider: user.proveedorInfo.nombre_empresa,
+            uuid: prod?.id || 'uuid-desconocido',
+            name: prod?.name || 'Producto sin nombre',
+            provider: prod?.provider?.nombre_empresa || 'Proveedor desconocido',
             stars: 5,
-            image: images[0]?.imageUrl || "/default.jpg",
-            prices: prices.map(p => ({
-              amount: parseFloat(p.pricePerUnit).toLocaleString('es-CO', {
-                minimumFractionDigits: 0
-              }),
-              condition: p.minQuantity
-            }))
-          };
+            image: images?.[0]?.imageUrl || '/default.jpg',
+            prices: Array.isArray(prices) && prices.length > 0
+              ? prices.map(p => ({
+                  amount: parseFloat(p?.pricePerUnit || '0').toLocaleString('es-CO', {
+                    minimumFractionDigits: 0
+                  }),
+                  condition: p?.minQuantity ?? 'Sin condición'
+                }))
+              : [{
+                  amount: '0',
+                  condition: 'Sin condición'
+                }]
+          };  
         }));
 
         setProductos(parsed);
