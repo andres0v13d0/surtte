@@ -24,18 +24,23 @@ function Home() {
             const prices = await pricesRes.json();
 
             return {
-              uuid: prod.id,
-              name: prod.name,
-              provider: prod.provider?.nombre_empresa || 'Proveedor desconocido',
+              uuid: prod?.id || 'uuid-desconocido',
+              name: prod?.name || 'Producto sin nombre',
+              provider: prod?.provider?.nombre_empresa || 'Proveedor desconocido',
               stars: 5,
-              image: images[0]?.imageUrl || '/default.jpg',
-              prices: prices.map(p => ({
-                amount: parseFloat(p.pricePerUnit).toLocaleString('es-CO', {
-                  minimumFractionDigits: 0
-                }),
-                condition: p.minQuantity
-              }))
-            };
+              image: images?.[0]?.imageUrl || '/default.jpg',
+              prices: Array.isArray(prices) && prices.length > 0
+                ? prices.map(p => ({
+                    amount: parseFloat(p?.pricePerUnit || '0').toLocaleString('es-CO', {
+                      minimumFractionDigits: 0
+                    }),
+                    condition: p?.minQuantity ?? 'Sin condición'
+                  }))
+                : [{
+                    amount: '0',
+                    condition: 'Sin condición'
+                  }]
+            };            
           })
         );
 
