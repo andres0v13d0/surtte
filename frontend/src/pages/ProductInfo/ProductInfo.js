@@ -53,14 +53,14 @@ const ProductInfo = () => {
         </div>
 
         <div className="product-details">
-          <h2 className="product-title">Solid Sweatshirts</h2>
-          <p className="product-description">100% algodón, ajuste clásico</p>
-
+          <h2 className="product-title">Camiseta Oficial Colombia Hombre - Amarilla 2024</h2>
+          <p className="product-description">Demuestra tu pasión por la Tricolor con la camiseta oficial de la Selección Colombia 2024 para hombre. Confeccionada en tela liviana y transpirable, ideal para alentar en la cancha o lucir con orgullo.</p>
+          <div className="line"></div>
           <div className="dynamic-price-highlight">
-            <h3>Precio por unidad: COP {applicablePrice.amount.toLocaleString()}</h3>
+            <h3><b>COP</b>{applicablePrice.amount.toLocaleString()}</h3>
             <p>{applicablePrice.condition}</p>
           </div>
-
+          <div className="line"></div>
           <div className="price-scroll-list">
             {pricesMock.map((price, i) => (
               <div key={i} className={`price-block ${price.condition === applicablePrice.condition ? 'active' : ''}`}>

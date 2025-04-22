@@ -5,11 +5,11 @@ import Search from '../Search/Search';
 import BarSup from '../BarSup/BarSup'; 
 
 const Header = ({ minimal = false }) => {
-
+    
     return (
         <header className={minimal ? "header minimal" : "header"}>
             <div className='buttons'>    
-                <h1 id='h-title'>SUR<b>TT</b>E</h1>
+                <h1 onClick={() => window.location.href = "/"} id='h-title'>SUR<b>TT</b>E</h1>
                 {!minimal && <Cart />}
             </div>
 
