@@ -123,4 +123,21 @@ export class ProvidersService {
     provider.documentosCompletos = true;
     return this.providerRepository.save(provider);
   }
+
+  async getPublicProviderById(id: number) {
+    const provider = await this.providerRepository.findOne({
+      where: { id },
+    });
+  
+    if (!provider) throw new NotFoundException('Proveedor no encontrado');
+  
+    return {
+      id: provider.id,
+      nombre_empresa: provider.nombre_empresa,
+      descripcion: provider.descripcion,
+      calificacion: provider.calificacion,
+      cantidadPedidos: provider.cantidadPedidos,
+      proveedorConfiable: provider.proveedorConfiable,
+    };
+  }  
 }

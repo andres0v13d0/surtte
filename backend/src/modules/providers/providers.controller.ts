@@ -10,6 +10,11 @@ import { RolUsuario } from '../users/entity/user.entity';
 export class ProvidersController {
   constructor(private readonly providersService: ProvidersService) {}
 
+  @Get('public/:id')
+  async getPublicInfo(@Param('id', ParseIntPipe) id: number) {
+    return this.providersService.getPublicProviderById(id);
+  }
+  
   @UseGuards(FirebaseAuthGuard)
   @Post()
   async create(@Body() dto: CreateProviderDto): Promise<any> {
