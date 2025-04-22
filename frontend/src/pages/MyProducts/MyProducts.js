@@ -35,6 +35,7 @@ function MyProducts() {
           const prices = await priceRes.json();
 
           return {
+            uuid: prod.id,
             name: prod.name,
             provider: user.proveedorInfo.nombre_empresa,
             stars: 5,

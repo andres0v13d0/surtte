@@ -1,20 +1,28 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import './Product.css'; 
 
 const Product = ({
+    uuid,
     image,
     name,
     provider,
     stars,
     prices,
 }) => {
+
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate(`/product/${uuid}`);
+    };
     
     const mainPrice = prices[0];
 
     return (
-        <div className="product">
+        <div className="product" onClick={handleClick}>
             <img 
                 src={image}
                 alt={name}

@@ -1,14 +1,23 @@
+.cart{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+}
+
 .cart #icon-cart{
     height: 20px;
     color: white;
-    margin: 0 15px;
+    margin: 0;
+    padding: 0;
 }
 
 .cart #number{
     color: #fa7e17;
     font-size: 15px;
     font-weight: bold;
-    position: absolute;
-    right: 25px;
-    top: 20px;
+    margin: 0;
+    padding: 0;
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header/Header';
 import NavInf from '../../components/NavInf/NavInf';
 import Footer from '../../components/Footer/Footer';
+import { Link } from 'react-router-dom';
 import './Categories.css';
 
 const Categories = () => {
@@ -19,14 +20,12 @@ const Categories = () => {
 
                 const subData = await subsRes.json();
 
-                // Revisar qué devuelve realmente la otra API
                 const raw = await imagesRes.text();
                 console.log('Respuesta de with-image:', raw);
 
-                const imagesData = JSON.parse(raw); // Solo si sabemos que es JSON válido
+                const imagesData = JSON.parse(raw); 
                 console.log('Parsed imageData:', imagesData);
 
-                // Unimos las imágenes con las subcategorías
                 const mergedSubCategories = subData.map(sub => {
                     const imageMatch = imagesData.find(img => img.id === sub.id);
                     return {
@@ -37,7 +36,6 @@ const Categories = () => {
 
                 setSubCategories(mergedSubCategories);
 
-                // Extraemos categorías únicas
                 const uniqueCategories = [];
                 mergedSubCategories.forEach(sub => {
                     if (!uniqueCategories.find(cat => cat.id === sub.category.id)) {
@@ -79,13 +77,19 @@ const Categories = () => {
                         {subCategories
                             .filter((sub) => sub.category.id === selectedCategoryId)
                             .map((sub) => (
-                                <div className="category-item" key={sub.id}>
+                                <Link
+                                to={`/sub-category/${sub.slug}`}
+                                key={sub.id}
+                                className="category-item"
+                                style={{ textDecoration: 'none', color: 'inherit' }}
+                                >
                                     <div className="circle-image">
                                         <img src={sub.imageUrl} alt={sub.name} />
                                     </div>
                                     <span>{sub.name}</span>
-                                </div>
-                            ))}
+                                </Link>
+                            )
+                        )}
                     </div>
                 </section>
             </div>

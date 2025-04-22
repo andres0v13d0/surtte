@@ -40,6 +40,7 @@ const CategoryPage = () => {
             const prices = await pricesRes.json();
 
             return {
+              uuid: prod.id,
               name: prod.name,
               provider: prod.provider?.nombre_empresa || 'Proveedor desconocido',
               stars: 5,

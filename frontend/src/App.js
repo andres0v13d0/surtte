@@ -10,6 +10,7 @@ import Chat from './pages/Chat/Chat';
 import MyProducts from './pages/MyProducts/MyProducts';
 import AddProduct from './pages/AddProduct/AddProduct';
 import CategoryPage from './pages/CategoryPage/CategoryPage';
+import ProductInfo from './pages/ProductInfo/ProductInfo';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/add-product" element={<AddProduct />} />
         <Route path="/sub-category/:subCategorySlug" element={<CategoryPage />} />
         <Route path="/category/:categorySlug" element={<CategoryPage />} />
+        <Route path="/product/:uuid" element={<ProductInfo />} />
       </Routes>
     </Router>
   );
