@@ -47,7 +47,7 @@ export class ProductsService {
       description: dto.description.trim(),
       category,
       subCategory,
-      status: dto.status || ProductStatus.PENDING,
+      status: dto.status || ProductStatus.ACTIVE,
     });
 
     return this.productRepo.save(newProduct);
