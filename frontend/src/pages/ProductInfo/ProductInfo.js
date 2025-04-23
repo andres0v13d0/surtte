@@ -15,138 +15,163 @@ const ProductInfo = () => {
   const [unitType, setUnitType] = useState('units');
   const [quantity, setQuantity] = useState(1);
   const [totalUnits, setTotalUnits] = useState(1);
-  const [applicablePrice, setApplicablePrice] = useState(null);
   const scrollRef = useRef(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [mainImage, setMainImage] = useState(null);
 
   useEffect(() => {
-  const productosCache = {};
+    const productosCache = {};
 
-  const getProductoConDatos = async (id) => {
-    if (productosCache[id]) return productosCache[id];
+    const getProductoConDatos = async (id) => {
+      if (productosCache[id]) return productosCache[id];
 
-    const [imgRes, priceRes] = await Promise.all([
-      fetch(`https://api.surtte.com/images/by-product/${id}`),
-      fetch(`https://api.surtte.com/product-prices/product/${id}`)
-    ]);
+      const [imgRes, priceRes] = await Promise.all([
+        fetch(`https://api.surtte.com/images/by-product/${id}`),
+        fetch(`https://api.surtte.com/product-prices/product/${id}`)
+      ]);
 
-    const imgs = await imgRes.json();
-    const priceList = await priceRes.json();
+      const imgs = await imgRes.json();
+      const priceList = await priceRes.json();
 
-    productosCache[id] = { imgs, priceList };
-    return productosCache[id];
-  };
+      productosCache[id] = { imgs, priceList };
+      return productosCache[id];
+    };
 
-  const fetchData = async () => {
-    try {
-      const productRes = await fetch(`https://api.surtte.com/products/${uuid}`);
-      const productData = await productRes.json();
-      setProduct(productData);
+    const fetchData = async () => {
+      try {
+        const productRes = await fetch(`https://api.surtte.com/products/${uuid}`);
+        const productData = await productRes.json();
+        setProduct(productData);
 
-      const { imgs: imagesData, priceList: pricesData } = await getProductoConDatos(uuid);
-      setImages(imagesData);
-      setMainImage(imagesData?.[0]?.imageUrl || '/camiseta.avif');
-      setPrices(pricesData);
+        const { imgs: imagesData, priceList: pricesData } = await getProductoConDatos(uuid);
+        setImages(imagesData);
+        setMainImage(imagesData?.[0]?.imageUrl || '/camiseta.avif');
+        setPrices(pricesData);
+        const bestInitial = [...pricesData]
+          .filter((p) => {
+            if (!p?.minQuantity || typeof p.minQuantity !== 'string') return false;
+            const match = p.minQuantity.match(/\d+/);
+            if (!match) return false;
+            return true;
+          })
+          .sort((a, b) => parseFloat(a.pricePerUnit) - parseFloat(b.pricePerUnit))[0];
 
-      const providerRes = await fetch(`https://api.surtte.com/providers/public/${productData.provider.id}`);
-      const providerData = await providerRes.json();
-      setProvider(providerData);
+        if (bestInitial?.minQuantity?.toLowerCase().includes('docena')) {
+          setUnitType('dozens');
+          const match = bestInitial.minQuantity.match(/\d+/);
+          if (match) setQuantity(parseInt(match[0]));
+        } else {
+          setUnitType('units');
+          const match = bestInitial.minQuantity.match(/\d+/);
+          if (match) setQuantity(parseInt(match[0]));
+        }
 
-      const relatedRes = await fetch(`https://api.surtte.com/products/by-provider/${productData.provider.id}`);
-      const relatedData = await relatedRes.json();
+        const providerRes = await fetch(`https://api.surtte.com/providers/public/${productData.provider.id}`);
+        const providerData = await providerRes.json();
+        setProvider(providerData);
 
-      const relatedFormatted = await Promise.all(
-        relatedData.filter(p => p.id !== productData.id).map(async (prod) => {
-          try {
-            const { imgs, priceList } = await getProductoConDatos(prod.id);
+        const relatedRes = await fetch(`https://api.surtte.com/products/by-provider/${productData.provider.id}`);
+        const relatedData = await relatedRes.json();
 
-            return {
-              uuid: prod.id,
-              name: prod.name,
-              provider: providerData?.nombre_empresa || 'Proveedor',
-              stars: parseInt(providerData?.calificacion) || 5,
-              image: imgs?.[0]?.imageUrl || '/default.jpg',
-              prices: Array.isArray(priceList) && priceList.length > 0
-                ? priceList.map(p => ({
-                    amount: parseFloat(p?.pricePerUnit || '0').toLocaleString('es-CO', { minimumFractionDigits: 0 }),
-                    condition: p?.minQuantity ?? 'Sin condición'
-                  }))
-                : [{ amount: '0', condition: 'Sin condición' }]
-            };
-          } catch {
-            return null;
-          }
-        })
-      );
+        const relatedFormatted = await Promise.all(
+          relatedData.filter(p => p.id !== productData.id).map(async (prod) => {
+            try {
+              const { imgs, priceList } = await getProductoConDatos(prod.id);
 
-      setRelatedProducts(relatedFormatted.filter(Boolean));
-    } catch (err) {
-      console.error('Error cargando datos del producto:', err);
-    }
-  };
+              return {
+                uuid: prod.id,
+                name: prod.name,
+                provider: providerData?.nombre_empresa || 'Proveedor',
+                stars: parseInt(providerData?.calificacion) || 5,
+                image: imgs?.[0]?.imageUrl || '/default.jpg',
+                prices: Array.isArray(priceList) && priceList.length > 0
+                  ? priceList.map(p => ({
+                      amount: parseFloat(p?.pricePerUnit || '0').toLocaleString('es-CO', { minimumFractionDigits: 0 }),
+                      condition: p?.minQuantity ?? 'Sin condición'
+                    }))
+                  : [{ amount: '0', condition: 'Sin condición' }]
+              };
+            } catch {
+              return null;
+            }
+          })
+        );
 
-  fetchData();
-}, [uuid]);
+        setRelatedProducts(relatedFormatted.filter(Boolean));
+      } catch (err) {
+        console.error('Error cargando datos del producto:', err);
+      }
+    };
 
+    fetchData();
+  }, [uuid]);
 
-  const { unidadesDisponibles, docenasDisponibles, cantidadMinima } = useMemo(() => {
+  
+
+  
+
+  const {
+    unidadesDisponibles,
+    docenasDisponibles,
+    cantidadMinimaUnits,
+    cantidadMinimaDozens
+  } = useMemo(() => {
+    let minUnits = Infinity;
+    let minDozens = Infinity;
+
     const unidades = prices.some(p => p.minQuantity?.toLowerCase().includes('unidad'));
     const docenas = prices.some(p => p.minQuantity?.toLowerCase().includes('docena'));
 
-    const cantidades = prices.map(p => {
-      const match = p.minQuantity?.match(/\d+/);
-      if (!match) return null;
-      const number = parseInt(match[0]);
-      return number;
-    }).filter(Boolean);
+    prices.forEach(p => {
+      const match = p.minQuantity?.match(/(\d+)/);
+      if (match) {
+        const num = parseInt(match[1]);
+        if (p.minQuantity.toLowerCase().includes('unidad')) {
+          minUnits = Math.min(minUnits, num);
+        } else if (p.minQuantity.toLowerCase().includes('docena')) {
+          minDozens = Math.min(minDozens, num);
+        }
+      }
+    });
 
     return {
       unidadesDisponibles: unidades,
       docenasDisponibles: docenas,
-      cantidadMinima: Math.min(...cantidades)
+      cantidadMinimaUnits: isFinite(minUnits) ? minUnits : 1,
+      cantidadMinimaDozens: isFinite(minDozens) ? minDozens : 1
     };
   }, [prices]);
 
-  const cantidadMinimaValida = isFinite(cantidadMinima) ? cantidadMinima : 1;
+  const cantidadMinimaValida = unitType === 'dozens' ? cantidadMinimaDozens : cantidadMinimaUnits;
 
   useEffect(() => {
-    const convertedUnits = unitType === 'dozens' ? quantity * 12 : quantity;
-    setTotalUnits(convertedUnits);
+    const nuevaCantidad = unitType === 'dozens' ? cantidadMinimaDozens : cantidadMinimaUnits;
+    setQuantity(nuevaCantidad);
+  }, [unitType, cantidadMinimaDozens, cantidadMinimaUnits]);
 
-    const bestPrice = prices
+  useEffect(() => {
+    const units = unitType === 'dozens' ? quantity * 12 : quantity;
+    setTotalUnits(units);
+  }, [quantity, unitType]);
+  
+
+  const applicablePrice = useMemo(() => {
+    const best = prices
       .filter((p) => {
         if (!p?.minQuantity || typeof p.minQuantity !== 'string') return false;
         const match = p.minQuantity.match(/\d+/);
         if (!match) return false;
         const number = parseInt(match[0]);
-        const isDozen = p.minQuantity.includes('docena');
+        const isDozen = p.minQuantity.toLowerCase().includes('docena');
         const requiredUnits = isDozen ? number * 12 : number;
-        return convertedUnits >= requiredUnits;
+        return totalUnits >= requiredUnits;
       })
-      .sort((a, b) => b.pricePerUnit - a.pricePerUnit)[0] || prices[0];
+      .sort((a, b) => parseFloat(a.pricePerUnit) - parseFloat(b.pricePerUnit))[0]; // menor precio
+  
+    return best || prices[0];
+  }, [totalUnits, prices]);
+  
 
-    setApplicablePrice(bestPrice);
-
-    if (scrollRef.current) {
-      const index = prices.findIndex((p) => p?.minQuantity === bestPrice?.minQuantity);
-      if (index !== -1) {
-        const element = scrollRef.current.children[index];
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-        }
-      }
-    }
-  }, [quantity, unitType, prices]);
-
-  useEffect(() => {
-    if (cantidadMinima && cantidadMinima > 1) {
-      setQuantity(cantidadMinima);
-    }
-    if (!unidadesDisponibles && docenasDisponibles) {
-      setUnitType('dozens');
-    }
-  }, [cantidadMinima, unidadesDisponibles, docenasDisponibles]);
 
   if (!product || !provider || !applicablePrice) return <p>Cargando...</p>;
 
@@ -185,14 +210,18 @@ const ProductInfo = () => {
           <p className="product-description">{product.description}</p>
           <div className="line"></div>
           <div className="dynamic-price-highlight">
-            <h3><b>COP</b>{parseFloat(applicablePrice.pricePerUnit).toLocaleString('es-CO', { minimumFractionDigits: 0 })}</h3>
+            <h3><b>COP</b>{parseFloat(applicablePrice?.pricePerUnit || 0).toLocaleString('es-CO', { minimumFractionDigits: 0 })}</h3>
           </div>
           <p className='p-info-prices'>Este producto tiene precios escalonados según la cantidad. Mira las tarifas disponibles:</p>
           <div className="price-scroll-list" ref={scrollRef}>
             {prices.map((price, i) => (
               <div
                 key={i}
-                className={`price-block ${price.pricePerUnit === applicablePrice.pricePerUnit ? 'active' : ''}`}
+                className={`price-block ${
+                  parseFloat(price.pricePerUnit).toFixed(0) === parseFloat(applicablePrice?.pricePerUnit || 0).toFixed(0)
+                    ? 'active'
+                    : ''
+                }`}
               >
                 <p className="price-amount">COP {parseFloat(price.pricePerUnit).toLocaleString('es-CO', { minimumFractionDigits: 0 })} c/u</p>
                 <p className="price-condition">{price.minQuantity}</p>

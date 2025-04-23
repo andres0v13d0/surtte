@@ -254,8 +254,8 @@ const AddProduct = () => {
 
     const handleImageUpload = (event) => {
         const files = Array.from(event.target.files);
-        if (files.length + images.length > 6) {
-            alert('Puedes subir hasta 6 imágenes máximo.');
+        if (files.length + images.length > 4) {
+            alert('Puedes subir hasta 4 imágenes máximo.');
             return;
         }
 
@@ -291,7 +291,7 @@ const AddProduct = () => {
                                     </>
                                 ))}
 
-                                {images.length < 6 && (
+                                {images.length < 4 && (
                                     <>
                                         <div className="preview-box" onClick={() => document.getElementById('hidden-file-input').click()}>
                                             <span className="add-image">

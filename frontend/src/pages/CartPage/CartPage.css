@@ -1,0 +1,175 @@
+.cart-page {
+  padding: 1.5rem;
+  background-color: #fff;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.request-all {
+  padding-top: 1rem;
+  text-align: start;
+  width: 100%;
+}
+
+.request-all .total-global{
+  display: flex;
+  flex-direction: column;
+}
+
+.request-all .total-global p{
+  font-weight: normal;
+  font-size: 15px;
+  margin: 0;
+}
+
+.prices-shower{
+  display: flex;
+  align-items: start;
+  height: auto;
+}
+
+.prices-shower h1{
+  font-size: 15px;
+  margin: 5px 5px 0 0;
+  font-weight: normal;
+}
+
+.prices-shower h2{
+  margin: 0;
+  font-size: 30px;
+}
+
+.total-global + p{
+  color: #6d6d6d;
+  font-size: 13px;
+}
+
+.request-btn,
+.request-all-btn {
+  padding: 0.75rem;
+  background-color: #fa7e17;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 15px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.request-btn:hover,
+.request-all-btn:hover {
+  border: 1px solid #fa7e17;
+  background-color: white;
+  color: #fa7e17;
+  transition: all 0.3s ease-in-out;
+}
+
+.total-global {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.provider-group {
+  border: 1px solid #ccc;
+  margin-bottom: 2rem;
+  padding: 1rem;
+}
+
+legend {
+  padding: 0 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.cart-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-bottom: 1px solid #eee;
+  padding: 1rem 0;
+}
+
+.item-info {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
+  color: #444;
+}
+
+.item-info .item-image {
+  display: flex;
+  width: 100px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.item-info .item-image img {
+  width: 100%;
+  height: auto;
+}
+
+.item-info .item-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  margin: 0;
+  width: 200px;
+
+}
+
+.product-name {
+  font-size: 16px;
+  font-weight: normal;
+  margin-bottom: 5px;
+}
+
+.product-price {
+  font-size: 25px;
+  display: flex;
+}
+
+.product-price p{
+  margin: 3px 2px 0 0;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.item-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.item-controls select {
+  padding: 8px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: white;
+  width: 100%;
+}
+
+.item-controls #item-delete {
+  color: red;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.provider-total {
+  display: flex;
+  margin: 10px 0;
+  width: 100%;
+  align-items: start;
+  font-size: 18px;
+}
+
+.provider-total p, .provider-total h1{
+  margin: 0;
+  font-size: 18px;
+}
+
+.provider-total p{
+  font-size: 12px;
+  margin: 0 2px 0 10px;
+}

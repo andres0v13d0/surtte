@@ -68,14 +68,14 @@ function MyProducts() {
     <>
       <Header />
       <div className='products-cont'>
-        {productos.map((prod, index) => (
-          <Product key={index} {...prod} />
-        ))}
         <div className='products-add' onClick={addProduct}>
           <div className='add-button'>
             <FontAwesomeIcon icon={faPlus} />
           </div>
         </div>
+        {productos.map((prod, index) => (
+          <Product key={index} {...prod} />
+        ))}
       </div>
       <NavInf selected={"profile"} />
       <Footer />
