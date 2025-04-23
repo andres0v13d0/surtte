@@ -1,69 +1,201 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import './ProductInfo.css';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import NavInf from '../../components/NavInf/NavInf';
-
-const pricesMock = [
-  { amount: 70000, condition: 'por 1 unidad' },
-  { amount: 50000, condition: 'por 9 o más unidades' },
-  { amount: 30000, condition: 'por 3 o más docenas' },
-  { amount: 20000, condition: 'por 10 o más docenas' },
-];
-
-const camiseta = "/camiseta.avif";
+import Product from '../../components/Product/Product';
 
 const ProductInfo = () => {
+  const { uuid } = useParams();
+  const [product, setProduct] = useState(null);
+  const [images, setImages] = useState([]);
+  const [prices, setPrices] = useState([]);
+  const [provider, setProvider] = useState(null);
   const [unitType, setUnitType] = useState('units');
   const [quantity, setQuantity] = useState(1);
   const [totalUnits, setTotalUnits] = useState(1);
-  const [applicablePrice, setApplicablePrice] = useState(pricesMock[0]);
-  const [usedDocenaMatch, setUsedDocenaMatch] = useState(false);
+  const [applicablePrice, setApplicablePrice] = useState(null);
+  const scrollRef = useRef(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [mainImage, setMainImage] = useState(null);
+
+  useEffect(() => {
+  const productosCache = {};
+
+  const getProductoConDatos = async (id) => {
+    if (productosCache[id]) return productosCache[id];
+
+    const [imgRes, priceRes] = await Promise.all([
+      fetch(`https://api.surtte.com/images/by-product/${id}`),
+      fetch(`https://api.surtte.com/product-prices/product/${id}`)
+    ]);
+
+    const imgs = await imgRes.json();
+    const priceList = await priceRes.json();
+
+    productosCache[id] = { imgs, priceList };
+    return productosCache[id];
+  };
+
+  const fetchData = async () => {
+    try {
+      const productRes = await fetch(`https://api.surtte.com/products/${uuid}`);
+      const productData = await productRes.json();
+      setProduct(productData);
+
+      const { imgs: imagesData, priceList: pricesData } = await getProductoConDatos(uuid);
+      setImages(imagesData);
+      setMainImage(imagesData?.[0]?.imageUrl || '/camiseta.avif');
+      setPrices(pricesData);
+
+      const providerRes = await fetch(`https://api.surtte.com/providers/public/${productData.provider.id}`);
+      const providerData = await providerRes.json();
+      setProvider(providerData);
+
+      const relatedRes = await fetch(`https://api.surtte.com/products/by-provider/${productData.provider.id}`);
+      const relatedData = await relatedRes.json();
+
+      const relatedFormatted = await Promise.all(
+        relatedData.filter(p => p.id !== productData.id).map(async (prod) => {
+          try {
+            const { imgs, priceList } = await getProductoConDatos(prod.id);
+
+            return {
+              uuid: prod.id,
+              name: prod.name,
+              provider: providerData?.nombre_empresa || 'Proveedor',
+              stars: parseInt(providerData?.calificacion) || 5,
+              image: imgs?.[0]?.imageUrl || '/default.jpg',
+              prices: Array.isArray(priceList) && priceList.length > 0
+                ? priceList.map(p => ({
+                    amount: parseFloat(p?.pricePerUnit || '0').toLocaleString('es-CO', { minimumFractionDigits: 0 }),
+                    condition: p?.minQuantity ?? 'Sin condición'
+                  }))
+                : [{ amount: '0', condition: 'Sin condición' }]
+            };
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      setRelatedProducts(relatedFormatted.filter(Boolean));
+    } catch (err) {
+      console.error('Error cargando datos del producto:', err);
+    }
+  };
+
+  fetchData();
+}, [uuid]);
+
+
+  const { unidadesDisponibles, docenasDisponibles, cantidadMinima } = useMemo(() => {
+    const unidades = prices.some(p => p.minQuantity?.toLowerCase().includes('unidad'));
+    const docenas = prices.some(p => p.minQuantity?.toLowerCase().includes('docena'));
+
+    const cantidades = prices.map(p => {
+      const match = p.minQuantity?.match(/\d+/);
+      if (!match) return null;
+      const number = parseInt(match[0]);
+      return number;
+    }).filter(Boolean);
+
+    return {
+      unidadesDisponibles: unidades,
+      docenasDisponibles: docenas,
+      cantidadMinima: Math.min(...cantidades)
+    };
+  }, [prices]);
+
+  const cantidadMinimaValida = isFinite(cantidadMinima) ? cantidadMinima : 1;
 
   useEffect(() => {
     const convertedUnits = unitType === 'dozens' ? quantity * 12 : quantity;
     setTotalUnits(convertedUnits);
 
-    const bestPrice = pricesMock
+    const bestPrice = prices
       .filter((p) => {
-        const number = parseInt(p.condition.match(/\d+/));
-        const isDozen = p.condition.includes('docena');
+        if (!p?.minQuantity || typeof p.minQuantity !== 'string') return false;
+        const match = p.minQuantity.match(/\d+/);
+        if (!match) return false;
+        const number = parseInt(match[0]);
+        const isDozen = p.minQuantity.includes('docena');
         const requiredUnits = isDozen ? number * 12 : number;
         return convertedUnits >= requiredUnits;
       })
-      .sort((a, b) => b.amount - a.amount)[0] || pricesMock[0];
+      .sort((a, b) => b.pricePerUnit - a.pricePerUnit)[0] || prices[0];
 
     setApplicablePrice(bestPrice);
-    setUsedDocenaMatch(bestPrice.condition.includes('docena'));
-  }, [quantity, unitType]);
 
+    if (scrollRef.current) {
+      const index = prices.findIndex((p) => p?.minQuantity === bestPrice?.minQuantity);
+      if (index !== -1) {
+        const element = scrollRef.current.children[index];
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        }
+      }
+    }
+  }, [quantity, unitType, prices]);
+
+  useEffect(() => {
+    if (cantidadMinima && cantidadMinima > 1) {
+      setQuantity(cantidadMinima);
+    }
+    if (!unidadesDisponibles && docenasDisponibles) {
+      setUnitType('dozens');
+    }
+  }, [cantidadMinima, unidadesDisponibles, docenasDisponibles]);
+
+  if (!product || !provider || !applicablePrice) return <p>Cargando...</p>;
 
   return (
     <>
       <Header />
       <div className="product-container">
         <div className="product-image-section">
-          <div className="thumbnail-container">
-            <img src={camiseta} alt="thumb" className="thumbnail" />
-            <img src={camiseta} alt="thumb" className="thumbnail" />
-            <img src={camiseta} alt="thumb" className="thumbnail" />
-          </div>
-          <img src={camiseta} alt="Producto" className="main-image" />
+          {images.length > 1 && (
+            <div className="thumbnail-container">
+              {images.map((img, i) => (
+                <img
+                  key={i}
+                  src={img.imageUrl}
+                  alt={`thumb-${i}`}
+                  className={`thumbnail ${mainImage === img.imageUrl ? 'selected' : ''}`}
+                  loading="lazy"
+                  onClick={() => setMainImage(img.imageUrl)}
+                />
+              ))}
+            </div>
+          )}
+          <img
+            src={mainImage}
+            alt="Producto"
+            className="main-image"
+            loading="lazy"
+            decoding="async"
+            width="300"
+            height="300"
+          />
         </div>
 
         <div className="product-details">
-          <h2 className="product-title">Camiseta Oficial Colombia Hombre - Amarilla 2024</h2>
-          <p className="product-description">Demuestra tu pasión por la Tricolor con la camiseta oficial de la Selección Colombia 2024 para hombre. Confeccionada en tela liviana y transpirable, ideal para alentar en la cancha o lucir con orgullo.</p>
+          <h2 className="product-title">{product.name}</h2>
+          <p className="product-description">{product.description}</p>
           <div className="line"></div>
           <div className="dynamic-price-highlight">
-            <h3><b>COP</b>{applicablePrice.amount.toLocaleString()}</h3>
+            <h3><b>COP</b>{parseFloat(applicablePrice.pricePerUnit).toLocaleString('es-CO', { minimumFractionDigits: 0 })}</h3>
           </div>
           <p className='p-info-prices'>Este producto tiene precios escalonados según la cantidad. Mira las tarifas disponibles:</p>
-          <div className="price-scroll-list">
-            {pricesMock.map((price, i) => (
-              <div key={i} className={`price-block ${price.condition === applicablePrice.condition ? 'active' : ''}`}>
-                <p className="price-amount">COP {price.amount.toLocaleString()} c/u</p>
-                <p className="price-condition">{price.condition}</p>
+          <div className="price-scroll-list" ref={scrollRef}>
+            {prices.map((price, i) => (
+              <div
+                key={i}
+                className={`price-block ${price.pricePerUnit === applicablePrice.pricePerUnit ? 'active' : ''}`}
+              >
+                <p className="price-amount">COP {parseFloat(price.pricePerUnit).toLocaleString('es-CO', { minimumFractionDigits: 0 })} c/u</p>
+                <p className="price-condition">{price.minQuantity}</p>
               </div>
             ))}
           </div>
@@ -72,37 +204,42 @@ const ProductInfo = () => {
             <div className="unit-selector">
               <label>Unidad:</label>
               <select value={unitType} onChange={(e) => setUnitType(e.target.value)}>
-                <option value="units">Unidades</option>
-                <option value="dozens">Docenas</option>
+                {unidadesDisponibles && <option value="units">Unidades</option>}
+                {docenasDisponibles && <option value="dozens">Docenas</option>}
               </select>
             </div>
 
             <div className="quantity-selector">
               <label>Cantidad:</label>
               <select value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))}>
-                {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
+                {Array.from({ length: 20 }, (_, i) => i + cantidadMinimaValida).map((num) => (
                   <option key={num} value={num}>{num}</option>
                 ))}
               </select>
             </div>
           </div>
 
-          {unitType === 'units' && usedDocenaMatch && (totalUnits % 12 === 0) && (
+          {unitType === 'units' && applicablePrice.minQuantity?.includes('docena') && (totalUnits % 12 === 0) && (
             <p className="warning-text">💡 Podrías ahorrar más si seleccionas "Docenas" en vez de "Unidades".</p>
           )}
-        
-        
-         <button className="add-to-cart">Añadir al carrito</button>
-         <div className="line"></div>
+
+          <button className="add-to-cart">Añadir al carrito</button>
+          <div className="line"></div>
 
           <div className="product-provider-info">
             <h1>Información del proveedor</h1>
-            <p className='p-name-provider'>Distribuciones el Paisa</p>
-            <p className='p-calf-provider'><strong>Calificación: </strong>⭐ ⭐ ⭐ ⭐ ⭐ </p>
-            <p className='p-desc-provider'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vehicula vitae orci id vestibulum. Phasellus mollis molestie ante nec venenatis. Sed in urna sed lectus elementum scelerisque.</p>
+            <p className='p-name-provider'>{provider.nombre_empresa}</p>
+            <p className='p-calf-provider'><strong>Calificación: </strong>⭐ {provider.calificacion}</p>
+            <p className='p-desc-provider'>{provider.descripcion}</p>
           </div>
+
           <div className="line"></div>
           <h2 className="more-products-title">Más productos del proveedor</h2>
+          <div className='products-cont'>
+            {relatedProducts.map((prod, index) => (
+              <Product key={index} {...prod} />
+            ))}
+          </div>
         </div>
       </div>
       <NavInf />

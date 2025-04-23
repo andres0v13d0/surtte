@@ -22,6 +22,79 @@ const AddProduct = () => {
     const [subcategoria, setSubcategoria] = useState(null);
     const [categorias, setCategorias] = useState([]);
 
+    const validarCantidad = (texto) => {
+        const regexOMas = /^(\d+)\s+o\s+m[aá]s\s+(unidades|docenas)$/i;
+        const regexRango = /^(\d+)\s+a\s+(\d+)\s+(unidades|docenas)$/i;
+    
+        const matchOMas = texto.match(regexOMas);
+        if (matchOMas) {
+            return {
+                valido: true,
+                tipo: 'mas',
+                unidad: matchOMas[2].toLowerCase()
+            };
+        }
+    
+        const matchRango = texto.match(regexRango);
+        if (matchRango) {
+            const min = parseInt(matchRango[1]);
+            const max = parseInt(matchRango[2]);
+            if (min < max) {
+                return {
+                valido: true,
+                tipo: 'rango',
+                unidad: matchRango[3].toLowerCase()
+                };
+            }
+        }
+    
+        return { valido: false };
+    };
+    
+    const validarStep = (pasoActual) => {
+        if (pasoActual === 0 && images.length === 0) {
+            alert('Debes subir al menos una imagen.');
+            return false;
+        }
+        if (pasoActual === 1 && (!productName.trim() || !description.trim() || !categoria)) {
+            alert('Completa todos los campos del producto.');
+            return false;
+        }
+        if (pasoActual === 2) {
+            const errores = [];
+            const unidadesPorTipo = { unidades: 0, docenas: 0 };
+        
+            for (const block of priceBlocks) {
+                const precio = parseFloat((block.precio || '').toString().replace(/\./g, ''));
+                const cantidad = block.cantidad.trim();
+                const resultado = validarCantidad(cantidad);
+        
+                if (!resultado.valido || isNaN(precio) || precio <= 0) {
+                    errores.push(`Cantidad o precio inválido en un bloque.`);
+                    break;
+                }
+        
+                if (resultado.tipo === 'mas') {
+                    unidadesPorTipo[resultado.unidad]++;
+                }
+            }
+        
+            if (errores.length > 0) {
+                alert(errores[0]);
+                return false;
+            }
+        
+            for (const unidad in unidadesPorTipo) {
+                if (unidadesPorTipo[unidad] > 1) {
+                    alert(`Solo puedes poner una condición 'o más' por tipo de unidad (${unidad}).`);
+                    return false;
+                }
+            }
+        }
+    
+        return true;
+    };  
+
     useEffect(() => {
         const fetchCategorias = async () => {
           try {
@@ -51,6 +124,7 @@ const AddProduct = () => {
     const subcategorias = categoria ? categorias.find(c => c.label === categoria.label)?.options || [] : [];
 
     const goToStep = (newStep) => {
+        if (newStep > step && !validarStep(step)) return;
         setDirection(newStep > step ? 'right' : 'left');
         setStep(newStep);
     };
@@ -72,6 +146,12 @@ const AddProduct = () => {
                 const precio = parseFloat((p.precio || '').toString().replace(/\./g, ''));
                 return !isNaN(precio) && precio > 0 && p.cantidad?.trim();
             });
+
+            const algunBloqueInvalido = priceBlocks.some(p => !validarCantidad(p.cantidad.trim()).valido);
+
+            if (algunBloqueInvalido) {
+                return alert('Hay cantidades mal escritas. Usa formatos como "9 o más unidades" o "1 a 3 docenas".');
+            }
             
 
             if (!preciosValidos.length) {
