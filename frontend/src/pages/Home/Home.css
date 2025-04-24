@@ -1,0 +1,8 @@
+.products-cont {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}

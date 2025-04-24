@@ -1,21 +1,24 @@
 .product {
+  margin: 0;
     display: flex;
-    height: 200px;
-    width: auto;
+    flex-direction: column;
+    height: 300px;
+    width: 180px;
     margin: 10px;
-    border: 1px solid #ccc;
     border-radius: 5px;
     font-family: 'Ubuntu', sans-serif;
   }
   
   .product .product-image {
-    width: 30%;
-    height: 100%;
+    width: 180px;
+    height: 200px;
     object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid #ccc;
   }
   
   .product .product-info {
-    padding: 10px;
+    margin-top: 2px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -23,9 +26,13 @@
   }
   
   .product .product-info .product-name {
-    font-size: 15px;
+    font-size: 13px;
     margin: 0;
-    font-weight: 500;
+    font-weight: normal;
+    width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .product-rating {
@@ -37,30 +44,43 @@
   .product-rating .rating-text {
     font-size: 12px;
     color: #888;
+    margin-left: 5px;
   }
   
   .product-rating .star-icon {
-    margin-left: 5px;
-    color: #FFD700;
-    font-size: 15px;
+    margin: 0;
+    color: black;
+    font-size: 11px;
+  }
+
+  .product-price-inf{
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
   }
   
   .product-price-highlight {
-    margin-top: 10px;
     position: relative;
   }
   
   .main-price {
-    font-size: 22px;
-    font-weight: bold;
+    font-size: 20px;
+    font-weight: 500;
     color: #fa7e17;
     margin: 0;
+    display: flex;
+  }
+
+  .main-price span{
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 5px;
   }
   
   .price-note {
-    font-size: 13px;
+    font-size: 10px;
     color: #666;
-    margin-top: -4px;
+    margin: 0;
   }
   
   .tooltip-wrapper {
@@ -100,17 +120,17 @@
   }
   
   .add-to-cart-button {
-    margin-top: 10px;
-    padding: 0.5rem 1rem;
-    background-color: #fa7e17;
-    color: white;
-    border: none;
+    margin-left: auto;
+    background-color: transparent;
+    color: #fa7e17;
     border-radius: 25px;
+    border: none;
     cursor: pointer;
     transition: background-color 0.2s;
+    font-size: 25px
   }
   
   .add-to-cart-button:hover {
-    background-color: #e86f10;
+    color: black;
   }
   

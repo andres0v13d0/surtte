@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import './Product.css'; 
 
 const Product = ({
@@ -32,27 +32,29 @@ const Product = ({
                 <p className="product-name">{name}</p>
 
                 <div className="product-rating">
-                    <span className="rating-text">{provider}</span>
                     {[...Array(stars)].map((_, index) => (
                         <FontAwesomeIcon key={index} icon={faStar} className="star-icon" />
                     ))}
+                    <span className="rating-text">{provider}</span>
                 </div>
 
-                <div className="product-price-highlight">
-                    <p className="main-price">COP {mainPrice.amount}</p>
-                    <p className="price-note">Aplica {mainPrice.condition}</p>
-
-                    <div className="tooltip-wrapper">
-                        <span className="price-more-info">+{prices.length - 1} precios disponibles</span>
-                        <div className="tooltip-content">
-                        {prices.slice(1).map((price, i) => (
-                            <p key={i}><strong>${price.amount}</strong> {price.condition}</p>
-                        ))}
-                        </div>
+                <div className="tooltip-wrapper">
+                    <span className="price-more-info">+{prices.length - 1} precios disponibles</span>
+                    <div className="tooltip-content">
+                    {prices.slice(1).map((price, i) => (
+                        <p key={i}><strong>${price.amount}</strong> {price.condition}</p>
+                    ))}
                     </div>
                 </div>
 
-                <button className="add-to-cart-button">Añadir al carrito</button>
+                <div className='product-price-inf'>
+                    <div className="product-price-highlight">
+                        <p className="main-price"><span>COP</span>{mainPrice.amount}</p>
+                        <p className="price-note">Aplica {mainPrice.condition}</p>
+                    </div>
+                    <button className="add-to-cart-button"><FontAwesomeIcon icon={faCartPlus} /></button>
+                </div>
+                
             </div>
         </div>
     );

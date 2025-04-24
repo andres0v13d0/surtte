@@ -3,6 +3,7 @@ import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
 import NavInf from '../../components/NavInf/NavInf';
 import Product from '../../components/Product/Product';
+import './Home.css';
 
 function Home() {
   const [products, setProducts] = useState([]);
