@@ -1,5 +1,6 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import Logout from './pages/Logout/Logout';
 import Login from './pages/Login/Login'
 import Home from './pages/Home/Home';
@@ -13,9 +14,34 @@ import CategoryPage from './pages/CategoryPage/CategoryPage';
 import ProductInfo from './pages/ProductInfo/ProductInfo';
 import CartPage from './pages/CartPage/CartPage';
 
+const titles = {
+  '/': 'Inicio - SURTTE',
+  '/login': 'Iniciar sesión - SURTTE',
+  '/logout': 'Cerrar sesión - SURTTE',
+  '/register': 'Registrarse - SURTTE',
+  '/profile': 'Perfil - SURTTE',
+  '/categories': 'Categorías - SURTTE',
+  '/messages': 'Chat - SURTTE',
+  '/my-products': 'Mis productos - SURTTE',
+  '/add-product': 'Agregar producto - SURTTE',
+  '/cart': 'Carrito - SURTTE',
+};
+
+const TitleUpdater = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const basePath = location.pathname.split('/')[1] ? `/${location.pathname.split('/')[1]}` : '/';
+    document.title = titles[basePath] || 'SURTTE';
+  }, [location]);
+
+  return null;
+};
+
 function App() {
   return (
     <Router>
+      <TitleUpdater />
       <Routes>
         <Route path="/" element={<Home />} />    
         <Route path="/login" element={<Login />} />
