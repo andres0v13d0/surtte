@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany } from 'typeorm';
 import { Provider } from '../../providers/entity/provider.entity';
+import { CartItem } from 'src/modules/cart/entity/cart.entity';
  
 export enum RolUsuario {
     ADMIN = 'admin',
@@ -40,4 +41,7 @@ export class User {
 
     @OneToOne(() => Provider, (provider) => provider.usuario)
     proveedorInfo: Provider;
+
+    @OneToMany(() => CartItem, (cartItem) => cartItem.user)
+    cartItems: CartItem[];
 }

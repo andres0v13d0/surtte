@@ -13,6 +13,7 @@ import { Category } from 'src/modules/categories/entities/category.entity';
 import { SubCategory } from 'src/modules/categories/entities/sub-category.entity';
 import { ProductImage } from './product-image.entity';
 import { ProductPrice } from './product-price.entity';
+import { CartItem } from 'src/modules/cart/entity/cart.entity';
 
 export enum ProductStatus {
   ACTIVE = 'active',
@@ -62,4 +63,7 @@ export class Product {
 
   @OneToMany(() => ProductPrice, (price) => price.product)
   prices: ProductPrice[];
+
+  @OneToMany(() => CartItem, (cartItem) => cartItem.product)
+  cartItems: CartItem[];
 }
