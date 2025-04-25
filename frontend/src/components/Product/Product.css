@@ -64,7 +64,7 @@
   }
   
   .main-price {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 500;
     color: #fa7e17;
     margin: 0;
@@ -74,11 +74,11 @@
   .main-price span{
     font-size: 10px;
     font-weight: 500;
-    margin-top: 5px;
+    margin-top: 4px;
   }
   
   .price-note {
-    font-size: 10px;
+    font-size: 8px;
     color: #666;
     margin: 0;
   }
@@ -127,7 +127,7 @@
     border: none;
     cursor: pointer;
     transition: background-color 0.2s;
-    font-size: 25px
+    font-size: 20px;
   }
   
   .add-to-cart-button:hover {

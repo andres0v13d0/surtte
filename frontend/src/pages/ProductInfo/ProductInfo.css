@@ -154,6 +154,11 @@
   border: 1px solid #ccc;
 }
 
+.quantity-selector .highlight-quantity,
+.unit-selector .highlight-quantity {
+  border: 2px solid red !important;
+}
+
 .add-to-cart {
   margin-top: 10px;
   padding: 1rem 1rem;

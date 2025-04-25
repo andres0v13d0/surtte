@@ -21,10 +21,8 @@ const Categories = () => {
                 const subData = await subsRes.json();
 
                 const raw = await imagesRes.text();
-                console.log('Respuesta de with-image:', raw);
 
                 const imagesData = JSON.parse(raw); 
-                console.log('Parsed imageData:', imagesData);
 
                 const mergedSubCategories = subData.map(sub => {
                     const imageMatch = imagesData.find(img => img.id === sub.id);

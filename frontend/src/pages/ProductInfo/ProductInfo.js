@@ -18,7 +18,31 @@ const ProductInfo = () => {
   const scrollRef = useRef(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [mainImage, setMainImage] = useState(null);
+  const unitRef = useRef(null);
+  const quantityRef = useRef(null);
 
+  useEffect(() => {
+    const shouldScroll = sessionStorage.getItem('scrollToQuantity') === 'true';
+  
+    if (shouldScroll && product && prices.length > 0) {
+      setTimeout(() => {
+        if (unitRef.current && quantityRef.current) {
+          unitRef.current.classList.add('highlight-quantity');
+          quantityRef.current.classList.add('highlight-quantity');
+  
+          unitRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  
+          sessionStorage.removeItem('scrollToQuantity');
+  
+          setTimeout(() => {
+            unitRef.current?.classList.remove('highlight-quantity');
+            quantityRef.current?.classList.remove('highlight-quantity');
+          }, 3000);
+        }
+      }, 100);
+    }
+  }, [product, prices]);
+  
   useEffect(() => {
     const productosCache = {};
 
@@ -106,10 +130,6 @@ const ProductInfo = () => {
     fetchData();
   }, [uuid]);
 
-  
-
-  
-
   const {
     unidadesDisponibles,
     docenasDisponibles,
@@ -154,7 +174,6 @@ const ProductInfo = () => {
     setTotalUnits(units);
   }, [quantity, unitType]);
   
-
   const applicablePrice = useMemo(() => {
     const best = prices
       .filter((p) => {
@@ -166,11 +185,44 @@ const ProductInfo = () => {
         const requiredUnits = isDozen ? number * 12 : number;
         return totalUnits >= requiredUnits;
       })
-      .sort((a, b) => parseFloat(a.pricePerUnit) - parseFloat(b.pricePerUnit))[0]; // menor precio
+      .sort((a, b) => parseFloat(a.pricePerUnit) - parseFloat(b.pricePerUnit))[0];
   
     return best || prices[0];
   }, [totalUnits, prices]);
   
+  const handleAddToCart = async () => {
+  try {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('Debes iniciar sesión para agregar al carrito.');
+      return;
+    }
+
+    const res = await fetch('https://api.surtte.com/cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        productId: product.id,
+        unitType,
+        quantity,
+        priceSnapshot: parseFloat(applicablePrice?.pricePerUnit || 0),
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error('No se pudo agregar al carrito');
+    }
+
+    alert('Producto agregado al carrito exitosamente ✅');
+  } catch (err) {
+    console.error('Error al agregar al carrito:', err);
+    alert('Ocurrió un error al agregar al carrito 😓');
+  }
+};
 
 
   if (!product || !provider || !applicablePrice) return <p>Cargando...</p>;
@@ -230,17 +282,17 @@ const ProductInfo = () => {
           </div>
 
           <div className="selectors">
-            <div className="unit-selector">
+            <div className="unit-selector" >
               <label>Unidad:</label>
-              <select value={unitType} onChange={(e) => setUnitType(e.target.value)}>
+              <select ref={unitRef} value={unitType} onChange={(e) => setUnitType(e.target.value)}>
                 {unidadesDisponibles && <option value="units">Unidades</option>}
                 {docenasDisponibles && <option value="dozens">Docenas</option>}
               </select>
             </div>
 
-            <div className="quantity-selector">
+            <div className="quantity-selector" >
               <label>Cantidad:</label>
-              <select value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))}>
+              <select ref={quantityRef} value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))}>
                 {Array.from({ length: 20 }, (_, i) => i + cantidadMinimaValida).map((num) => (
                   <option key={num} value={num}>{num}</option>
                 ))}
@@ -252,7 +304,7 @@ const ProductInfo = () => {
             <p className="warning-text">💡 Podrías ahorrar más si seleccionas "Docenas" en vez de "Unidades".</p>
           )}
 
-          <button className="add-to-cart">Añadir al carrito</button>
+          <button className="add-to-cart" onClick={handleAddToCart}>Añadir al carrito</button>
           <div className="line"></div>
 
           <div className="product-provider-info">

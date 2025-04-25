@@ -9,7 +9,7 @@ import axios from 'axios';
 import './Login.css';
 import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
-import BrandLogo from '../../components/BrandLogo/BrandLogo';
+import BrandLogo from '../../utils/BrandLogo/BrandLogo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 

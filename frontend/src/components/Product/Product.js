@@ -18,6 +18,11 @@ const Product = ({
     const handleClick = () => {
         navigate(`/product/${uuid}`);
     };
+
+    const handleAddToCartClick = (e) => {
+        sessionStorage.setItem('scrollToQuantity', 'true');
+        navigate(`/product/${uuid}`);
+    };
     
     const mainPrice = prices[0];
 
@@ -52,7 +57,9 @@ const Product = ({
                         <p className="main-price"><span>COP</span>{mainPrice.amount}</p>
                         <p className="price-note">Aplica {mainPrice.condition}</p>
                     </div>
-                    <button className="add-to-cart-button"><FontAwesomeIcon icon={faCartPlus} /></button>
+                    <button className="add-to-cart-button" onClick={handleAddToCartClick}>
+                        <FontAwesomeIcon icon={faCartPlus} />
+                    </button>
                 </div>
                 
             </div>

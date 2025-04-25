@@ -11,8 +11,8 @@ import Chat from './pages/Chat/Chat';
 import MyProducts from './pages/MyProducts/MyProducts';
 import AddProduct from './pages/AddProduct/AddProduct';
 import CategoryPage from './pages/CategoryPage/CategoryPage';
-import ProductInfo from './pages/ProductInfo/ProductInfo';
 import CartPage from './pages/CartPage/CartPage';
+import ProductInfoWrapper from './utils/ProductInfoWrapper/ProductInfoWrapper';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -54,7 +54,7 @@ function App() {
         <Route path="/add-product" element={<AddProduct />} />
         <Route path="/sub-category/:subCategorySlug" element={<CategoryPage />} />
         <Route path="/category/:categorySlug" element={<CategoryPage />} />
-        <Route path="/product/:uuid" element={<ProductInfo />} />
+        <Route path="/product/:uuid" element={<ProductInfoWrapper />} />
         <Route path="/cart" element={<CartPage />} />
       </Routes>
     </Router>
