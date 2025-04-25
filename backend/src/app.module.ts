@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { CartModule } from './modules/cart/cart.module';
+import { RedisModule } from './modules/redis/redis.module';
 
 async function getDatabaseSecrets() {
   const client = new SecretsManagerClient({ region: 'us-east-2' });
@@ -62,6 +63,7 @@ async function getDatabaseSecrets() {
     ProductsModule,
     CategoriesModule,
     CartModule,
+    RedisModule,
   ],
 })
 export class AppModule {}
