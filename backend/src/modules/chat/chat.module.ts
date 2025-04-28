@@ -6,6 +6,7 @@ import { ChatGateway } from './chat.gateway';
 import { RedisModule } from '../redis/redis.module';
 import { NotificationModule } from '../notification/notification.module';
 import { UsersModule } from '../users/users.module';
+import { ChatController } from './chat.controller';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModule } from '../users/users.module';
     NotificationModule,
     UsersModule
   ],
+  controllers: [ChatController],
   providers: [ChatService, ChatGateway],
   exports: [ChatService],
 })
