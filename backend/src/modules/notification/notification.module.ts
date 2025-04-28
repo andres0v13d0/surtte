@@ -12,5 +12,6 @@ import { RedisModule } from '../redis/redis.module';
   ],
   providers: [NotificationService],
   controllers: [NotificationController],
+  exports: [NotificationService],
 })
 export class NotificationModule {}
