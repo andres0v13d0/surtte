@@ -7,13 +7,17 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
+  ManyToMany,
+  JoinTable
 } from 'typeorm';
 import { Provider } from 'src/modules/providers/entity/provider.entity';
 import { Category } from 'src/modules/categories/entities/category.entity';
 import { SubCategory } from 'src/modules/categories/entities/sub-category.entity';
 import { ProductImage } from './product-image.entity';
 import { ProductPrice } from './product-price.entity';
+import { Color } from './color.entity';
 import { CartItem } from 'src/modules/cart/entity/cart.entity';
+import { Size } from './size.entity';
 
 export enum ProductStatus {
   ACTIVE = 'active',
@@ -66,4 +70,20 @@ export class Product {
 
   @OneToMany(() => CartItem, (cartItem) => cartItem.product)
   cartItems: CartItem[];
+
+  @ManyToMany(() => Color, (color) => color.products, { cascade: true })
+  @JoinTable({
+    name: 'product_colors',
+    joinColumn: { name: 'product_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'color_id', referencedColumnName: 'id' },
+  })
+  colors: Color[];
+
+  @ManyToMany(() => Size, (size) => size.products, { cascade: true })
+  @JoinTable({
+    name: 'product_sizes',
+    joinColumn: { name: 'product_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'size_id', referencedColumnName: 'id' },
+  })
+  sizes: Size[];
 }
