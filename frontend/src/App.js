@@ -13,6 +13,7 @@ import AddProduct from './pages/AddProduct/AddProduct';
 import CategoryPage from './pages/CategoryPage/CategoryPage';
 import CartPage from './pages/CartPage/CartPage';
 import ProductInfoWrapper from './utils/ProductInfoWrapper/ProductInfoWrapper';
+import UserChat from './pages/UserChat/UserChat';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -25,6 +26,7 @@ const titles = {
   '/my-products': 'Mis productos - SURTTE',
   '/add-product': 'Agregar producto - SURTTE',
   '/cart': 'Carrito - SURTTE',
+  '/user-chat': 'Chat de usuario - SURTTE',
 };
 
 const TitleUpdater = () => {
@@ -56,6 +58,7 @@ function App() {
         <Route path="/category/:categorySlug" element={<CategoryPage />} />
         <Route path="/product/:uuid" element={<ProductInfoWrapper />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/messages/user-chat" element={<UserChat />} />
       </Routes>
     </Router>
   );

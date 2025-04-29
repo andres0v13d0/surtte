@@ -155,6 +155,55 @@ const CartPage = () => {
 
   if (loading) return <p>Cargando carrito...</p>;
 
+  const solicitarPedido = async (providerId, productId, item) => {
+    try {
+      const usuario = JSON.parse(localStorage.getItem('usuario'));
+      const token = localStorage.getItem('token');
+      const senderId = usuario.id;
+  
+      await fetch('https://api.surtte.com/chat/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          senderId,
+          receiverId: providerId,
+          message: 'Hola, quiero solicitar un pedido de su tienda.',
+          messageType: 'TEXT',
+        }),
+      });
+  
+      const productMessage = {
+        type: 'PRODUCT',
+        name: item.productNameSnapshot,
+        quantity: item.quantity,
+        imageUrl: item.imageUrlSnapshot,
+      };
+  
+      await fetch('https://api.surtte.com/chat/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          senderId,
+          receiverId: providerId,
+          message: JSON.stringify(productMessage),
+          messageType: 'TEXT',
+        }),
+      });
+  
+      alert('¡Pedido enviado exitosamente!');
+    } catch (err) {
+      console.error('Error al enviar el pedido:', err);
+      alert('Hubo un error al solicitar el pedido.');
+    }
+  };
+  
+
   return (
     <>
       <Header />
@@ -216,7 +265,12 @@ const CartPage = () => {
                   </div>
                 ))}
                 <div className="provider-total">Subtotal <p>COP</p> <h1>{total.toLocaleString('es-CO', { minimumFractionDigits: 0 })}</h1></div>
-                <button className="request-btn" onClick={() => console.log(`Solicitar pedido a: ${provider}`)}>Solicitar pedido</button>
+                <button 
+                  className="request-btn" 
+                  onClick={() => solicitarPedido(items[0].product.providerId, items[0].product.id, items[0])}
+                >
+                  Solicitar pedido
+                </button>
               </fieldset>
             );
           })}
