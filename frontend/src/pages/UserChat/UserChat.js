@@ -4,7 +4,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import './UserChat.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane, faMicrophone, faPaperclip, faArrowLeft, faCircleStop } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faMicrophone, faPaperclip, faArrowLeft, faCircleStop, faPlay } from '@fortawesome/free-solid-svg-icons';
 
 export default function UserChat() {
   const { id } = useParams();
@@ -15,6 +15,7 @@ export default function UserChat() {
   const [receiverName] = useState(localStorage.getItem('receiverName') || 'Usuario');
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [playingAudioIndex, setPlayingAudioIndex] = useState(null);
   const chunksRef = useRef([]);
   const chatEndRef = useRef(null);
   const socketRef = useRef(null);
@@ -42,13 +43,15 @@ export default function UserChat() {
                 sizes: parsed.sizes || 'N/A',
                 image: parsed.imageUrl || '/camiseta.avif',
               };
+            }
+          } catch {
+            if (m.messageType === 'AUDIO' && m.fileUrl) {
+              msg.type = 'audio';
+              msg.audio = m.fileUrl;
             } else {
               msg.type = 'text';
               msg.text = m.message;
             }
-          } catch (e) {
-            msg.type = 'text';
-            msg.text = m.message;
           }
           return msg;
         });
@@ -63,7 +66,7 @@ export default function UserChat() {
       try {
         const token = localStorage.getItem('token');
         const res = await axios.get(`https://api.surtte.com/chat/is-online/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         setIsOnline(res.data);
       } catch (error) {
@@ -82,9 +85,7 @@ export default function UserChat() {
 
       const socket = io('https://api.surtte.com', {
         transports: ['websocket'],
-        auth: {
-          token: tokenFirebase,
-        },
+        auth: { token: tokenFirebase },
       });
 
       socketRef.current = socket;
@@ -130,10 +131,15 @@ export default function UserChat() {
             sizes: parsed.sizes || 'N/A',
             image: parsed.imageUrl || '/camiseta.avif',
           },
-          sender: 'left'
+          sender: 'left',
         };
       }
     } catch {}
+
+    if (m.messageType === 'AUDIO' && m.fileUrl) {
+      return { type: 'audio', audio: m.fileUrl, sender: 'left' };
+    }
+
     return { type: 'text', text: m.message, sender: 'left' };
   };
 
@@ -149,7 +155,6 @@ export default function UserChat() {
     };
 
     socketRef.current.emit('sendMessage', payload);
-
     setMessages((prev) => [...prev, { type: 'text', text: input.trim(), sender: 'right' }]);
     setInput('');
   };
@@ -164,11 +169,35 @@ export default function UserChat() {
 
       recorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        const formData = new FormData();
-        formData.append('file', blob);
+        const token = localStorage.getItem('token');
 
-        const audioURL = URL.createObjectURL(blob);
-        setMessages((prev) => [...prev, { type: 'audio', audio: audioURL, sender: 'right' }]);
+        const signedRes = await axios.post('https://api.surtte.com/chat/upload', {
+          filename: `audio-${Date.now()}.webm`,
+          mimeType: 'audio/webm',
+        }, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const { signedUrl, finalUrl } = signedRes.data;
+
+        await fetch(signedUrl, {
+          method: 'PUT',
+          body: blob,
+          headers: {
+            'Content-Type': 'audio/webm',
+          },
+        });
+
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        socketRef.current.emit('sendMessage', {
+          senderId: usuario.id,
+          receiverId: parseInt(id),
+          message: '',
+          messageType: 'AUDIO',
+          fileUrl: finalUrl,
+        });
+
+        setMessages((prev) => [...prev, { type: 'audio', audio: finalUrl, sender: 'right' }]);
       };
 
       recorder.start();
@@ -204,12 +233,33 @@ export default function UserChat() {
     }]);
   };
 
+  const handlePlayAudio = (index, url) => {
+    if (playingAudioIndex === index) {
+      const audio = document.getElementById(`audio-${index}`);
+      audio.pause();
+      setPlayingAudioIndex(null);
+    } else {
+      const audio = document.getElementById(`audio-${index}`);
+      audio.play();
+      setPlayingAudioIndex(index);
+
+      audio.onended = () => setPlayingAudioIndex(null);
+    }
+  };
+
   const renderMessage = (msg, index) => {
     if (msg.type === 'text') {
       return <div key={index} className={`chat-message ${msg.sender}`}>{msg.text}</div>;
     }
     if (msg.type === 'audio') {
-      return <div key={index} className={`chat-message ${msg.sender}`}><audio controls src={msg.audio} /></div>;
+      return (
+        <div key={index} className={`chat-message ${msg.sender}`} style={{ display: 'flex', alignItems: 'center' }}>
+          <audio id={`audio-${index}`} src={msg.audio} hidden />
+          <button onClick={() => handlePlayAudio(index, msg.audio)} className="audio-play-button">
+            <FontAwesomeIcon icon={playingAudioIndex === index ? faCircleStop : faPlay} size="lg" />
+          </button>
+        </div>
+      );
     }
     if (msg.type === 'product') {
       return (
