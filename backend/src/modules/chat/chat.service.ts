@@ -170,7 +170,7 @@ export class ChatService {
   }
 
   async generateSignedUrlForMessage(dto: GenerateSignedUrlDto): Promise<{ signedUrl: string; finalUrl: string }> {
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'audio/mpeg', 'audio/mp3', 'application/pdf'];
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'audio/mpeg', 'audio/mp3', 'audio/webm','application/pdf'];
 
     if (!allowedMimeTypes.includes(dto.mimeType)) {
       throw new ForbiddenException('Unsupported file type.');
