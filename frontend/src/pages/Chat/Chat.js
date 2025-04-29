@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import NavInf from '../../components/NavInf/NavInf';
 import Footer from '../../components/Footer/Footer';
@@ -7,6 +8,7 @@ import './Chat.css';
 
 const Chat = () => {
     const [chats, setChats] = useState([]);
+    const navigate = useNavigate(); 
 
     useEffect(() => {
         const fetchChats = async () => {
@@ -33,13 +35,13 @@ const Chat = () => {
                         name: convo.otherUserName || 'Usuario',
                         lastMessage: convo.lastMessage?.message || '',
                         time: formatDate(convo.lastMessage?.createdAt),
+                        timeRaw: convo.lastMessage?.createdAt,
                         unreadCount: convo.unreadCount || 0,
                         pinned: false
                     };
                 });
-                
 
-                chatsFormatted.sort((a, b) => b.timeRaw - a.timeRaw);
+                chatsFormatted.sort((a, b) => new Date(b.timeRaw) - new Date(a.timeRaw));
 
                 setChats(chatsFormatted);
             } catch (err) {
@@ -76,7 +78,12 @@ const Chat = () => {
                         <p className="no-chats">No tienes conversaciones aún.</p>
                     ) : (
                         chats.map((chat) => (
-                            <div className="chat-item" key={chat.id}>
+                            <div
+                                className="chat-item"
+                                key={chat.id}
+                                onClick={() => navigate(`/messages/user-chat/${chat.id}`)} 
+                                style={{ cursor: 'pointer' }}
+                            >
                                 <div className="chat-info">
                                     <div className="chat-header">
                                         <span className="chat-name">
@@ -91,12 +98,11 @@ const Chat = () => {
                                     <div className="chat-message">
                                         {(() => {
                                             try {
-                                            const parsed = JSON.parse(chat.lastMessage);
-                                            if (parsed?.type === 'PRODUCT') {
-                                                return `Producto: ${parsed.name || 'desconocido'}`;
-                                            }
-                                            } catch (e) {
-                                            }
+                                                const parsed = JSON.parse(chat.lastMessage);
+                                                if (parsed?.type === 'PRODUCT') {
+                                                    return `Producto: ${parsed.name || 'desconocido'}`;
+                                                }
+                                            } catch (e) {}
                                             return chat.lastMessage;
                                         })()}
                                     </div>

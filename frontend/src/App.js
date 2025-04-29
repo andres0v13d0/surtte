@@ -58,7 +58,7 @@ function App() {
         <Route path="/category/:categorySlug" element={<CategoryPage />} />
         <Route path="/product/:uuid" element={<ProductInfoWrapper />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/messages/user-chat" element={<UserChat />} />
+        <Route path="/messages/user-chat/:id" element={<UserChat />} />
       </Routes>
     </Router>
   );
