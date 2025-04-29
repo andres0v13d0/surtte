@@ -7,13 +7,15 @@ import { RedisModule } from '../redis/redis.module';
 import { NotificationModule } from '../notification/notification.module';
 import { UsersModule } from '../users/users.module';
 import { ChatController } from './chat.controller';
+import { User } from '../users/entity/user.entity';
+import { Provider } from '../providers/entity/provider.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ChatEntity]),
+    TypeOrmModule.forFeature([ChatEntity, User, Provider]),
     RedisModule,
     NotificationModule,
-    UsersModule
+    UsersModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],

@@ -2,6 +2,8 @@ import { Injectable, NotFoundException, ForbiddenException, InternalServerErrorE
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ChatEntity } from './entity/chat.entity';
+import { User } from '../users/entity/user.entity';
+import { Provider } from '../providers/entity/provider.entity';
 import { CreateMessageDto, GenerateSignedUrlDto, MessageType } from './dto/chat.dto';
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -17,7 +19,22 @@ export class ChatService {
   constructor(
     @InjectRepository(ChatEntity)
     private readonly chatRepository: Repository<ChatEntity>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+    @InjectRepository(Provider)
+    private readonly providerRepo: Repository<Provider>,
   ) {}
+
+  async getUserName(userId: number): Promise<string> {
+    const provider = await this.providerRepo.findOne({ where: { id: userId  } });
+    if (provider) return provider.nombre_empresa;
+  
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (user) return user.nombre;
+  
+    return 'Desconocido';
+  }
+  
 
   async createMessage(data: CreateMessageDto): Promise<ChatEntity> {
     const newMessage = this.chatRepository.create({
@@ -89,27 +106,47 @@ export class ChatService {
   }
   
 
-  async listConversations(userId: number): Promise<{ userId: string; lastMessage: ChatEntity }[]> {
-    const conversations = await this.chatRepository
+  async listConversations(currentUserId: number): Promise<any[]> {
+    const rawMessages = await this.chatRepository
       .createQueryBuilder('chat')
       .select(['chat.senderId', 'chat.receiverId'])
-      .where('chat.senderId = :userId OR chat.receiverId = :userId', { userId })
+      .addSelect('MAX(chat.createdAt)', 'maxDate')
+      .where('chat.senderId = :userId OR chat.receiverId = :userId', { userId: currentUserId })
+      .andWhere('chat.isDeleted = false')
       .groupBy('chat.senderId, chat.receiverId')
       .getRawMany();
-
-    const results = [];
-
-    for (const convo of conversations) {
-      const otherUserId = convo.chat_senderId === userId ? convo.chat_receiverId : convo.chat_senderId;
-      const lastMessage = await this.findLastMessage(userId, otherUserId);
-
-      if (lastMessage) {
-        results.push({ userId: otherUserId, lastMessage });
+  
+    const uniqueConversations = new Map<string, number>();
+  
+    for (const row of rawMessages) {
+      const userA = row.chat_senderId;
+      const userB = row.chat_receiverId;
+  
+      const key = [userA, userB].sort().join('-');
+      if (!uniqueConversations.has(key)) {
+        const otherId = userA === currentUserId ? userB : userA;
+        uniqueConversations.set(key, otherId);
       }
     }
-
+  
+    const results = [];
+  
+    for (const [key, otherUserId] of uniqueConversations.entries()) {
+      const lastMessage = await this.findLastMessage(currentUserId, otherUserId);
+      const unreadCount = await this.countUnreadMessages(currentUserId, otherUserId);
+      const otherUserName = await this.getUserName(otherUserId);
+  
+      results.push({
+        userId: otherUserId,
+        otherUserName,
+        lastMessage,
+        unreadCount
+      });
+    }
+  
     return results;
   }
+  
 
   async countUnreadMessages(userId: number, fromUserId: number): Promise<number> {
     const count = await this.chatRepository
