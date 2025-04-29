@@ -36,7 +36,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(socket: Socket) {
     try {
-      const token = socket.handshake.query.token as string;
+      const token = socket.handshake.auth?.token;
   
       if (!token) {
         this.logger.warn(`Conexión rechazada: No token proporcionado`);
