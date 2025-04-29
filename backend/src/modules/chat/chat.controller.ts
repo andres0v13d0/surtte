@@ -19,15 +19,7 @@ export class ChatController {
     const isOnline = await client.get(`user:${userId}:online`);
     return isOnline === 'true';
   }
-
-  @Post('generate-signed-url')
-  async generateSignedUrl(
-    @Body() dto: GenerateSignedUrlDto,
-    @Req() req: Request,
-  ) {
-    return this.chatService.generateSignedUrlForMessage(dto);
-  }
-
+  
   @Get('history/:userId')
   async getConversation(@Param('userId') userId: number, @Req() req: Request) {
     const currentUser = req['userDB'];
