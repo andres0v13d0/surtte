@@ -27,19 +27,17 @@ const Chat = () => {
 
                 const data = res.data;
 
-                const chatsFormatted = await Promise.all(
-                    data.map(async (convo) => {
-                        const userInfo = await getUserInfo(convo.userId, token);
-                        return {
-                            id: convo.userId,
-                            name: userInfo?.nombre_empresa || 'Usuario',
-                            lastMessage: convo.lastMessage?.message || '',
-                            time: formatDate(convo.lastMessage?.createdAt),
-                            unreadCount: convo.lastMessage?.unreadCount || 0,
-                            pinned: false
-                        };
-                    })
-                );
+                const chatsFormatted = data.map((convo) => {
+                    return {
+                        id: convo.userId,
+                        name: convo.otherUserName || 'Usuario',
+                        lastMessage: convo.lastMessage?.message || '',
+                        time: formatDate(convo.lastMessage?.createdAt),
+                        unreadCount: convo.unreadCount || 0,
+                        pinned: false
+                    };
+                });
+                
 
                 chatsFormatted.sort((a, b) => b.timeRaw - a.timeRaw);
 
@@ -51,16 +49,6 @@ const Chat = () => {
 
         fetchChats();
     }, []);
-
-    const getUserInfo = async (userId, token) => {
-        try {
-            const res = await axios.get(`https://api.surtte.com/providers/public/${userId}`);
-            return res.data; 
-        } catch (e) {
-            console.error(`Error obteniendo info de usuario ${userId}`, e);
-            return { name: 'Usuario', avatar: '/camiseta.avif' };
-        }
-    };
 
     const formatDate = (isoDate) => {
         if (!isoDate) return '';
