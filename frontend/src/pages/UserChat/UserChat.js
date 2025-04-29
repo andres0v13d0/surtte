@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 import './UserChat.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faMicrophone, faPaperclip, faArrowLeft, faCircleStop } from '@fortawesome/free-solid-svg-icons';
@@ -12,11 +13,12 @@ export default function UserChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isOnline, setIsOnline] = useState(false);
-  const [receiverName, setReceiverName] = useState('');
+  const [receiverName] = useState(localStorage.getItem('receiverName') || 'Usuario');
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const chunksRef = useRef([]);
   const chatEndRef = useRef(null);
+  const socketRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,7 +55,6 @@ export default function UserChat() {
         });
 
         setMessages(formattedMessages);
-        setReceiverName(convo[0]?.senderId === usuario.id ? convo[0].receiverName : convo[0].senderName);
       } catch (error) {
         console.error('Error cargando historial:', error);
       }
@@ -61,7 +62,10 @@ export default function UserChat() {
 
     const checkOnlineStatus = async () => {
       try {
-        const res = await axios.get(`https://api.surtte.com/chat/is-online/${id}`);
+        const token = localStorage.getItem('token');
+        const res = await axios.get(`https://api.surtte.com/chat/is-online/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         setIsOnline(res.data);
       } catch (error) {
         console.error('Error verificando estado en línea:', error);
@@ -73,11 +77,78 @@ export default function UserChat() {
   }, [id]);
 
   useEffect(() => {
+    const connectSocket = () => {
+      const tokenFirebase = localStorage.getItem('tokenFirebase');
+      if (!tokenFirebase) return;
+
+      const socket = io('https://api.surtte.com', {
+        query: { token: tokenFirebase },
+        transports: ['websocket'],
+      });
+
+      socketRef.current = socket;
+
+      socket.on('connect', () => {
+        console.log('🟢 Socket conectado');
+      });
+
+      socket.on('receiveMessage', (newMessage) => {
+        setMessages((prev) => [...prev, parseIncomingMessage(newMessage)]);
+        if (Notification.permission === 'granted') {
+          new Notification('Nuevo mensaje', {
+            body: newMessage.message.length > 50 ? `${newMessage.message.substring(0, 50)}...` : newMessage.message,
+          });
+        }
+      });
+    };
+
+    connectSocket();
+
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().catch(console.error);
+    }
+
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
     if (chatEndRef.current) chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const parseIncomingMessage = (m) => {
+    try {
+      const parsed = JSON.parse(m.message);
+      if (parsed?.type === 'PRODUCT') {
+        return {
+          type: 'product',
+          product: {
+            title: parsed.name,
+            quantity: parsed.quantity,
+            sizes: parsed.sizes || 'N/A',
+            image: parsed.imageUrl || '/camiseta.avif',
+          },
+          sender: 'left'
+        };
+      }
+    } catch {}
+    return { type: 'text', text: m.message, sender: 'left' };
+  };
+
   const handleSend = () => {
     if (!input.trim()) return;
+
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const payload = {
+      senderId: usuario.id,
+      receiverId: parseInt(id),
+      message: input.trim(),
+      messageType: 'TEXT',
+    };
+
+    socketRef.current.emit('sendMessage', payload);
+
     setMessages((prev) => [...prev, { type: 'text', text: input.trim(), sender: 'right' }]);
     setInput('');
   };
@@ -90,8 +161,12 @@ export default function UserChat() {
 
       recorder.ondataavailable = (e) => chunksRef.current.push(e.data);
 
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append('file', blob);
+
+        // Aquí deberías enviar el audio al servidor, para simplicidad solo lo mostramos
         const audioURL = URL.createObjectURL(blob);
         setMessages((prev) => [...prev, { type: 'audio', audio: audioURL, sender: 'right' }]);
       };

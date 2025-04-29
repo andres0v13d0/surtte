@@ -8,7 +8,8 @@ import './Chat.css';
 
 const Chat = () => {
     const [chats, setChats] = useState([]);
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
+     
 
     useEffect(() => {
         const fetchChats = async () => {
@@ -81,7 +82,10 @@ const Chat = () => {
                             <div
                                 className="chat-item"
                                 key={chat.id}
-                                onClick={() => navigate(`/messages/user-chat/${chat.id}`)} 
+                                onClick={() => {
+                                    localStorage.setItem('receiverName', chat.name);
+                                    navigate(`/messages/user-chat/${chat.id}`);
+                                }} 
                                 style={{ cursor: 'pointer' }}
                             >
                                 <div className="chat-info">
