@@ -20,6 +20,13 @@ export class ChatController {
     return isOnline === 'true';
   }
 
+  @Post('generate-signed-url')
+  async generateSignedUrl(
+    @Body() dto: GenerateSignedUrlDto,
+    @Req() req: Request,
+  ) {
+    return this.chatService.generateSignedUrlForMessage(dto);
+  }
 
   @Get('history/:userId')
   async getConversation(@Param('userId') userId: number, @Req() req: Request) {
