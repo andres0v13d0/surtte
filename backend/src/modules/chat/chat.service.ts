@@ -107,34 +107,28 @@ export class ChatService {
   
 
   async listConversations(currentUserId: number): Promise<any[]> {
-    const rawMessages = await this.chatRepository
+    const allMessages = await this.chatRepository
       .createQueryBuilder('chat')
-      .select(['chat.senderId', 'chat.receiverId'])
-      .addSelect('MAX(chat.createdAt)', 'maxDate')
-      .where('chat.senderId = :userId OR chat.receiverId = :userId', { userId: currentUserId })
+      .where('chat.senderId = :id OR chat.receiverId = :id', { id: currentUserId })
       .andWhere('chat.isDeleted = false')
-      .groupBy('chat.senderId, chat.receiverId')
-      .getRawMany();
+      .orderBy('chat.createdAt', 'DESC')
+      .getMany();
   
-    const uniqueConversations = new Map<string, number>();
+    const convoMap = new Map<string, ChatEntity>();
   
-    for (const row of rawMessages) {
-      const userA = row.chat_senderId;
-      const userB = row.chat_receiverId;
-  
-      const key = [userA, userB].sort().join('-');
-      if (!uniqueConversations.has(key)) {
-        const otherId = userA === currentUserId ? userB : userA;
-        uniqueConversations.set(key, otherId);
+    for (const msg of allMessages) {
+      const key = [msg.senderId, msg.receiverId].sort((a, b) => a - b).join('-');
+      if (!convoMap.has(key)) {
+        convoMap.set(key, msg);
       }
     }
   
     const results = [];
   
-    for (const [key, otherUserId] of uniqueConversations.entries()) {
-      const lastMessage = await this.findLastMessage(currentUserId, otherUserId);
-      const unreadCount = await this.countUnreadMessages(currentUserId, otherUserId);
+    for (const [_, lastMessage] of convoMap.entries()) {
+      const otherUserId = lastMessage.senderId === currentUserId ? lastMessage.receiverId : lastMessage.senderId;
       const otherUserName = await this.getUserName(otherUserId);
+      const unreadCount = await this.countUnreadMessages(currentUserId, otherUserId);
   
       results.push({
         userId: otherUserId,
@@ -145,8 +139,7 @@ export class ChatService {
     }
   
     return results;
-  }
-  
+  }  
 
   async countUnreadMessages(userId: number, fromUserId: number): Promise<number> {
     const count = await this.chatRepository
