@@ -1,4 +1,3 @@
-// UserChat.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -78,12 +77,14 @@ export default function UserChat() {
 
   useEffect(() => {
     const connectSocket = () => {
-      const tokenFirebase = localStorage.getItem('tokenFirebase');
+      const tokenFirebase = localStorage.getItem('token');
       if (!tokenFirebase) return;
 
       const socket = io('https://api.surtte.com', {
-        query: { token: tokenFirebase },
         transports: ['websocket'],
+        auth: {
+          token: tokenFirebase,
+        },
       });
 
       socketRef.current = socket;
@@ -166,7 +167,6 @@ export default function UserChat() {
         const formData = new FormData();
         formData.append('file', blob);
 
-        // Aquí deberías enviar el audio al servidor, para simplicidad solo lo mostramos
         const audioURL = URL.createObjectURL(blob);
         setMessages((prev) => [...prev, { type: 'audio', audio: audioURL, sender: 'right' }]);
       };
