@@ -1,5 +1,4 @@
 import {
-  IsNotEmpty,
   IsUUID,
   IsString,
   MaxLength,
@@ -7,38 +6,37 @@ import {
   IsIn,
   IsNumber,
   Min,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateProductPriceDto {
-  @IsNotEmpty()
   @IsUUID()
   productId: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  minQuantity: number;
+  minQuantity?: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  maxQuantity: number;
+  maxQuantity?: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsIn(['unidad', 'docena'], { message: 'La unidad debe ser "unidad" o "docena"' })
-  unity: string;
+  unity?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsDecimal({ decimal_digits: '0,2' }, { message: 'Debe tener máximo 2 decimales' })
-  price: number;
+  price?: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(255)
-  description: string;
+  description?: string;
 }
-
