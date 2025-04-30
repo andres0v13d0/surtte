@@ -19,6 +19,7 @@ export default function UserChat() {
   const chunksRef = useRef([]);
   const chatEndRef = useRef(null);
   const socketRef = useRef(null);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -235,16 +236,29 @@ export default function UserChat() {
 
   const handlePlayAudio = (index, url) => {
     if (playingAudioIndex === index) {
-      const audio = document.getElementById(`audio-${index}`);
-      audio.pause();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
       setPlayingAudioIndex(null);
-    } else {
-      const audio = document.getElementById(`audio-${index}`);
-      audio.play();
-      setPlayingAudioIndex(index);
-
-      audio.onended = () => setPlayingAudioIndex(null);
+      return;
     }
+  
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  
+    const newAudio = new Audio(url);
+    audioRef.current = newAudio;
+    setPlayingAudioIndex(index);
+  
+    newAudio.play();
+  
+    newAudio.onended = () => {
+      setPlayingAudioIndex(null);
+      audioRef.current = null;
+    };
   };
 
   const renderMessage = (msg, index) => {
