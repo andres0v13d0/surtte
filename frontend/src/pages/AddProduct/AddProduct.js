@@ -22,7 +22,7 @@ const AddProduct = () => {
     const [step, setStep] = useState(0);
     const [direction, setDirection] = useState('right');
     const [priceBlocks, setPriceBlocks] = useState([
-        { id: Date.now(), cantidad: '', precio: '' }
+        { id: Date.now(), cantidad: '', precio: '', unidad: null }
     ]);
     const [categoria, setCategoria] = useState(null);
     const [subcategoria, setSubcategoria] = useState(null);
