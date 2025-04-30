@@ -51,7 +51,7 @@ const Profile = () => {
                                 </span>
                             </Link>
 
-                            <Link to="/profile" className="user-button">
+                            <Link to="/favorites" className="user-button">
                                 <span className="icon-left">
                                     <FontAwesomeIcon icon={faStar} />
                                 </span>

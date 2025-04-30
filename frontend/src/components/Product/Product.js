@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faCartPlus } from '@fortawesome/free-solid-svg-icons';
-import './Product.css'; 
+import { faStar, faCartPlus, faPen, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
+import './Product.css';
 
 const Product = ({
     uuid,
@@ -11,28 +12,90 @@ const Product = ({
     provider,
     stars,
     prices,
+    favorites,
+    isProvider = false,
 }) => {
-
+    const effectiveFavorites = favorites ?? !isProvider;
     const navigate = useNavigate();
+    const [isFavorite, setIsFavorite] = useState(false);
+    const userId = JSON.parse(localStorage.getItem('usuario'))?.id;
+
+    useEffect(() => {
+        const fetchFavorites = async () => {
+            try {
+                const res = await fetch(`https://api.surtte.com/favorites/${userId}`);
+                const data = await res.json();
+                const exists = data.some(fav => fav.product.id === uuid);
+                setIsFavorite(exists);
+            } catch (err) {
+                console.error('Error cargando favoritos:', err);
+            }
+        };
+
+        if (effectiveFavorites && userId) {
+            fetchFavorites();
+        }
+    }, [effectiveFavorites, uuid, userId]);
+
+    const toggleFavorite = async (e) => {
+        e.stopPropagation();
+
+        if (!userId) return;
+
+        try {
+            if (isFavorite) {
+                await fetch(`https://api.surtte.com/favorites/${userId}/${uuid}`, {
+                    method: 'DELETE',
+                });
+                setIsFavorite(false);
+            } else {
+                await fetch('https://api.surtte.com/favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, productId: uuid }),
+                });
+                setIsFavorite(true);
+            }
+        } catch (err) {
+            console.error('Error al cambiar estado de favorito:', err);
+        }
+    };
 
     const handleClick = () => {
-        navigate(`/product/${uuid}`);
+        const path = isProvider ? `/edito-product/${uuid}` : `/product/${uuid}`;
+        navigate(path);
     };
 
     const handleAddToCartClick = (e) => {
+        e.stopPropagation();
         sessionStorage.setItem('scrollToQuantity', 'true');
-        navigate(`/product/${uuid}`);
+        const path = isProvider ? `/edito-product/${uuid}` : `/product/${uuid}`;
+        navigate(path);
     };
-    
+
     const mainPrice = prices[0];
 
     return (
         <div className="product" onClick={handleClick}>
-            <img 
+            {effectiveFavorites && (
+                <button
+                    className={`add-to-favorites-button ${isFavorite ? 'favorited' : ''}`}
+                    onClick={toggleFavorite}
+                    title={isFavorite ? 'Eliminar de favoritos' : 'Agregar a favoritos'}
+                >
+                    <FontAwesomeIcon
+                        icon={isFavorite ? faHeart : faHeartRegular}
+                        className="heart-icon"
+                    />
+                </button>
+            )}
+
+            <img
                 src={image}
                 alt={name}
-                className="product-image" 
+                className="product-image"
             />
+
             <div className='product-info'>
                 <p className="product-name">{name}</p>
 
@@ -46,9 +109,9 @@ const Product = ({
                 <div className="tooltip-wrapper">
                     <span className="price-more-info">+{prices.length - 1} precios disponibles</span>
                     <div className="tooltip-content">
-                    {prices.slice(1).map((price, i) => (
-                        <p key={i}><strong>${price.amount}</strong> {price.condition}</p>
-                    ))}
+                        {prices.slice(1).map((price, i) => (
+                            <p key={i}><strong>${price.amount}</strong> {price.condition}</p>
+                        ))}
                     </div>
                 </div>
 
@@ -58,10 +121,9 @@ const Product = ({
                         <p className="price-note">Aplica {mainPrice.condition}</p>
                     </div>
                     <button className="add-to-cart-button" onClick={handleAddToCartClick}>
-                        <FontAwesomeIcon icon={faCartPlus} />
+                        <FontAwesomeIcon icon={isProvider ? faPen : faCartPlus} />
                     </button>
                 </div>
-                
             </div>
         </div>
     );

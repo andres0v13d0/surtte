@@ -7,6 +7,7 @@
     margin: 10px;
     border-radius: 5px;
     font-family: 'Ubuntu', sans-serif;
+    position: relative;
   }
   
   .product .product-image {
@@ -133,4 +134,28 @@
   .add-to-cart-button:hover {
     color: black;
   }
+
+  .add-to-favorites-button {
+    margin-left: auto;
+    background-color: transparent;
+    color: red;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 20px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+  }
+
+  .add-to-favorites-button.favorited .heart-icon {
+    color: #e0245e;
+    transform: scale(1.2);
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+.add-to-favorites-button .heart-icon {
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
   
