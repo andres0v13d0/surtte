@@ -15,23 +15,21 @@ export class ProductPrice {
   @ManyToOne(() => Product, { nullable: false, onDelete: 'CASCADE' })
   product: Product;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   minQuantity: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   maxQuantity: number;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   unity: string; // 'unidad' o 'docena'
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   price: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   description: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }
-
-  
