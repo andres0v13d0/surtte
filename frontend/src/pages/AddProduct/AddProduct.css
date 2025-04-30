@@ -270,11 +270,43 @@
     transition: border 0.2s;
   }
 
-  .category-container .mi__control--is-focused {
+  .category-container .mi__control--is-focused{
     border: 2px solid black;
     box-shadow: none;
   }
 
-  .category-container .mi__menu-list::-webkit-scrollbar {
+  .category-container .mi__menu-list::-webkit-scrollbar, .price-select-unit__menu-list::-webkit-scrollbar {
     display: none;
   }
+
+  .price-fieldset .price-select-unit__control{
+    border: 1px solid #ccc;
+    margin: 20px 5px 10px 5px;
+  }
+
+ .price-fieldset .price-select-unit__menu-list {
+    max-height: 150px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    transition: border 0.2s;
+  }
+
+  .price-fieldset .price-select-unit__control--is-focused {
+    border: 2px solid black;
+    box-shadow: none;
+  }
+
+  .price-fieldset .price-select-unit__menu-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .input-error {
+    border: 2px solid #e53935 !important;
+    background-color: #fff5f5;
+  }
+  
+  .input-error-select .mi__control {
+    border: 2px solid #e53935 !important;
+    background-color: #fff5f5;
+  }
+  

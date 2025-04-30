@@ -1,0 +1,84 @@
+.tag-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.variant-block label{
+  margin-left: 0 !important;
+}
+
+.tag-input.size .tag {
+  border-radius: 5px;
+  display: flex;
+  background-color: #ccc;
+  padding: 1px 5px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.tag span {
+  margin-left: 6px;
+  cursor: pointer;
+  color: gray;
+}
+
+.tag-input.size{
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  height: 20px;
+}
+
+.tag-input.size .size-input{
+  border: none;
+  outline: none;
+  width: 25%;
+  padding: 0;
+  border-radius: 0%;
+  margin-left: 0;
+}
+
+.variant-section{
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+.add-price.delete.variants{
+  margin-left: 0 !important;
+  margin: 5px 0 10px 0 !important;
+}
+
+.variant-section .color-select__menu-list {
+  max-height: 150px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  transition: border 0.2s;
+}
+
+.variant-section .color-select__control--is-focused {
+  border: 2px solid black;
+  box-shadow: none;
+}
+
+.variant-section .color-select__menu-list::-webkit-scrollbar {
+  display: none;
+}
+
+
+.variant-section .add-price{
+  padding: 0 !important;
+}
+
+.variant-section label{
+  margin-left: 0 !important;
+}
+
+.variant-section .color-select__control {
+  margin-top: 10px;
+}
