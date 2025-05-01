@@ -7,9 +7,10 @@ import { Repository, ILike } from 'typeorm';
 import { Product, ProductStatus } from '../entities/product.entity';
 import { CreateProductDto } from '../dtos/create-product.dto';
 import { Provider } from '../../providers/entity/provider.entity';
-import { Category } from 'src/modules/categories/entities/category.entity';
-import { SubCategory } from 'src/modules/categories/entities/sub-category.entity';
-import {  }
+import { Category } from '../../categories/entities/category.entity';
+import { SubCategory } from '../../categories/entities/sub-category.entity';
+import { Size } from '../../products/entities/size.entity';
+import { Color } from '../../products/entities/color.entity';
 
 @Injectable()
 export class ProductsService {
@@ -49,7 +50,6 @@ export class ProductsService {
     if (!subCategory) throw new NotFoundException('Subcategoría no encontrada.');
   }
 
-  // Manejar colores
   const colorEntities = await Promise.all(
     (dto.colors ?? []).map(async ({ name, hexCode }) => {
       let color = await this.colorRepo.findOne({ where: { name } });
@@ -61,7 +61,6 @@ export class ProductsService {
     })
   );
 
-  // Manejar tallas
   const sizeEntities = await Promise.all(
     (dto.sizes ?? []).map(async ({ name }) => {
       let size = await this.sizeRepo.findOne({ where: { name } });
