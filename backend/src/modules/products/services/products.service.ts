@@ -9,6 +9,7 @@ import { CreateProductDto } from '../dtos/create-product.dto';
 import { Provider } from '../../providers/entity/provider.entity';
 import { Category } from 'src/modules/categories/entities/category.entity';
 import { SubCategory } from 'src/modules/categories/entities/sub-category.entity';
+import {  }
 
 @Injectable()
 export class ProductsService {
@@ -24,34 +25,68 @@ export class ProductsService {
 
     @InjectRepository(SubCategory)
     private readonly subCategoryRepo: Repository<SubCategory>,
+
+    @InjectRepository(Color)
+    private readonly colorRepo: Repository<Color>,
+    
+    @InjectRepository(Size)
+    private readonly sizeRepo: Repository<Size>,
+
   ) {}
 
   async create(dto: CreateProductDto): Promise<Product> {
-    const provider = await this.providerRepo.findOne({ where: { id: dto.providerId } });
-    if (!provider) throw new NotFoundException('Proveedor no encontrado.');
+  const provider = await this.providerRepo.findOne({ where: { id: dto.providerId } });
+  if (!provider) throw new NotFoundException('Proveedor no encontrado.');
 
-    const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
-    if (!category) throw new NotFoundException('Categoría no encontrada.');
+  const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
+  if (!category) throw new NotFoundException('Categoría no encontrada.');
 
-    let subCategory = null;
-    if (dto.subCategoryId) {
-      subCategory = await this.subCategoryRepo.findOne({
-        where: { id: dto.subCategoryId },
-      });
-      if (!subCategory) throw new NotFoundException('Subcategoría no encontrada.');
-    }
-
-    const newProduct = this.productRepo.create({
-      provider,
-      name: dto.name.trim(),
-      description: dto.description.trim(),
-      category,
-      subCategory,
-      status: dto.status || ProductStatus.ACTIVE,
+  let subCategory = null;
+  if (dto.subCategoryId) {
+    subCategory = await this.subCategoryRepo.findOne({
+      where: { id: dto.subCategoryId },
     });
-
-    return this.productRepo.save(newProduct);
+    if (!subCategory) throw new NotFoundException('Subcategoría no encontrada.');
   }
+
+  // Manejar colores
+  const colorEntities = await Promise.all(
+    (dto.colors ?? []).map(async ({ name, hexCode }) => {
+      let color = await this.colorRepo.findOne({ where: { name } });
+      if (!color) {
+        color = this.colorRepo.create({ name, hexCode });
+        await this.colorRepo.save(color);
+      }
+      return color;
+    })
+  );
+
+  // Manejar tallas
+  const sizeEntities = await Promise.all(
+    (dto.sizes ?? []).map(async ({ name }) => {
+      let size = await this.sizeRepo.findOne({ where: { name } });
+      if (!size) {
+        size = this.sizeRepo.create({ name });
+        await this.sizeRepo.save(size);
+      }
+      return size;
+    })
+  );
+
+  const newProduct = this.productRepo.create({
+    provider,
+    name: dto.name.trim(),
+    description: dto.description.trim(),
+    category,
+    subCategory,
+    status: dto.status || ProductStatus.ACTIVE,
+    colors: colorEntities,
+    sizes: sizeEntities,
+  });
+
+  return this.productRepo.save(newProduct);
+}
+
 
   async findAll(): Promise<Product[]> {
     return this.productRepo.find({
