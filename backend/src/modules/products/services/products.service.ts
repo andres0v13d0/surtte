@@ -108,7 +108,7 @@ export class ProductsService {
   async findByProvider(providerId: number): Promise<Product[]> {
     return this.productRepo.find({
       where: { provider: { id: providerId } },
-      relations: ['category', 'subCategory'],
+      relations: ['category', 'subCategory', 'provider'],
       order: { createdAt: 'DESC' },
     });
   }
