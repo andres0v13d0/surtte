@@ -39,6 +39,11 @@ export class CreateProductDto {
   @IsString()
   description: string;
 
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  reference?: string;
+
   @IsNotEmpty()
   @IsUUID()
   categoryId: string;
@@ -67,5 +72,3 @@ export class CreateProductDto {
   @Type(() => SizeInput)
   sizes?: SizeInput[];
 }
-
-  
