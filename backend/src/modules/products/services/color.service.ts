@@ -12,12 +12,11 @@ export class ColorService {
   ) {}
 
   async create(createColorDto: CreateColorDto): Promise<Color> {
-    const { name, hexCode } = createColorDto;
+    const { name } = createColorDto;
 
     const existingColor = await this.colorRepository.findOne({
       where: [
-        { name: name.toLowerCase() },
-        { hexCode: hexCode.toUpperCase() },
+        { name: name.toLowerCase() }
       ],
     });
 
@@ -26,8 +25,7 @@ export class ColorService {
     }
 
     const color = this.colorRepository.create({
-      name: name.toLowerCase(),  
-      hexCode: hexCode.toUpperCase(),
+      name: name.toLowerCase(),
     });
 
     return await this.colorRepository.save(color);
