@@ -309,4 +309,8 @@
     border: 2px solid #e53935 !important;
     background-color: #fff5f5;
   }
+
+  .price-fieldset .input-length{
+    margin-right: 0 !important;
+  }
   

@@ -84,6 +84,8 @@ const InputPrices = ({
                 />
               </div>
 
+              <p className="input-length">Cantidad en unidades</p>
+
               <label className="price-unit-label">Precio por docena</label>
               <div className="price-input">
                 <span className="currency-symbol">COP</span>
