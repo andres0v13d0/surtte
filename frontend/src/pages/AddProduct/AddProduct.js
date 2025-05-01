@@ -214,23 +214,38 @@ const AddProduct = () => {
             return;
           }
       
-          // Crear producto
-          const createRes = await fetch('https://api.surtte.com/products', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              providerId,
-              name: productName,
-              description,
-              categoryId: categoria.value,
-              subCategoryId: subcategoria?.value,
-            }),
-          });
+            const colors = [];
+            const sizes = [];
+
+            for (const variant of variantList) {
+                const nameLower = variant.name?.toLowerCase();
+                if (nameLower === 'color') {
+                        colors.push({
+                        name: variant.value,
+                        hexCode: variant.hexCode || '#000000'
+                    });
+                } else if (nameLower === 'talla') {
+                    sizes.push({ name: variant.value });
+                }
+            }
+
+            const createRes = await fetch('https://api.surtte.com/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    providerId,
+                    name: productName,
+                    description,
+                    categoryId: categoria.value,
+                    subCategoryId: subcategoria?.value,
+                    colors,
+                    sizes
+                }),
+            });
       
           const product = await createRes.json();
           const productId = product.id;
       
-          // Subir imágenes
           for (const file of images) {
             const mimeType = file.type;
             const filename = file.name;
@@ -252,26 +267,6 @@ const AddProduct = () => {
             });
           }
       
-          // Enviar variantes
-          for (const variant of variantList) {
-            const nameLower = variant.name?.toLowerCase();
-      
-            if (nameLower === 'talla') {
-              await fetch('https://api.surtte.com/sizes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: variant.value }),
-              });
-            } else if (nameLower === 'color') {
-              await fetch('https://api.surtte.com/colors', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: variant.value }),
-              });
-            }
-          }
-      
-          // Enviar precios
           for (const block of priceBlocks) {
             const precio = parseFloat((block.precio || '').toString().replace(/\./g, ''));
             const unidad = block.unidad?.value;
