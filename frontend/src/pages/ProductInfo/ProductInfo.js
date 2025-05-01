@@ -1,13 +1,12 @@
+// ...resto de imports
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
 import './ProductInfo.css';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import NavInf from '../../components/NavInf/NavInf';
-import Product from '../../components/Product/Product';
+// import Product from '../../components/Product/Product'; // 🔴 No se usa ahora
 
 const ProductInfo = () => {
-  const { uuid } = useParams();
   const [product, setProduct] = useState(null);
   const [images, setImages] = useState([]);
   const [prices, setPrices] = useState([]);
@@ -17,75 +16,55 @@ const ProductInfo = () => {
   const [totalUnits, setTotalUnits] = useState(1);
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
-  const [relatedProducts, setRelatedProducts] = useState([]);
   const [mainImage, setMainImage] = useState(null);
   const unitRef = useRef(null);
   const quantityRef = useRef(null);
 
   useEffect(() => {
-    const shouldScroll = sessionStorage.getItem('scrollToQuantity') === 'true';
-    if (shouldScroll && product && prices.length > 0) {
-      setTimeout(() => {
-        if (unitRef.current && quantityRef.current) {
-          unitRef.current.classList.add('highlight-quantity');
-          quantityRef.current.classList.add('highlight-quantity');
-          unitRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          sessionStorage.removeItem('scrollToQuantity');
-          setTimeout(() => {
-            unitRef.current?.classList.remove('highlight-quantity');
-            quantityRef.current?.classList.remove('highlight-quantity');
-          }, 3000);
-        }
-      }, 100);
-    }
-  }, [product, prices]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const productRes = await fetch(`https://api.surtte.com/products/${uuid}`);
-        const productData = await productRes.json();
-        setProduct(productData);
-        setColors(productData.colors || []);
-        setSizes(productData.sizes || []);
-
-        const [imgRes, priceRes] = await Promise.all([
-          fetch(`https://api.surtte.com/images/by-product/${uuid}`),
-          fetch(`https://api.surtte.com/product-prices/product/${uuid}`)
-        ]);
-        const imagesData = await imgRes.json();
-        const pricesData = await priceRes.json();
-        setImages(imagesData);
-        setMainImage(imagesData?.[0]?.imageUrl || '/camiseta.avif');
-        setPrices(pricesData);
-
-        const defaultPrice = pricesData.find(p => p.unity === 'unidad') || pricesData[0];
-        setUnitType(defaultPrice.unity === 'docena' ? 'dozens' : 'units');
-        setQuantity(defaultPrice.minQuantity || 1);
-
-        const providerRes = await fetch(`https://api.surtte.com/providers/public/${productData.provider.id}`);
-        const providerData = await providerRes.json();
-        setProvider(providerData);
-
-        const relatedRes = await fetch(`https://api.surtte.com/products/by-provider/${productData.provider.id}`);
-        const relatedData = await relatedRes.json();
-
-        setRelatedProducts(relatedData.filter(p => p.id !== productData.id));
-      } catch (err) {
-        console.error('Error cargando datos del producto:', err);
-      }
+    const mockProduct = {
+      id: '1234',
+      name: 'Camiseta Oficial Colombia',
+      description: 'Camiseta original de la selección Colombia 2024',
+      colors: [{ name: 'Amarillo' }, { name: 'Blanco' }],
+      sizes: [{ name: 'S' }, { name: 'M' }, { name: 'L' }],
+      provider: { id: 'prov1' }
     };
 
-    fetchData();
-  }, [uuid]);
+    const mockImages = [
+      { imageUrl: '/camiseta.avif' },
+      { imageUrl: '/camiseta2.avif' }
+    ];
+
+    const mockPrices = [
+      { id: 'p1', price: '60000', minQuantity: 1, maxQuantity: 5, unity: 'unidad', description: '1 a 5 unidades' },
+      { id: 'p2', price: '55000', minQuantity: 6, maxQuantity: 11, unity: 'unidad', description: '6 a 11 unidades' },
+      { id: 'p3', price: '50000', minQuantity: 12, maxQuantity: 99, unity: 'unidad', description: '12 o más unidades' },
+      { id: 'p4', price: '580000', minQuantity: 1, maxQuantity: 5, unity: 'docena', description: '1 a 5 docenas' }
+    ];
+
+    const mockProvider = {
+      nombre_empresa: 'Surtte Colombia',
+      calificacion: 4.8,
+      descripcion: 'Proveedor oficial de ropa deportiva en Colombia.'
+    };
+
+    setProduct(mockProduct);
+    setImages(mockImages);
+    setPrices(mockPrices);
+    setMainImage(mockImages[0].imageUrl);
+    setColors(mockProduct.colors);
+    setSizes(mockProduct.sizes);
+    setProvider(mockProvider);
+    setQuantity(mockPrices[0].minQuantity);
+    setUnitType(mockPrices[0].unity === 'docena' ? 'dozens' : 'units');
+  }, []);
 
   const availableQuantities = useMemo(() => {
     const allQuantities = new Set();
-    prices.filter(p => p.unity === (unitType === 'dozens' ? 'docena' : 'unidad'))
+    prices
+      .filter(p => p.unity === (unitType === 'dozens' ? 'docena' : 'unidad'))
       .forEach(p => {
-        const min = p.minQuantity;
-        const max = p.maxQuantity;
-        for (let i = min; i <= max; i++) {
+        for (let i = p.minQuantity; i <= p.maxQuantity; i++) {
           allQuantities.add(i);
         }
       });
@@ -104,35 +83,11 @@ const ProductInfo = () => {
       .sort((a, b) => parseFloat(a.price) - parseFloat(b.price))[0] || prices[0];
   }, [totalUnits, unitType, prices]);
 
-  const handleAddToCart = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Debes iniciar sesión para agregar al carrito.');
-        return;
-      }
-      const res = await fetch('https://api.surtte.com/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          productId: product.id,
-          unitType,
-          quantity,
-          priceSnapshot: parseFloat(applicablePrice?.price || 0),
-        }),
-      });
-      if (!res.ok) throw new Error('No se pudo agregar al carrito');
-      alert('Producto agregado al carrito exitosamente ✅');
-    } catch (err) {
-      console.error('Error al agregar al carrito:', err);
-      alert('Ocurrió un error al agregar al carrito 😓');
-    }
+  const handleAddToCart = () => {
+    alert(`Simulación: producto "${product.name}" agregado al carrito con ${quantity} ${unitType === 'dozens' ? 'docenas' : 'unidades'}.`);
   };
 
-  if (!product || !provider || !applicablePrice) return <p>Cargando...</p>;
+  if (!product || !provider || !applicablePrice) return <p>Cargando diseño...</p>;
 
   return (
     <>
@@ -155,7 +110,7 @@ const ProductInfo = () => {
           <div className="line"></div>
 
           <div className="dynamic-price-highlight">
-            <h3><b>COP</b>{parseFloat(applicablePrice?.price || 0).toLocaleString('es-CO')}</h3>
+            <h3><b>COP</b> {parseFloat(applicablePrice?.price || 0).toLocaleString('es-CO')}</h3>
           </div>
 
           <p className='p-info-prices'>Este producto tiene precios escalonados según la cantidad. Mira las tarifas disponibles:</p>
@@ -215,13 +170,14 @@ const ProductInfo = () => {
             <p className='p-desc-provider'>{provider.descripcion}</p>
           </div>
 
-          <div className="line"></div>
+          {/* 🔒 Ocultado por ahora */}
+          {/* <div className="line"></div>
           <h2 className="more-products-title">Más productos del proveedor</h2>
           <div className='products-cont'>
             {relatedProducts.map((prod, index) => (
               <Product key={index} {...prod} />
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
       <NavInf />

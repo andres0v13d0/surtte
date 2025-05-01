@@ -83,7 +83,6 @@ const AddProduct = () => {
             const campos = {};
             if (!productName.trim()) campos.productName = true;
             if (!description.trim()) campos.description = true;
-            if (!productReference.trim()) campos.productReference = true;
             if (!categoria) campos.categoria = true;
 
             if (Object.keys(campos).length > 0) {
@@ -211,7 +210,7 @@ const AddProduct = () => {
             return;
           }
       
-          if (!productName.trim() || !description.trim() || !productReference.trim() || !categoria) {
+          if (!productName.trim() || !description.trim() || !categoria) {
             setAlertType('error');
             setAlertMessage('Completa todos los campos requeridos.');
             setShowAlert(true);

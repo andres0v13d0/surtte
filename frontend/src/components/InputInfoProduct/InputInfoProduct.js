@@ -110,7 +110,7 @@ const InputInfoProduct = ({
         <b>Caracteres:</b> {description.length} / 200
       </p>
 
-      <label>Referencia del producto</label>
+      <label>Referencia del producto (Opcional)</label>
       <input
         type="text"
         value={productReference}
