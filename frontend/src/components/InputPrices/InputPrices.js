@@ -1,7 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
-import Select from 'react-select';
 
 const InputPrices = ({
   priceBlocks,
@@ -30,45 +29,83 @@ const InputPrices = ({
             <label>Cantidad</label>
             <input
               type="text"
-              placeholder="Ej: 1 - 5, 6, 12, 24 en adelante"
+              className={`inputQuantity ${camposInvalidos?.precios?.[index]?.cantidad ? 'input-error' : ''}`}
+              placeholder="Ej: 1 - 5  |  6  |  12 en adelante"
               value={block.cantidad}
-              onChange={(e) => {
-                updatePriceBlock(block.id, 'cantidad', e.target.value);
-                if (camposInvalidos?.precios?.[index]?.cantidad && e.target.value.trim()) {
-                  setCamposInvalidos((prev) => ({
-                    ...prev,
-                    precios: {
-                      ...prev.precios,
-                      [index]: {
-                        ...prev.precios[index],
-                        cantidad: false
-                      }
-                    }
-                  }));
+              onKeyDown={(e) => {
+                const allowedKeys = [
+                  'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End', ' '
+                ];
+                const allowedLetters = ['e', 'n', 'a', 'd', 'l', 'i', 't', 'o'];
+                const allowedChars = /[0-9\- ]/;
+
+                if (
+                  !allowedKeys.includes(e.key) &&
+                  !allowedLetters.includes(e.key.toLowerCase()) &&
+                  !allowedChars.test(e.key)
+                ) {
+                  e.preventDefault();
                 }
               }}
-              className={camposInvalidos?.precios?.[index]?.cantidad ? 'input-error' : ''}
+              onChange={(e) => {
+                let value = e.target.value.toLowerCase()
+                  .replace(/[,./*+=¿¡?<>()[\]{}"']+/g, '') 
+                  .replace(/\s{2,}/g, ' ')               
+                  .replace(/(\d+)\s*en\s*adelante/g, '$1 en adelante') 
+
+                const soloNumeros = /^\d+$/;
+                const rango = /^\d+\s*-\s*\d+$/;
+                const enAdelante = /^\d+\s+en\s+adelante$/;
+
+                const esValido = soloNumeros.test(value) || rango.test(value) || enAdelante.test(value);
+
+                updatePriceBlock(block.id, 'cantidad', value);
+
+                setCamposInvalidos((prev) => ({
+                  ...prev,
+                  precios: {
+                    ...prev.precios,
+                    [index]: {
+                      ...(prev?.precios?.[index] || {}),
+                      cantidad: !esValido
+                    }
+                  }
+                }));
+              }}
             />
-            <Select
-              options={[
-                { value: 'unidad', label: 'Precio por unidad' },
-                { value: 'docena', label: 'Precio por docena' }
-              ]}
-              value={block.unidad || { value: 'unidad', label: 'Precio por unidad' }}
-              onChange={(selected) => updatePriceBlock(block.id, 'unidad', selected)}
-              isClearable
-              classNamePrefix={"price-select-unit"}
-            />
+
+            {camposInvalidos?.precios?.[index]?.cantidad && (
+              <p className="input-length" style={{ color: 'red' }}>
+                Formato inválido. Usa: "6", "1 - 5" o "12 en adelante"
+              </p>
+            )}
+
+            <label className="price-unit-label">Precio por docena</label>
             <div className="price-input">
               <span className="currency-symbol">COP</span>
               <input
                 type="number"
-                placeholder="Ej: 50.000"
+                placeholder="Ej: 50000"
+                min="0"
+                step="1"
                 value={block.precio}
+                onKeyDown={(e) => {
+                  if (
+                    ['e', 'E', '+', '-', ','].includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
                 onChange={(e) => {
-                  updatePriceBlock(block.id, 'precio', e.target.value);
-                  const parsed = parseFloat((e.target.value || '').toString().replace(/\./g, ''));
-                  if (camposInvalidos?.precios?.[index]?.precio && !isNaN(parsed) && parsed > 0) {
+                  const raw = e.target.value.replace(/\D/g, ''); 
+                  updatePriceBlock(block.id, 'precio', raw);
+
+                  const parsed = parseFloat(raw);
+                  if (
+                    camposInvalidos?.precios?.[index]?.precio &&
+                    !isNaN(parsed) &&
+                    parsed > 0
+                  ) {
                     setCamposInvalidos((prev) => ({
                       ...prev,
                       precios: {
@@ -83,6 +120,7 @@ const InputPrices = ({
                 }}
                 className={camposInvalidos?.precios?.[index]?.precio ? 'input-error' : ''}
               />
+
             </div>
           </fieldset>
 

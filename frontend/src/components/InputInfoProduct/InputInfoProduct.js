@@ -3,34 +3,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import './InputInfoProduct.css';
 
-const colorOptions = [
-  { value: 'rojo', label: 'Rojo', hex: '#FF0000' },
-  { value: 'azul', label: 'Azul', hex: '#0000FF' },
-  { value: 'verde', label: 'Verde', hex: '#00FF00' },
-  { value: 'negro', label: 'Negro', hex: '#000000' },
-  { value: 'blanco', label: 'Blanco', hex: '#FFFFFF' },
-  { value: 'gris', label: 'Gris', hex: '#808080' },
-  { value: 'beige', label: 'Beige', hex: '#F5F5DC' },
-  { value: 'marrón', label: 'Marrón', hex: '#8B4513' },
-  { value: 'rosado', label: 'Rosado', hex: '#FFC0CB' },
-  { value: 'naranja', label: 'Naranja', hex: '#FFA500' },
-  { value: 'amarillo', label: 'Amarillo', hex: '#FFFF00' },
-  { value: 'morado', label: 'Morado', hex: '#800080' },
-  { value: 'vino', label: 'Vino', hex: '#8B0000' },
-  { value: 'turquesa', label: 'Turquesa', hex: '#40E0D0' },
-  { value: 'lila', label: 'Lila', hex: '#C8A2C8' },
-  { value: 'fucsia', label: 'Fucsia', hex: '#FF00FF' },
-  { value: 'celeste', label: 'Celeste', hex: '#87CEEB' },
-  { value: 'mostaza', label: 'Mostaza', hex: '#FFDB58' },
-  { value: 'ocre', label: 'Ocre', hex: '#CC7722' },
-  { value: 'azul marino', label: 'Azul marino', hex: '#000080' }
-];
-
 const InputInfoProduct = ({
   productName,
   setProductName,
   description,
   setDescription,
+  productReference,
+  setProductReference,
   categoria,
   setCategoria,
   subcategoria,
@@ -131,6 +110,21 @@ const InputInfoProduct = ({
         <b>Caracteres:</b> {description.length} / 200
       </p>
 
+      <label>Referencia del producto</label>
+      <input
+        type="text"
+        value={productReference}
+        maxLength={50}
+        onChange={(e) => {
+          setProductReference(e.target.value);
+          if (camposInvalidos?.productReference && e.target.value.trim()) {
+            setCamposInvalidos(prev => ({ ...prev, productReference: false }));
+          }
+        }}
+        placeholder="Ej: SM-360L"
+        className={camposInvalidos?.productReference ? 'input-error' : ''}
+      />
+
       <div className='category-container'>
         <label>Categoría</label>
         <Select
@@ -188,39 +182,22 @@ const InputInfoProduct = ({
             )}
 
             {variant.type === 'Color' && (
-              <Select
-                isMulti
-                options={colorOptions}
-                value={colorOptions.filter((c) =>
-                  variant.values.some(v => v.value === c.value)
-                )}
-                onChange={(selected) => {
-                  const updatedList = [...variantList];
-                  updatedList[index].values = selected.map(s => ({   
-                    name: s.label,   
-                    value: s.value,   
-                    hexCode: s.hex 
-                  }));
-                  setVariantList(updatedList);
-                }}
-                classNamePrefix="color-select"
-                placeholder="Selecciona colores..."
-                formatOptionLabel={(option) => (
-                  <>
-                    <span
-                      style={{
-                        width: '12px',
-                        height: '12px',
-                        borderRadius: '50%',
-                        backgroundColor: option.hex,
-                        display: 'inline-block'
-                      }}
-                    ></span>
-                    {option.label}
-                  </>
-                )}
-              />
+              <div className="tag-input size">
+                {variant.values.map((val, i) => (
+                  <div className="tag" key={i}>
+                    {val} <span onClick={() => removeVariantValue(index, i)}>×</span>
+                  </div>
+                ))}
+                <input
+                  type="text"
+                  value={variant.input}
+                  onChange={(e) => handleVariantInput(index, e.target.value)}
+                  placeholder="Ej: Rojo, Azul..."
+                  className='size-input'
+                />
+              </div>
             )}
+
 
             <button
               type="button"

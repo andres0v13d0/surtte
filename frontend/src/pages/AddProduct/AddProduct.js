@@ -19,10 +19,11 @@ const AddProduct = () => {
     const [previews, setPreviews] = useState([]);
     const [productName, setProductName] = useState('');
     const [description, setDescription] = useState('');
+    const [productReference, setProductReference] = useState('');
     const [step, setStep] = useState(0);
     const [direction, setDirection] = useState('right');
     const [priceBlocks, setPriceBlocks] = useState([
-        { id: Date.now(), cantidad: '', precio: '', unidad: null }
+        { id: Date.now(), cantidad: '', precio: '', unidad: 'docena' }
     ]);
     const [categoria, setCategoria] = useState(null);
     const [subcategoria, setSubcategoria] = useState(null);
@@ -30,44 +31,45 @@ const AddProduct = () => {
 
 
     const validarCantidad = (texto) => {
-        texto = texto.trim();
-
-        const enAdelanteRegex = /^(\d+)\s+en\s+adelante$/i;
-        const matchEnAdelante = texto.match(enAdelanteRegex);
-        if (matchEnAdelante) {
-            return {
+      texto = texto.trim();
+    
+      // Solo permite números enteros positivos
+      const soloNumeros = /^\d+$/;
+      const soloRango = /^\d+\s*-\s*\d+$/;
+      const enAdelante = /^\d+\s+en\s+adelante$/i;
+    
+      if (enAdelante.test(texto)) {
+        const numero = parseInt(texto.split(' ')[0]);
+        return {
+          valido: true,
+          tipo: 'enAdelante',
+          cantidad: numero
+        };
+      }
+    
+      if (soloRango.test(texto)) {
+        const [min, max] = texto.split('-').map(n => parseInt(n.trim()));
+        if (min < max) {
+          return {
             valido: true,
-            tipo: 'enAdelante',
-            cantidad: parseInt(matchEnAdelante[1])
-            };
+            tipo: 'rango',
+            min,
+            max
+          };
         }
-
-        const rangoRegex = /^(\d+)\s*-\s*(\d+)$/;
-        const matchRango = texto.match(rangoRegex);
-        if (matchRango) {
-            const min = parseInt(matchRango[1]);
-            const max = parseInt(matchRango[2]);
-            if (min < max) {
-            return {
-                valido: true,
-                tipo: 'rango',
-                min,
-                max
-            };
-            }
-        }
-
-        const exactoRegex = /^\d+$/;
-        if (exactoRegex.test(texto)) {
-            return {
-            valido: true,
-            tipo: 'exacto',
-            cantidad: parseInt(texto)
-            };
-        }
-
-        return { valido: false };
+      }
+    
+      if (soloNumeros.test(texto)) {
+        return {
+          valido: true,
+          tipo: 'exacto',
+          cantidad: parseInt(texto)
+        };
+      }
+    
+      return { valido: false };
     };
+    
 
     
     const validarStep = (pasoActual) => {
@@ -81,6 +83,7 @@ const AddProduct = () => {
             const campos = {};
             if (!productName.trim()) campos.productName = true;
             if (!description.trim()) campos.description = true;
+            if (!productReference.trim()) campos.productReference = true;
             if (!categoria) campos.categoria = true;
 
             if (Object.keys(campos).length > 0) {
@@ -101,17 +104,17 @@ const AddProduct = () => {
 
             priceBlocks.forEach((block, index) => {
                 const precio = parseFloat((block.precio || '').toString().replace(/\./g, ''));
-                const cantidad = block.cantidad.trim();
+                const cantidad = limpiarCantidad(block.cantidad);
                 const resultado = validarCantidad(cantidad);
 
                 const esPrecioValido = !isNaN(precio) && precio > 0;
 
                 if (!resultado.valido || !esPrecioValido) {
-                errores.push(`Cantidad o precio inválido en un bloque.`);
-                erroresPorBloque[index] = {
-                    cantidad: !resultado.valido,
-                    precio: !esPrecioValido,
-                };
+                  errores.push(`Cantidad o precio inválido en un bloque.`);
+                  erroresPorBloque[index] = {
+                      cantidad: !resultado.valido,
+                      precio: !esPrecioValido,
+                  };
                 }
 
                 if (resultado.tipo === 'mas') {
@@ -141,7 +144,17 @@ const AddProduct = () => {
 
     
         return true;
-    };  
+    }; 
+    
+    const limpiarCantidad = (texto) => {
+      return texto
+        .toLowerCase()
+        .replace(/[,./*+=¿¡?<>()[\]{}"']+/g, '')
+        .replace(/\s{2,}/g, ' ')
+        .replace(/(\d+)\s*en\s*adelante/g, '$1 en adelante')
+        .trim();
+    };
+    
 
     useEffect(() => {
         const fetchCategorias = async () => {
@@ -198,7 +211,7 @@ const AddProduct = () => {
             return;
           }
       
-          if (!productName.trim() || !description.trim() || !categoria) {
+          if (!productName.trim() || !description.trim() || !productReference.trim() || !categoria) {
             setAlertType('error');
             setAlertMessage('Completa todos los campos requeridos.');
             setShowAlert(true);
@@ -221,10 +234,7 @@ const AddProduct = () => {
               const type = variant.type?.toLowerCase();
               if (type === 'color') {
                 for (const color of variant.values) {
-                  colors.push({
-                    name: color.name,
-                    hexCode: color.hexCode || '#000000'
-                  });
+                  colors.push({ name: color });
                 }
               } else if (type === 'talla') {
                 for (const size of variant.values) {
@@ -241,6 +251,7 @@ const AddProduct = () => {
                     providerId,
                     name: productName,
                     description,
+                    reference: productReference,
                     categoryId: categoria.value,
                     subCategoryId: subcategoria?.value,
                     colors,
@@ -274,8 +285,8 @@ const AddProduct = () => {
       
           for (const block of priceBlocks) {
             const precio = parseFloat((block.precio || '').toString().replace(/\./g, ''));
-            const unidad = block.unidad?.value;
-            const cantidad = block.cantidad.trim();
+            const unidad = 'docena';
+            const cantidad = limpiarCantidad(block.cantidad);
             const resultado = validarCantidad(cantidad);
       
             let minQuantity = 0;
@@ -294,7 +305,7 @@ const AddProduct = () => {
               maxQuantity = 50;
               description = `${resultado.cantidad} en adelante`;
             } else {
-              continue; // si no pasa validación, lo ignora
+              continue;
             }
       
             await fetch('https://api.surtte.com/product-prices', {
@@ -311,11 +322,11 @@ const AddProduct = () => {
             });
           }
       
-          // Reset
           setImages([]);
           setPreviews([]);
           setProductName('');
           setDescription('');
+          setProductReference('');
           setCategoria(null);
           setSubcategoria(null);
           setStep(0);
@@ -384,6 +395,8 @@ const AddProduct = () => {
                             setProductName={setProductName}
                             description={description}
                             setDescription={setDescription}
+                            productReference={productReference}
+                            setProductReference={setProductReference}
                             categoria={categoria}
                             setCategoria={setCategoria}
                             subcategoria={subcategoria}
