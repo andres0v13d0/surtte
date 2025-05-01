@@ -32,10 +32,11 @@ function Home() {
               image: images?.[0]?.imageUrl || '/default.jpg',
               prices: Array.isArray(prices) && prices.length > 0
                 ? prices.map(p => ({
-                    amount: parseFloat(p?.pricePerUnit || '0').toLocaleString('es-CO', {
+                    amount: parseFloat(p?.price || '0').toLocaleString('es-CO', {
                       minimumFractionDigits: 0
                     }),
-                    condition: p?.minQuantity ?? 'Sin condición'
+                    condition: p?.description ?? 'Sin condición'
+
                   }))
                 : [{
                     amount: '0',
