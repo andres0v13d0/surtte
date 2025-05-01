@@ -36,46 +36,47 @@ export class ProductsService {
   ) {}
 
   async create(dto: CreateProductDto): Promise<Product> {
-  const provider = await this.providerRepo.findOne({ where: { id: dto.providerId } });
-  if (!provider) throw new NotFoundException('Proveedor no encontrado.');
-
-  const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
-  if (!category) throw new NotFoundException('Categoría no encontrada.');
-
-  let subCategory = null;
-  if (dto.subCategoryId) {
-    subCategory = await this.subCategoryRepo.findOne({
-      where: { id: dto.subCategoryId },
-    });
-    if (!subCategory) throw new NotFoundException('Subcategoría no encontrada.');
-  }
-
-  const colorEntities = await Promise.all(
-    (dto.colors ?? []).map(async ({ name, hexCode }) => {
-      let color = await this.colorRepo.findOne({ where: { name } });
-      if (!color) {
-        color = this.colorRepo.create({ name, hexCode });
-        await this.colorRepo.save(color);
-      }
-      return color;
-    })
-  );
-
-  const sizeEntities = await Promise.all(
-    (dto.sizes ?? []).map(async ({ name }) => {
-      let size = await this.sizeRepo.findOne({ where: { name } });
-      if (!size) {
-        size = this.sizeRepo.create({ name });
-        await this.sizeRepo.save(size);
-      }
-      return size;
-    })
+    const provider = await this.providerRepo.findOne({ where: { id: dto.providerId } });
+    if (!provider) throw new NotFoundException('Proveedor no encontrado.');
+  
+    const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
+    if (!category) throw new NotFoundException('Categoría no encontrada.');
+  
+    let subCategory = null;
+    if (dto.subCategoryId) {
+      subCategory = await this.subCategoryRepo.findOne({
+        where: { id: dto.subCategoryId },
+      });
+      if (!subCategory) throw new NotFoundException('Subcategoría no encontrada.');
+    }
+  
+    const colorEntities = await Promise.all(
+      (dto.colors ?? []).map(async ({ name, hexCode }) => {
+        let color = await this.colorRepo.findOne({ where: { name } });
+        if (!color) {
+          color = this.colorRepo.create({ name, hexCode });
+          await this.colorRepo.save(color);
+        }
+        return color;
+      })
+    );
+  
+    const sizeEntities = await Promise.all(
+      (dto.sizes ?? []).map(async ({ name }) => {
+        let size = await this.sizeRepo.findOne({ where: { name } });
+        if (!size) {
+          size = this.sizeRepo.create({ name });
+          await this.sizeRepo.save(size);
+        }
+        return size;
+      })
   );
 
   const newProduct = this.productRepo.create({
     provider,
     name: dto.name.trim(),
     description: dto.description.trim(),
+    reference: dto.reference?.trim(),
     category,
     subCategory,
     status: dto.status || ProductStatus.ACTIVE,
@@ -189,6 +190,7 @@ export class ProductsService {
 
     product.name = dto.name.trim();
     product.description = dto.description.trim();
+    product.reference = dto.reference?.trim();
 
     if (dto.categoryId) {
       const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
