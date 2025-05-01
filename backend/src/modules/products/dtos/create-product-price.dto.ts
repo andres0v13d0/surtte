@@ -14,17 +14,9 @@ export class CreateProductPriceDto {
   @IsUUID()
   productId: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  minQuantity?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  maxQuantity?: number;
+  @IsString()
+  @MaxLength(100)
+  quantity: string;
 
   @IsOptional()
   @IsIn(['unidad', 'docena'], { message: 'La unidad debe ser "unidad" o "docena"' })
