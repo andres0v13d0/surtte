@@ -51,10 +51,10 @@ export class ProductsService {
     }
   
     const colorEntities = await Promise.all(
-      (dto.colors ?? []).map(async ({ name, hexCode }) => {
+      (dto.colors ?? []).map(async ({ name }) => {
         let color = await this.colorRepo.findOne({ where: { name } });
         if (!color) {
-          color = this.colorRepo.create({ name, hexCode });
+          color = this.colorRepo.create({ name });
           await this.colorRepo.save(color);
         }
         return color;
