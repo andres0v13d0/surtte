@@ -194,7 +194,11 @@ const InputInfoProduct = ({
                 value={colorOptions.filter((c) => variant.values.includes(c.value))}
                 onChange={(selected) => {
                   const updatedList = [...variantList];
-                  updatedList[index].values = selected.map(s => s.value);
+                  updatedList[index].values = selected.map(s => ({   
+                    name: s.label,   
+                    value: s.value,   
+                    hexCode: s.hex 
+                  }));
                   setVariantList(updatedList);
                 }}
                 classNamePrefix="color-select"
