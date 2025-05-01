@@ -218,16 +218,21 @@ const AddProduct = () => {
             const sizes = [];
 
             for (const variant of variantList) {
-                const nameLower = variant.name?.toLowerCase();
-                if (nameLower === 'color') {
-                        colors.push({
-                        name: variant.value,
-                        hexCode: variant.hexCode || '#000000'
-                    });
-                } else if (nameLower === 'talla') {
-                    sizes.push({ name: variant.value });
+              const type = variant.type?.toLowerCase();
+              if (type === 'color') {
+                for (const color of variant.values) {
+                  colors.push({
+                    name: color.name,
+                    hexCode: color.hexCode || '#000000'
+                  });
                 }
+              } else if (type === 'talla') {
+                for (const size of variant.values) {
+                  sizes.push({ name: size });
+                }
+              }
             }
+            
 
             const createRes = await fetch('https://api.surtte.com/products', {
                 method: 'POST',

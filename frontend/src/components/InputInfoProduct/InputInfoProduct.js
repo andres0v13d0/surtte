@@ -191,7 +191,9 @@ const InputInfoProduct = ({
               <Select
                 isMulti
                 options={colorOptions}
-                value={colorOptions.filter((c) => variant.values.includes(c.value))}
+                value={colorOptions.filter((c) =>
+                  variant.values.some(v => v.value === c.value)
+                )}
                 onChange={(selected) => {
                   const updatedList = [...variantList];
                   updatedList[index].values = selected.map(s => ({   
