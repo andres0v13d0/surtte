@@ -40,6 +40,9 @@ export class Product {
   @Column({ type: 'text' })
   description: string;
 
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  reference: string;
+
   @Column()
   providerId: number;
 
