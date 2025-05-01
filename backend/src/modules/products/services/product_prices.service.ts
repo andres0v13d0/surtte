@@ -18,24 +18,10 @@ export class ProductPricesService {
   async create(dto: CreateProductPriceDto): Promise<ProductPrice> {
     const product = await this.productRepo.findOne({ where: { id: dto.productId } });
     if (!product) throw new NotFoundException('Producto no encontrado.');
-  
-    const existing = await this.priceRepo.findOne({
-      where: {
-        product: { id: dto.productId },
-        minQuantity: dto.minQuantity,
-      },
-      relations: ['product'],
-    });
-  
-    if (existing) {
-      console.warn(`Ya existe un precio con minQuantity = ${dto.minQuantity} para el producto ${dto.productId}`);
-      return null;
-    }
-  
+    
     const newPrice = this.priceRepo.create({
       product,
-      minQuantity: dto.minQuantity,
-      maxQuantity: dto.maxQuantity,
+      quantity: dto.quantity,
       unity: dto.unity,
       price: dto.price,
       description: dto.description,
@@ -50,7 +36,7 @@ export class ProductPricesService {
 
     return this.priceRepo.find({
       where: { product: { id: productId } },
-      order: { minQuantity: 'ASC' },
+      order: { createdAt: 'ASC' },
     });
   }
 
