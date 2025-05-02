@@ -17,12 +17,27 @@
   position: relative;
 }
 
-.main-image {
+.main-image-wrapper {
   width: 100%;
   aspect-ratio: 1 / 1;
+  overflow: auto;
   border-radius: 10px;
-  object-fit: cover;
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none; 
 }
+
+.main-image-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.main-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
 
 .thumbnail-container {
   display: flex;

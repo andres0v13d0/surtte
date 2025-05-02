@@ -129,7 +129,9 @@ const ProductInfo = () => {
       <div className="product-container">
         <h2 className="product-title">{product.name}</h2>
         <div className="product-image-section">
-          <img src={mainImage} alt="Producto" className="main-image" />
+          <div className="main-image-wrapper">
+            <img src={mainImage} alt="Producto" className="main-image" />
+          </div>
           <FontAwesomeIcon icon={faAngleLeft} className="arrow left" onClick={() => {
             const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
             const newIndex = (currentIndex - 1 + images.length) % images.length;

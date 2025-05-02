@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import './AddProduct.css';
@@ -14,7 +13,6 @@ const AddProduct = () => {
   const [alertType, setAlertType] = useState(null); 
   const [alertMessage, setAlertMessage] = useState('');
   const [showAlert, setShowAlert] = useState(false);
-  const navigate = useNavigate();
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [productName, setProductName] = useState('');
@@ -124,7 +122,7 @@ const AddProduct = () => {
           return { ...block, inputCantidad: '' };
         });
       });
-      
+
       const user = JSON.parse(localStorage.getItem('usuario'));
       if (!user || user.rol !== 'proveedor' || !user.proveedorInfo?.id) {
         setAlertType('error');
@@ -245,8 +243,6 @@ const AddProduct = () => {
       setAlertType('success');
       setAlertMessage('Producto guardado exitosamente.');
       setShowAlert(true);
-      navigate('/my-products');
-
     } catch (err) {
       console.error(err);
       setAlertType('error');
