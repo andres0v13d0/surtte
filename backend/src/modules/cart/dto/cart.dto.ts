@@ -1,13 +1,18 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsString, IsNumber, IsUUID, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  IsNumber,
+  Min,
+} from 'class-validator';
 
 export class CreateCartItemDto {
   @IsUUID()
   @IsNotEmpty()
   productId: string;
-
-  @IsString()
-  @IsNotEmpty()
-  unitType: string;
 
   @IsInt()
   @Min(1)
@@ -15,12 +20,24 @@ export class CreateCartItemDto {
 
   @IsNumber()
   priceSnapshot: number;
+
+  @IsString()
+  @IsOptional()
+  colorSnapshot?: string;
+
+  @IsString()
+  @IsOptional()
+  sizeSnapshot?: string;
 }
 
 export class UpdateCartItemDto {
   @IsInt()
   @Min(1)
   quantity: number;
+
+  @IsNumber()
+  @IsOptional()
+  priceSnapshot?: number;
 }
 
 export class ToggleCheckDto {

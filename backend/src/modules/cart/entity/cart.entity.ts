@@ -32,8 +32,11 @@ export class CartItem {
   @Column('int')
   quantity: number;
 
-  @Column()
-  unitType: string; 
+  @Column({ nullable: true })
+  colorSnapshot: string; // Ej: "Rojo"
+
+  @Column({ nullable: true })
+  sizeSnapshot: string; // Ej: "M"
 
   @Column()
   productNameSnapshot: string;
