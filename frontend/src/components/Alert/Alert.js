@@ -17,7 +17,7 @@ const Alert = ({ type, message, onClose, redirectTo }) => {
       const timer = setTimeout(() => {
         onClose?.();
         navigate(redirectTo);
-      }, 2000);
+      }, 1000);
       return () => clearTimeout(timer);
     } else if (type === 'info') {
       const timer = setTimeout(() => onClose?.(), 2000);

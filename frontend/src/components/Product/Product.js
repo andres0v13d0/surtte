@@ -19,6 +19,27 @@ const Product = ({
     const navigate = useNavigate();
     const [isFavorite, setIsFavorite] = useState(false);
     const userId = JSON.parse(localStorage.getItem('usuario'))?.id;
+    const [has2x, setHas2x] = useState(false);
+
+    const checkImageExists = async (url) => {
+        try {
+          const res = await fetch(url, { method: 'HEAD' });
+          return res.ok;
+        } catch (err) {
+          return false;
+        }
+    };
+
+    useEffect(() => {
+        const check2x = async () => {
+          const url2x = image.replace('.webp', '@2x.webp');
+          const exists = await checkImageExists(url2x);
+          setHas2x(exists);
+        };
+      
+        check2x();
+    }, [image]);
+      
 
     useEffect(() => {
         const fetchFavorites = async () => {
@@ -92,11 +113,12 @@ const Product = ({
 
             <img
                 src={image}
-                srcSet={`${image} 1x, ${image.replace('.webp', '@2x.webp')} 2x`}
+                {...(has2x ? { srcSet: `${image} 1x, ${image.replace('.webp', '@2x.webp')} 2x` } : {})}
                 alt={name}
                 className="product-image"
                 loading="lazy"
             />
+
 
             <div className='product-info'>
                 <p className="product-name">{name}</p>
@@ -109,13 +131,23 @@ const Product = ({
                 </div>
 
                 <div className="tooltip-wrapper">
-                    <span className="price-more-info">+{prices.length - 1} precios disponibles</span>
-                    <div className="tooltip-content">
-                        {prices.slice(1).map((price, i) => (
-                            <p key={i}><strong>${price.amount}</strong> {price.condition}</p>
-                        ))}
-                    </div>
+                    {prices.length > 1 ? (
+                        <>
+                        <span className="price-more-info">+{prices.length - 1} precios disponibles</span>
+                        <div className="tooltip-content">
+                            {prices.slice(1).map((price, i) => (
+                                <p key={i}><strong>${price.amount}</strong> {price.condition}</p>
+                            ))}
+                        </div>
+                        </>
+                    ) : (
+                        <>
+                        <span className="price-more-info" style={{ visibility: 'hidden' }}>.</span>
+                        <div className="tooltip-content" style={{ display: 'none' }}></div>
+                        </>
+                    )}
                 </div>
+
 
                 <div className='product-price-inf'>
                     <div className="product-price-highlight">

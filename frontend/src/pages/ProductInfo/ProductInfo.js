@@ -7,8 +7,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
 import Product from '../../components/Product/Product';
+import Alert from '../../components/Alert/Alert';
 
 const ProductInfo = () => {
+  const [alert, setAlert] = useState(null);
   const { uuid  } = useParams();
   const id = uuid;
   const [product, setProduct] = useState(null);
@@ -106,9 +108,33 @@ const ProductInfo = () => {
     });
   }, [quantity, prices]);
 
-  const handleAddToCart = () => {
-    alert(`Simulación: producto "${product.name}" agregado al carrito con ${quantity} docenas.`);
+  const handleAddToCart = async () => {
+    try {
+      const body = {
+        productId: product.id,
+        quantity,
+        priceSnapshot: applicablePrice?.price,
+        colorSnapshot: colors.length > 0 ? document.querySelector('.selectors select[name="color"]')?.value : null,
+        sizeSnapshot: sizes.length > 0 ? document.querySelector('.selectors select[name="size"]')?.value : null,
+      };
+  
+      const res = await fetch('https://api.surtte.com/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(body),
+      });
+  
+      if (!res.ok) throw new Error('Token vencido o no autorizado');
+  
+      setAlert({ type: 'info', message: 'Producto agregado' });
+    } catch (err) {
+      window.location.href = '/login';
+    }
   };
+  
 
   if (!id || !product || !provider) {
     return (
@@ -126,6 +152,15 @@ const ProductInfo = () => {
 
   return (
     <>
+
+      {alert && (
+        <Alert
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
+
       <Header searchBar={true} />
       <div className="product-container">
         <h2 className="product-title">{product.name}</h2>
@@ -187,7 +222,7 @@ const ProductInfo = () => {
             {colors.length > 0 && (
               <div className="unit-selector">
                 <label>Color:</label>
-                <select>
+                <select name="color">
                   {colors.map((c, i) => <option key={i} value={c.name}>{c.name}</option>)}
                 </select>
               </div>
@@ -195,7 +230,7 @@ const ProductInfo = () => {
             {sizes.length > 0 && (
               <div className="unit-selector">
                 <label>Talla:</label>
-                <select>
+                <select name="size">
                   {sizes.map((s, i) => <option key={i} value={s.name}>{s.name}</option>)}
                 </select>
               </div>
