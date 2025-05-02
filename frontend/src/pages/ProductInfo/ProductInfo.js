@@ -1,99 +1,100 @@
-// ...resto de imports
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import './ProductInfo.css';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import NavInf from '../../components/NavInf/NavInf';
-// import Product from '../../components/Product/Product'; // 🔴 No se usa ahora
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { useParams } from 'react-router-dom';
+import Product from '../../components/Product/Product'; // Asegúrate que este componente existe
 
 const ProductInfo = () => {
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [images, setImages] = useState([]);
   const [prices, setPrices] = useState([]);
   const [provider, setProvider] = useState(null);
-  const [unitType, setUnitType] = useState('units');
   const [quantity, setQuantity] = useState(1);
-  const [totalUnits, setTotalUnits] = useState(1);
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [mainImage, setMainImage] = useState(null);
-  const unitRef = useRef(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const quantityRef = useRef(null);
 
   useEffect(() => {
-    const mockProduct = {
-      id: '1234',
-      name: 'Camiseta Oficial Colombia',
-      description: 'Camiseta original de la selección Colombia 2024',
-      colors: [{ name: 'Amarillo' }, { name: 'Blanco' }],
-      sizes: [{ name: 'S' }, { name: 'M' }, { name: 'L' }],
-      provider: { id: 'prov1' }
+    const fetchData = async () => {
+      try {
+        const productRes = await fetch(`https://api.surtte.com/products/${id}`);
+        const productData = await productRes.json();
+        setProduct(productData);
+        setColors(productData.colors || []);
+        setSizes(productData.sizes || []);
+
+        const imagesRes = await fetch(`https://api.surtte.com/images/by-product/${id}`);
+        const imagesData = await imagesRes.json();
+        setImages(imagesData);
+        setMainImage(imagesData?.[0]?.imageUrl || null);
+
+        const pricesRes = await fetch(`https://api.surtte.com/product-prices/product/${id}`);
+        const pricesData = await pricesRes.json();
+        setPrices(pricesData);
+
+        const firstQty = pricesData?.[0]?.quantity?.split(',')?.[0];
+        if (firstQty) setQuantity(parseInt(firstQty.trim()));
+
+        const providerRes = await fetch(`https://api.surtte.com/providers/${productData.providerId}`);
+        const providerData = await providerRes.json();
+        setProvider(providerData);
+
+        const relatedRes = await fetch(`https://api.surtte.com/products/by-provider/${productData.providerId}`);
+        const relatedData = await relatedRes.json();
+        setRelatedProducts(relatedData.filter(p => p.id !== productData.id));
+      } catch (err) {
+        console.error('Error al cargar datos del producto:', err);
+      }
     };
 
-    const mockImages = [
-      { imageUrl: '/camiseta.avif' },
-      { imageUrl: '/camiseta2.avif' }
-    ];
-
-    const mockPrices = [
-      { id: 'p1', price: '60000', minQuantity: 1, maxQuantity: 5, unity: 'unidad', description: '1 a 5 unidades' },
-      { id: 'p2', price: '55000', minQuantity: 6, maxQuantity: 11, unity: 'unidad', description: '6 a 11 unidades' },
-      { id: 'p3', price: '50000', minQuantity: 12, maxQuantity: 99, unity: 'unidad', description: '12 o más unidades' },
-      { id: 'p4', price: '580000', minQuantity: 1, maxQuantity: 5, unity: 'docena', description: '1 a 5 docenas' }
-    ];
-
-    const mockProvider = {
-      nombre_empresa: 'Surtte Colombia',
-      calificacion: 4.8,
-      descripcion: 'Proveedor oficial de ropa deportiva en Colombia.'
-    };
-
-    setProduct(mockProduct);
-    setImages(mockImages);
-    setPrices(mockPrices);
-    setMainImage(mockImages[0].imageUrl);
-    setColors(mockProduct.colors);
-    setSizes(mockProduct.sizes);
-    setProvider(mockProvider);
-    setQuantity(mockPrices[0].minQuantity);
-    setUnitType(mockPrices[0].unity === 'docena' ? 'dozens' : 'units');
-  }, []);
+    fetchData();
+  }, [id]);
 
   const availableQuantities = useMemo(() => {
-    const allQuantities = new Set();
-    prices
-      .filter(p => p.unity === (unitType === 'dozens' ? 'docena' : 'unidad'))
-      .forEach(p => {
-        for (let i = p.minQuantity; i <= p.maxQuantity; i++) {
-          allQuantities.add(i);
-        }
-      });
-    return Array.from(allQuantities).sort((a, b) => a - b);
-  }, [unitType, prices]);
-
-  useEffect(() => {
-    const units = unitType === 'dozens' ? quantity * 12 : quantity;
-    setTotalUnits(units);
-  }, [quantity, unitType]);
+    const set = new Set();
+    prices.forEach(p => {
+      p.quantity.split(',').forEach(q => set.add(parseInt(q.trim())));
+    });
+    return Array.from(set).sort((a, b) => a - b);
+  }, [prices]);
 
   const applicablePrice = useMemo(() => {
-    return prices
-      .filter(p => p.unity === (unitType === 'dozens' ? 'docena' : 'unidad'))
-      .filter(p => totalUnits >= p.minQuantity && totalUnits <= p.maxQuantity)
-      .sort((a, b) => parseFloat(a.price) - parseFloat(b.price))[0] || prices[0];
-  }, [totalUnits, unitType, prices]);
+    return prices.find(p => {
+      const qList = p.quantity.split(',').map(q => parseInt(q.trim()));
+      return qList.includes(quantity);
+    });
+  }, [quantity, prices]);
 
   const handleAddToCart = () => {
-    alert(`Simulación: producto "${product.name}" agregado al carrito con ${quantity} ${unitType === 'dozens' ? 'docenas' : 'unidades'}.`);
+    alert(`Simulación: producto "${product.name}" agregado al carrito con ${quantity} docenas.`);
   };
 
   if (!product || !provider || !applicablePrice) return <p>Cargando diseño...</p>;
 
   return (
     <>
-      <Header />
+      <Header searchBar={true} />
       <div className="product-container">
+        <h2 className="product-title">{product.name}</h2>
         <div className="product-image-section">
+          <img src={mainImage} alt="Producto" className="main-image" />
+          <FontAwesomeIcon icon={faAngleLeft} className="arrow left" onClick={() => {
+            const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
+            const newIndex = (currentIndex - 1 + images.length) % images.length;
+            setMainImage(images[newIndex].imageUrl);
+          }} />
+          <FontAwesomeIcon icon={faAngleRight} className="arrow right" onClick={() => {
+            const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
+            const newIndex = (currentIndex + 1) % images.length;
+            setMainImage(images[newIndex].imageUrl);
+          }} />
           {images.length > 1 && (
             <div className="thumbnail-container">
               {images.map((img, i) => (
@@ -101,19 +102,24 @@ const ProductInfo = () => {
               ))}
             </div>
           )}
-          <img src={mainImage} alt="Producto" className="main-image" />
         </div>
 
         <div className="product-details">
-          <h2 className="product-title">{product.name}</h2>
           <p className="product-description">{product.description}</p>
-          <div className="line"></div>
+          <p className='p-calf-provider'><strong>Calificación: </strong>⭐ {provider.calificacion}</p>
 
           <div className="dynamic-price-highlight">
             <h3><b>COP</b> {parseFloat(applicablePrice?.price || 0).toLocaleString('es-CO')}</h3>
+            <div className="dozens-info">
+              <p className="dozenz-info-text">Docena</p>
+              <div className='dozenz-unit'>
+                <p className="dozenz-unit-text">Unidad</p>
+                <p className="dozenz-unit-number">$ {parseFloat(applicablePrice?.price / 12 || 0).toLocaleString('es-CO')}</p>
+              </div>
+            </div>
           </div>
 
-          <p className='p-info-prices'>Este producto tiene precios escalonados según la cantidad. Mira las tarifas disponibles:</p>
+          <p className='p-info-prices'>Este producto tiene precios según la cantidad. Mira las tarifas disponibles:</p>
           <div className="price-scroll-list">
             {prices.map((p, i) => (
               <div key={i} className={`price-block ${p.id === applicablePrice.id ? 'active' : ''}`}>
@@ -123,33 +129,23 @@ const ProductInfo = () => {
             ))}
           </div>
 
-          {colors.length > 0 && (
-            <div className="selector-inline">
-              <label>Color:</label>
-              <select>
-                {colors.map((c, i) => <option key={i} value={c.name}>{c.name}</option>)}
-              </select>
-            </div>
-          )}
-
-          {sizes.length > 0 && (
-            <div className="selector-inline">
-              <label>Talla:</label>
-              <select>
-                {sizes.map((s, i) => <option key={i} value={s.name}>{s.name}</option>)}
-              </select>
-            </div>
-          )}
-
           <div className="selectors">
-            <div className="unit-selector">
-              <label>Unidad:</label>
-              <select ref={unitRef} value={unitType} onChange={(e) => setUnitType(e.target.value)}>
-                {prices.some(p => p.unity === 'unidad') && <option value="units">Unidades</option>}
-                {prices.some(p => p.unity === 'docena') && <option value="dozens">Docenas</option>}
-              </select>
-            </div>
-
+            {colors.length > 0 && (
+              <div className="unit-selector">
+                <label>Color:</label>
+                <select>
+                  {colors.map((c, i) => <option key={i} value={c.name}>{c.name}</option>)}
+                </select>
+              </div>
+            )}
+            {sizes.length > 0 && (
+              <div className="unit-selector">
+                <label>Talla:</label>
+                <select>
+                  {sizes.map((s, i) => <option key={i} value={s.name}>{s.name}</option>)}
+                </select>
+              </div>
+            )}
             <div className="quantity-selector">
               <label>Cantidad:</label>
               <select ref={quantityRef} value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))}>
@@ -166,18 +162,20 @@ const ProductInfo = () => {
           <div className="product-provider-info">
             <h1>Información del proveedor</h1>
             <p className='p-name-provider'>{provider.nombre_empresa}</p>
-            <p className='p-calf-provider'><strong>Calificación: </strong>⭐ {provider.calificacion}</p>
             <p className='p-desc-provider'>{provider.descripcion}</p>
           </div>
 
-          {/* 🔒 Ocultado por ahora */}
-          {/* <div className="line"></div>
-          <h2 className="more-products-title">Más productos del proveedor</h2>
-          <div className='products-cont'>
-            {relatedProducts.map((prod, index) => (
-              <Product key={index} {...prod} />
-            ))}
-          </div> */}
+          {relatedProducts.length > 0 && (
+            <>
+              <div className="line"></div>
+              <h2 className="more-products-title">Más productos del proveedor</h2>
+              <div className='products-cont'>
+                {relatedProducts.map((prod, index) => (
+                  <Product key={index} {...prod} />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
       <NavInf />

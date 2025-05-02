@@ -11,26 +11,28 @@
   align-items: center;
   justify-content: space-around;
   margin-top: 1rem;
+  flex-direction: column;
+  padding: 0 16px;
+  overflow: hidden;
+  position: relative;
 }
 
 .main-image {
   width: 100%;
-  max-width: 300px;
   border-radius: 10px;
   object-fit: cover;
 }
 
 .thumbnail-container {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   gap: 8px;
   margin-top: 10px;
 }
 
 .thumbnail {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   object-fit: cover;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -38,18 +40,18 @@
 }
 
 .product-details {
-  padding: 16px;
+  padding: 0 16px;
 }
 
 .product-title {
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 4px;
+  padding-left: 16px;
 }
 
 .product-description {
-  color: #666;
-  font-size: 15px;
+  font-size: 20px;
   margin-bottom: 12px;
 }
 
@@ -61,15 +63,25 @@
 }
 .dynamic-price-highlight {
   margin-bottom: 16px;
+  margin-top: 0;
+  display: flex;
+  align-items: end;
+}
+
+.dynamic-price-highlight p{
+  font-size: 15px !important;
+  color: #555;
+  margin: 0 0 11px 5px;
 }
 
 .dynamic-price-highlight h3 {
   font-size: 60px;
-  color: #222;
+  color: #fa7e17;
   margin: 0;
   display: flex;
   align-items: start;
   font-weight: 500;
+  padding: 0;
 }
 
 .dynamic-price-highlight b {
@@ -120,7 +132,6 @@
 }
 
 .price-block .price-condition {
-
   color: #555;
   margin: 0;
 }
@@ -201,7 +212,7 @@
 .product-provider-info .p-calf-provider {
   font-size: 13px;
   color: #666;
-  margin-bottom: 12px;
+  margin: 0;
 }
 
 .product-provider-info .p-desc-provider {
@@ -244,4 +255,58 @@
     flex-direction: row;
     justify-content: center;
   }
+}
+
+
+.arrow {
+  font-size: 50px;
+  color: black;
+  cursor: pointer;
+  transition: color 0.2s;
+  font-weight: bold;
+  position: absolute;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15% !important;
+}
+
+.arrow.left {
+  left: 0;
+  margin-left: 16px;
+}
+.arrow.right {
+  right: 0;
+  margin-right: 16px;
+}
+
+.dozens-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+.dozens-info p {
+  font-size: 20px;
+  margin: 0;
+}
+
+.dozenz-unit{
+  border: 1px solid #555;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.dozenz-unit p{
+  margin: 0;
+  font-size: 12px !important;
+}
+
+.dozenz-unit p:first-child{
+  background-color: #555;
+  color: #fff;
 }

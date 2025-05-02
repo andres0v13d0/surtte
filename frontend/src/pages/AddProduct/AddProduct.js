@@ -182,6 +182,8 @@ const AddProduct = () => {
           .filter(n => !isNaN(n) && n > 0)
           .join(',');
 
+        const description = `Aplica ${quantity} unidades`;
+
         await fetch('https://api.surtte.com/product-prices', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -190,6 +192,7 @@ const AddProduct = () => {
             quantity,
             unity: block.unidad,
             price: precio,
+            description,
           }),
         });
       }

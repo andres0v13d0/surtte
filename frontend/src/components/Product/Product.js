@@ -118,7 +118,7 @@ const Product = ({
                 <div className='product-price-inf'>
                     <div className="product-price-highlight">
                         <p className="main-price"><span>COP</span>{mainPrice.amount}</p>
-                        <p className="price-note">Aplica {mainPrice.condition}</p>
+                        <p className="price-note">{mainPrice.condition}</p>
                     </div>
                     <button className="add-to-cart-button" onClick={handleAddToCartClick}>
                         <FontAwesomeIcon icon={isProvider ? faPen : faCartPlus} />

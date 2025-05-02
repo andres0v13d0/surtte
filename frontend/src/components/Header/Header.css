@@ -56,3 +56,37 @@
 .header .buttons #icons{
     height: 25px;
 }
+
+.header.search-bar{
+    height: auto;
+    padding: 10px 0;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.header.search-bar .back-button-header{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 25px;
+    margin: 0 10px 0 0;
+    cursor: pointer;
+}
+
+.header.search-bar .back-button-header:hover{
+    color: #fa7e17;
+}
+
+.header.search-bar .search{
+    width: 85%;
+    background-color: white;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
