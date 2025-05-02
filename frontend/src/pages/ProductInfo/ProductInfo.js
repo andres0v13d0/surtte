@@ -21,6 +21,7 @@ const ProductInfo = () => {
   const [mainImage, setMainImage] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const quantityRef = useRef(null);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -130,7 +131,13 @@ const ProductInfo = () => {
         <h2 className="product-title">{product.name}</h2>
         <div className="product-image-section">
           <div className="main-image-wrapper">
-            <img src={mainImage} alt="Producto" className="main-image" />
+            <img 
+              src={mainImage} 
+              alt="Producto" 
+              className={`main-image ${imgLoaded ? 'loaded' : ''}`}
+              onLoad={() => setImgLoaded(true)}
+              loading='lazy' 
+            />
           </div>
           <FontAwesomeIcon icon={faAngleLeft} className="arrow left" onClick={() => {
             const currentIndex = images.findIndex(img => img.imageUrl === mainImage);

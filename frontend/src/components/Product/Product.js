@@ -92,8 +92,10 @@ const Product = ({
 
             <img
                 src={image}
+                srcSet={`${image} 1x, ${image.replace('.webp', '@2x.webp')} 2x`}
                 alt={name}
                 className="product-image"
+                loading="lazy"
             />
 
             <div className='product-info'>

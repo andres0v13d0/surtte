@@ -8,6 +8,7 @@ import InputPrices from '../../components/InputPrices/InputPrices';
 import Alert from '../../components/Alert/Alert'; 
 
 const AddProduct = () => {
+  const [retinaImages, setRetinaImages] = useState([]);
   const [variantList, setVariantList] = useState([]);
   const [camposInvalidos, setCamposInvalidos] = useState({});
   const [alertType, setAlertType] = useState(null); 
@@ -123,6 +124,18 @@ const AddProduct = () => {
         });
       });
 
+      for (const block of priceBlocks) {
+        const precio = parseFloat((block.precio || '').toString().replace(/\./g, ''));
+        const tieneCantidades = Array.isArray(block.cantidades) && block.cantidades.length > 0;
+      
+        if (!tieneCantidades || isNaN(precio) || precio <= 0) {
+          setAlertType('error');
+          setAlertMessage('Cada bloque de precio debe tener al menos una cantidad válida y un precio mayor a 0.');
+          setShowAlert(true);
+          return;
+        }
+      }
+
       const user = JSON.parse(localStorage.getItem('usuario'));
       if (!user || user.rol !== 'proveedor' || !user.proveedorInfo?.id) {
         setAlertType('error');
@@ -204,6 +217,25 @@ const AddProduct = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ productId, imageUrl: finalUrl, temporal: false }),
         });
+      }
+
+      if (retinaImages.length > 0) {
+        for (let i = 0; i < retinaImages.length; i++) {
+          const retinaFile = retinaImages[i];
+          const mimeType = retinaFile.type;
+          const filename = retinaFile.name;
+      
+          const signedRes = await fetch('https://api.surtte.com/images/signed-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mimeType, filename, productId }),
+          });
+      
+          const { signedUrl } = await signedRes.json();
+          await fetch(signedUrl, { method: 'PUT', body: retinaFile });
+      
+          // OJO: no registramos esta imagen porque es solo para srcSet
+        }
       }
 
       for (const block of priceBlocks) {
@@ -298,6 +330,7 @@ const AddProduct = () => {
               previews={previews}
               setImages={setImages}
               setPreviews={setPreviews}
+              setRetinaImages={setRetinaImages}
               goToStep={goToStep}
             />
           )}
