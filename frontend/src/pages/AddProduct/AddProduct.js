@@ -83,6 +83,21 @@ const AddProduct = () => {
 
   const goToStep = (newStep) => {
     if (newStep > step && !validarStep(step)) return;
+
+    setVariantList(prev => {
+      return prev.map(variant => {
+        const val = variant.input.trim();
+        if (val && !variant.values.includes(val)) {
+          return {
+            ...variant,
+            values: [...variant.values, val],
+            input: ''
+          };
+        }
+        return { ...variant, input: '' };
+      });
+    });
+
     setDirection(newStep > step ? 'right' : 'left');
     setStep(newStep);
   };
@@ -90,6 +105,26 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setPriceBlocks(prev => {
+        return prev.map(block => {
+          const val = block.inputCantidad?.trim();
+          if (
+            val &&
+            !isNaN(val) &&
+            Number.isInteger(Number(val)) &&
+            Number(val) > 0 &&
+            !block.cantidades.includes(val)
+          ) {
+            return {
+              ...block,
+              cantidades: [...block.cantidades, val],
+              inputCantidad: ''
+            };
+          }
+          return { ...block, inputCantidad: '' };
+        });
+      });
+      
       const user = JSON.parse(localStorage.getItem('usuario'));
       if (!user || user.rol !== 'proveedor' || !user.proveedorInfo?.id) {
         setAlertType('error');

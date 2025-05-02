@@ -79,9 +79,41 @@ const InputPrices = ({
                   type="text"
                   value={inputCantidad}
                   onChange={(e) => handleCantidadInput(e, block.id)}
+                  onBlur={() => {
+                    const value = inputCantidad.trim();
+                    if (
+                      value &&
+                      !isNaN(value) &&
+                      Number.isInteger(Number(value)) &&
+                      Number(value) > 0 &&
+                      !cantidades.includes(value)
+                    ) {
+                      const updatedCantidades = [...cantidades, value];
+                      updatePriceBlock(block.id, 'cantidades', updatedCantidades);
+                    }
+                    updatePriceBlock(block.id, 'inputCantidad', '');
+                  }}
+                  onKeyDown={(e) => {
+                    if (['Enter', 'Tab'].includes(e.key)) {
+                      e.preventDefault();
+                      const value = inputCantidad.trim();
+                      if (
+                        value &&
+                        !isNaN(value) &&
+                        Number.isInteger(Number(value)) &&
+                        Number(value) > 0 &&
+                        !cantidades.includes(value)
+                      ) {
+                        const updatedCantidades = [...cantidades, value];
+                        updatePriceBlock(block.id, 'cantidades', updatedCantidades);
+                      }
+                      updatePriceBlock(block.id, 'inputCantidad', '');
+                    }
+                  }}
                   placeholder="Ej: 1, 2, 5..."
-                  className='size-input'
+                  className="size-input"
                 />
+
               </div>
 
               <p className="input-length">Cantidad en unidades</p>

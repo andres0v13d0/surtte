@@ -6,10 +6,11 @@ import NavInf from '../../components/NavInf/NavInf';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
-import Product from '../../components/Product/Product'; // Asegúrate que este componente existe
+import Product from '../../components/Product/Product';
 
 const ProductInfo = () => {
-  const { id } = useParams();
+  const { uuid  } = useParams();
+  const id = uuid;
   const [product, setProduct] = useState(null);
   const [images, setImages] = useState([]);
   const [prices, setPrices] = useState([]);
@@ -42,13 +43,45 @@ const ProductInfo = () => {
         const firstQty = pricesData?.[0]?.quantity?.split(',')?.[0];
         if (firstQty) setQuantity(parseInt(firstQty.trim()));
 
-        const providerRes = await fetch(`https://api.surtte.com/providers/${productData.providerId}`);
+        const providerRes = await fetch(`https://api.surtte.com/providers/public/${productData.providerId}`);
         const providerData = await providerRes.json();
         setProvider(providerData);
 
         const relatedRes = await fetch(`https://api.surtte.com/products/by-provider/${productData.providerId}`);
         const relatedData = await relatedRes.json();
-        setRelatedProducts(relatedData.filter(p => p.id !== productData.id));
+        const formatted = await Promise.all(
+          (Array.isArray(relatedData) ? relatedData : []).filter(p => p.id !== productData.id).map(async (prod) => {
+            const [imagesRes, pricesRes] = await Promise.all([
+              fetch(`https://api.surtte.com/images/by-product/${prod.id}`),
+              fetch(`https://api.surtte.com/product-prices/product/${prod.id}`)
+            ]);
+        
+            const images = await imagesRes.json();
+            const prices = await pricesRes.json();
+        
+            return {
+              uuid: prod?.id || 'uuid-desconocido',
+              name: prod?.name || 'Producto sin nombre',
+              provider: prod?.provider?.nombre_empresa || 'Proveedor desconocido',
+              stars: 5,
+              image: images?.[0]?.imageUrl || '/default.jpg',
+              prices: Array.isArray(prices) && prices.length > 0
+                ? prices.map(p => ({
+                    amount: parseFloat(p?.price || '0').toLocaleString('es-CO', {
+                      minimumFractionDigits: 0
+                    }),
+                    condition: p?.description ?? 'Sin condición'
+                  }))
+                : [{
+                    amount: '0',
+                    condition: 'Sin condición'
+                  }]
+            };
+          })
+        );
+        
+        setRelatedProducts(formatted);
+        
       } catch (err) {
         console.error('Error al cargar datos del producto:', err);
       }
@@ -76,7 +109,19 @@ const ProductInfo = () => {
     alert(`Simulación: producto "${product.name}" agregado al carrito con ${quantity} docenas.`);
   };
 
-  if (!product || !provider || !applicablePrice) return <p>Cargando diseño...</p>;
+  if (!id || !product || !provider) {
+    return (
+      <>
+        <Header />
+        <div className="error-container">
+          <h2>No se pudo cargar el producto 😓</h2>
+          <p>Revisa la URL o intenta más tarde.</p>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+  
 
   return (
     <>

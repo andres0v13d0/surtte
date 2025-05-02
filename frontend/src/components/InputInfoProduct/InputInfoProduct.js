@@ -175,11 +175,35 @@ const InputInfoProduct = ({
                   type="text"
                   value={variant.input}
                   onChange={(e) => handleVariantInput(index, e.target.value)}
+                  onBlur={() => {
+                    if (variant.input.trim()) {
+                      const updatedList = [...variantList];
+                      const val = variant.input.trim();
+                      if (!updatedList[index].values.includes(val)) {
+                        updatedList[index].values.push(val);
+                      }
+                      updatedList[index].input = '';
+                      setVariantList(updatedList);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (['Enter', 'Tab'].includes(e.key)) {
+                      e.preventDefault();
+                      const updatedList = [...variantList];
+                      const val = variant.input.trim();
+                      if (val && !updatedList[index].values.includes(val)) {
+                        updatedList[index].values.push(val);
+                      }
+                      updatedList[index].input = '';
+                      setVariantList(updatedList);
+                    }
+                  }}
                   placeholder="Ej: S, M, L..."
-                  className='size-input'
+                  className="size-input"
                 />
               </div>
             )}
+
 
             {variant.type === 'Color' && (
               <div className="tag-input size">
@@ -192,11 +216,35 @@ const InputInfoProduct = ({
                   type="text"
                   value={variant.input}
                   onChange={(e) => handleVariantInput(index, e.target.value)}
+                  onBlur={() => {
+                    if (variant.input.trim()) {
+                      const updatedList = [...variantList];
+                      const val = variant.input.trim();
+                      if (!updatedList[index].values.includes(val)) {
+                        updatedList[index].values.push(val);
+                      }
+                      updatedList[index].input = '';
+                      setVariantList(updatedList);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (['Enter', 'Tab'].includes(e.key)) {
+                      e.preventDefault();
+                      const updatedList = [...variantList];
+                      const val = variant.input.trim();
+                      if (val && !updatedList[index].values.includes(val)) {
+                        updatedList[index].values.push(val);
+                      }
+                      updatedList[index].input = '';
+                      setVariantList(updatedList);
+                    }
+                  }}
                   placeholder="Ej: Rojo, Azul..."
-                  className='size-input'
+                  className="size-input"
                 />
               </div>
             )}
+
 
 
             <button
