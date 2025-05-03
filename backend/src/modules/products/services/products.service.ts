@@ -4,6 +4,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
+import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Product, ProductStatus } from '../entities/product.entity';
 import { CreateProductDto } from '../dtos/create-product.dto';
 import { Provider } from '../../providers/entity/provider.entity';
@@ -32,6 +33,10 @@ export class ProductsService {
     
     @InjectRepository(Size)
     private readonly sizeRepo: Repository<Size>,
+
+    private readonly bucketName = 'surtte-product-images',
+    private readonly cloudFrontUrl = 'https://cdn.surtte.com',
+    private readonly s3 = new S3Client({ region: 'us-east-2' }),
 
   ) {}
 
@@ -187,17 +192,17 @@ export class ProductsService {
 
   async update(id: string, dto: CreateProductDto): Promise<Product> {
     const product = await this.findOneById(id);
-
+  
     product.name = dto.name.trim();
     product.description = dto.description.trim();
     product.reference = dto.reference?.trim();
-
+  
     if (dto.categoryId) {
       const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
       if (!category) throw new NotFoundException('Categoría no encontrada.');
       product.category = category;
     }
-
+  
     if (dto.subCategoryId) {
       const subCategory = await this.subCategoryRepo.findOne({ where: { id: dto.subCategoryId } });
       if (!subCategory) throw new NotFoundException('Subcategoría no encontrada.');
@@ -205,12 +210,60 @@ export class ProductsService {
     } else {
       product.subCategory = null;
     }
-
+  
+    if (dto.colors) {
+      const colorEntities = await Promise.all(
+        dto.colors.map(async ({ name }) => {
+          let color = await this.colorRepo.findOne({ where: { name } });
+          if (!color) {
+            color = this.colorRepo.create({ name });
+            await this.colorRepo.save(color);
+          }
+          return color;
+        }),
+      );
+      product.colors = colorEntities;
+    }
+  
+    if (dto.sizes) {
+      const sizeEntities = await Promise.all(
+        dto.sizes.map(async ({ name }) => {
+          let size = await this.sizeRepo.findOne({ where: { name } });
+          if (!size) {
+            size = this.sizeRepo.create({ name });
+            await this.sizeRepo.save(size);
+          }
+          return size;
+        }),
+      );
+      product.sizes = sizeEntities;
+    }
+  
     return this.productRepo.save(product);
   }
-
+  
   async remove(id: string): Promise<void> {
-    const product = await this.findOneById(id);
+    const product = await this.productRepo.findOne({
+      where: { id },
+      relations: ['images'],
+    });
+  
+    if (!product) throw new NotFoundException('Producto no encontrado.');
+  
+    for (const image of product.images) {
+      const key = image.imageUrl.replace(`${this.cloudFrontUrl}/`, '');
+      try {
+        await this.s3.send(
+          new DeleteObjectCommand({
+            Bucket: this.bucketName,
+            Key: key,
+          })
+        );
+      } catch (err) {
+        console.error(`Error al borrar imagen ${key} de S3`, err);
+      }
+    }
+  
     await this.productRepo.remove(product);
   }
 }

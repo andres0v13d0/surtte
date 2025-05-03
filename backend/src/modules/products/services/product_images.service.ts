@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ProductImage } from '../entities/product-image.entity';
 import { GenerateSignedUrlDto } from '../dtos/generate-signed-url.dto';
@@ -70,7 +70,20 @@ export class ProductImagesService {
   async deleteImage(id: string): Promise<void> {
     const img = await this.imageRepo.findOne({ where: { id } });
     if (!img) throw new NotFoundException('Imagen no encontrada.');
-
+  
+    const key = img.imageUrl.replace(`${this.cloudFrontUrl}/`, '');
+  
+    const command = new DeleteObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+    });
+  
+    try {
+      await this.s3.send(command);
+    } catch (error) {
+      console.error('Error al eliminar de S3:', error);
+    }
+  
     await this.imageRepo.remove(img);
   }
 }

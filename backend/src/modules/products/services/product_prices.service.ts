@@ -40,6 +40,18 @@ export class ProductPricesService {
     });
   }
 
+  async update(id: string, dto: CreateProductPriceDto): Promise<ProductPrice> {
+    const price = await this.findOne(id);
+  
+    if (dto.quantity !== undefined) price.quantity = dto.quantity;
+    if (dto.unity !== undefined) price.unity = dto.unity;
+    if (dto.price !== undefined) price.price = dto.price;
+    if (dto.description !== undefined) price.description = dto.description;
+  
+    return this.priceRepo.save(price);
+  }
+  
+
   async findOne(id: string): Promise<ProductPrice> {
     const price = await this.priceRepo.findOne({
       where: { id },

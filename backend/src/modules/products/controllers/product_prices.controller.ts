@@ -6,6 +6,7 @@ import {
     Body,
     Param,
     ParseUUIDPipe,
+    Patch,
   } from '@nestjs/common';
   import { ProductPricesService } from '../services/product_prices.service';
   import { CreateProductPriceDto } from '../dtos/create-product-price.dto';
@@ -30,6 +31,15 @@ import {
     findOne(@Param('id', ParseUUIDPipe) id: string) {
       return this.productPricesService.findOne(id);
     }
+
+    @Patch(':id')
+    update(
+      @Param('id', ParseUUIDPipe) id: string,
+      @Body() dto: CreateProductPriceDto,
+    ) {
+      return this.productPricesService.update(id, dto);
+    }
+
   
     @Delete(':id')
     remove(@Param('id', ParseUUIDPipe) id: string) {
