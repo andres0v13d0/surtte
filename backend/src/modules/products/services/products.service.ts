@@ -15,6 +15,11 @@ import { Color } from '../../products/entities/color.entity';
 
 @Injectable()
 export class ProductsService {
+
+  private readonly bucketName = 'surtte-product-images';
+  private readonly cloudFrontUrl = 'https://cdn.surtte.com';
+  private readonly s3 = new S3Client({ region: 'us-east-2' });
+
   constructor(
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
@@ -33,11 +38,6 @@ export class ProductsService {
     
     @InjectRepository(Size)
     private readonly sizeRepo: Repository<Size>,
-
-    private readonly bucketName = 'surtte-product-images',
-    private readonly cloudFrontUrl = 'https://cdn.surtte.com',
-    private readonly s3 = new S3Client({ region: 'us-east-2' }),
-
   ) {}
 
   async create(dto: CreateProductDto): Promise<Product> {
