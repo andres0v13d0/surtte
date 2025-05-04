@@ -19,27 +19,7 @@ const Product = ({
     const navigate = useNavigate();
     const [isFavorite, setIsFavorite] = useState(false);
     const userId = JSON.parse(localStorage.getItem('usuario'))?.id;
-    const [has2x, setHas2x] = useState(false);
-
-    const checkImageExists = async (url) => {
-        try {
-          const res = await fetch(url, { method: 'HEAD' });
-          return res.ok;
-        } catch (err) {
-          return false;
-        }
-    };
-
-    useEffect(() => {
-        const check2x = async () => {
-          const url2x = image.replace('.webp', '@2x.webp');
-          const exists = await checkImageExists(url2x);
-          setHas2x(exists);
-        };
-      
-        check2x();
-    }, [image]);
-      
+     
 
     useEffect(() => {
         const fetchFavorites = async () => {
@@ -113,7 +93,6 @@ const Product = ({
 
             <img
                 src={image}
-                {...(has2x ? { srcSet: `${image} 1x, ${image.replace('.webp', '@2x.webp')} 2x` } : {})}
                 alt={name}
                 className="product-image"
                 loading="lazy"

@@ -115,7 +115,7 @@ const CartPage = () => {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     const token = localStorage.getItem('token');
 
-    for (const [provName, items] of Object.entries(grouped)) {
+    for (const [items] of Object.entries(grouped)) {
       const receiverId = items[0].product.providerId;
 
       await fetch('https://api.surtte.com/chat/message', {
