@@ -34,7 +34,7 @@ const Profile = () => {
                                     <span className="icon-left">
                                         <FontAwesomeIcon icon={faShoppingBasket} />
                                     </span>
-                                    <span className="text">Mis productos</span>
+                                    <span className="text">Panel de proveedor</span>
                                     <span className="icon-right">
                                         <FontAwesomeIcon icon={faChevronRight} />
                                     </span>

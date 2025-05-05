@@ -66,7 +66,12 @@ function MyProducts() {
 
   return (
     <>
-      <Header />
+      <Header 
+        minimal={true}
+        providerName={JSON.parse(localStorage.getItem('usuario'))?.proveedorInfo?.nombre_empresa}
+        menuProvider={true}
+        currentPage='products'
+      />
       <div className='products-cont'>
         <div className='products-add' onClick={addProduct}>
           <div className='add-button'>
@@ -77,7 +82,7 @@ function MyProducts() {
           <Product key={index} {...prod} />
         ))}
       </div>
-      <NavInf selected={"profile"} />
+      <NavInf />
       <Footer />
     </>
   );

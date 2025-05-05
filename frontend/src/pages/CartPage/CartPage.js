@@ -111,54 +111,133 @@ const CartPage = () => {
   const calculateProviderTotal = (items) =>
     items.reduce((sum, item) => sum + calculateSubtotal(item), 0);
 
-  const handleRequestAll = async () => {
+  const handleRequestByProvider = async (providerId, items) => {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     const token = localStorage.getItem('token');
-
-    for (const [items] of Object.entries(grouped)) {
-      const receiverId = items[0].product.providerId;
-
+    const senderId = usuario.id;
+  
+    const checkedItems = items.filter((item) => item.isChecked);
+  
+    if (checkedItems.length === 0) {
+      alert('Selecciona al menos un producto para este proveedor.');
+      return;
+    }
+  
+    try {
       await fetch('https://api.surtte.com/chat/message', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          senderId: usuario.id,
-          receiverId,
+          senderId,
+          receiverId: providerId,
           message: 'Hola, quiero solicitar un pedido de su tienda.',
           messageType: 'TEXT',
         }),
       });
-
-      for (const item of items) {
+  
+      for (const item of checkedItems) {
         const msg = {
           type: 'PRODUCT',
           name: item.productNameSnapshot,
           quantity: item.quantity,
           imageUrl: item.imageUrlSnapshot,
         };
-
+  
         await fetch('https://api.surtte.com/chat/message', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
-            senderId: usuario.id,
-            receiverId,
+            senderId,
+            receiverId: providerId,
             message: JSON.stringify(msg),
             messageType: 'TEXT',
           }),
         });
-
+  
         await fetch(`https://api.surtte.com/cart/${item.id}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },
         });
       }
+  
+      setCartItems((prev) => prev.filter((item) => item.providerId !== providerId || !item.isChecked));
+      navigate('/messages');
+    } catch (err) {
+      console.error('Error al solicitar el pedido:', err);
+      alert('Error al enviar el pedido a este proveedor.');
     }
-
-    setCartItems([]);
-    navigate('/messages');
   };
+  
 
+  const handleRequestAll = async () => {
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const token = localStorage.getItem('token');
+    const senderId = usuario.id;
+  
+    try {
+      for (const [provider, items] of Object.entries(grouped)) {
+        const checkedItems = items.filter((item) => item.isChecked);
+        if (checkedItems.length === 0) continue;
+  
+        const receiverId = checkedItems[0].product.providerId;
+  
+        await fetch('https://api.surtte.com/chat/message', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            senderId,
+            receiverId,
+            message: 'Hola, quiero solicitar un pedido de su tienda.',
+            messageType: 'TEXT',
+          }),
+        });
+  
+        for (const item of checkedItems) {
+          const msg = {
+            type: 'PRODUCT',
+            name: item.productNameSnapshot,
+            quantity: item.quantity,
+            imageUrl: item.imageUrlSnapshot,
+          };
+  
+          await fetch('https://api.surtte.com/chat/message', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              senderId,
+              receiverId,
+              message: JSON.stringify(msg),
+              messageType: 'TEXT',
+            }),
+          });
+  
+          await fetch(`https://api.surtte.com/cart/${item.id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        }
+      }
+  
+      setCartItems((prev) => prev.filter((item) => !item.isChecked));
+      navigate('/messages');
+    } catch (err) {
+      console.error('Error al solicitar todos los pedidos:', err);
+      alert('Hubo un error al solicitar los pedidos.');
+    }
+  };
+  
   if (loading) return <p>Cargando carrito...</p>;
 
   return (
@@ -241,6 +320,15 @@ const CartPage = () => {
             <div className="provider-total">
               Subtotal: COP {calculateProviderTotal(items).toLocaleString('es-CO')}
             </div>
+            <button
+              className="request-btn" 
+              onClick={() =>
+                handleRequestByProvider(items[0].product.providerId, items)
+              }
+            >
+              Solicitar pedido para este proveedor
+            </button>
+
           </fieldset>
         ))}
       </div>
