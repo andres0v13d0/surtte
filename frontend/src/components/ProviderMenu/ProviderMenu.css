@@ -23,7 +23,7 @@
 
 .provider-menu {
   background-color: white;
-  width: 50vw;
+  width: 70vw;
   max-width: 400px;
   height: 100%;
   padding: 1rem;
@@ -51,12 +51,36 @@
   align-items: center;
 }
 
-.close-btn {
+.menu-header .provider-info{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 50px 0;
+}
+
+.provider-info h3{
+  margin: 0;
+  font-size: 25px;
+  font-weight: 500; 
+}
+
+.provider-info p{
+  margin: 0;
+  font-size: 15px;
+  font-weight: 400; 
+}
+
+.menu-header .close-btn {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.3rem;
-  color: #555;
+  color: #fa7e17;
+  position: absolute;
+  right: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 50px;
+  font-size: 30px;
 }
 
 .provider-menu ul {
@@ -69,17 +93,41 @@
   margin-bottom: 0.75rem;
 }
 
-.provider-menu li.active a {
-  font-weight: bold;
-  color: #007bff;
-}
-
-.provider-menu a {
+ul li .user-button{
   text-decoration: none;
-  color: #333;
-  font-size: 1rem;
+  background-color: white;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  color: black;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  gap: 1rem;
 }
 
-.provider-menu a:hover {
-  text-decoration: underline;
+.icon-left,
+.icon-right {
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.user-button.active {
+  background-color: #fa7e17;
+  color: white;
+}
+
+.user-button:hover svg {
+  color: white;
+}
+
+.user-button.mg{
+  margin-bottom: 1rem;
 }
