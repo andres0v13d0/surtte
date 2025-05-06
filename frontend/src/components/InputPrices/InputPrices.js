@@ -9,19 +9,20 @@ const InputPrices = ({
   handleRemovePriceBlock,
   goToStep,
   camposInvalidos,
-  setCamposInvalidos
+  setCamposInvalidos,
+  editMode = false,
+  editActive = false
 }) => {
+  const allowEdit = !editMode || editActive;
 
   const handleCantidadInput = (e, blockId) => {
     const inputValue = e.target.value;
     const block = priceBlocks.find(b => b.id === blockId);
-  
     const updatedCantidades = Array.isArray(block?.cantidades) ? [...block.cantidades] : [];
     const lastChar = inputValue.slice(-1);
-  
+
     if (lastChar === ',') {
       const value = inputValue.slice(0, -1).trim();
-  
       if (
         value &&
         !isNaN(value) &&
@@ -32,7 +33,6 @@ const InputPrices = ({
         updatedCantidades.push(value);
         updatePriceBlock(blockId, 'cantidades', updatedCantidades);
       }
-  
       updatePriceBlock(blockId, 'inputCantidad', '');
     } else {
       const soloNumeros = /^[0-9]*$/;
@@ -41,7 +41,6 @@ const InputPrices = ({
       }
     }
   };
-  
 
   const removeCantidad = (blockId, indexToRemove) => {
     const block = priceBlocks.find(b => b.id === blockId);
@@ -52,15 +51,17 @@ const InputPrices = ({
 
   return (
     <div className="step slide-in">
-      <div className='step-sup'>
-        <button id="btn-back" type="button" onClick={() => goToStep(1)}>
-          <FontAwesomeIcon icon={faChevronLeft} />
-        </button>
-        <div>
-          <h1>Paso 3 de 3</h1>
-          <h2>Precios del producto</h2>
+      {!editMode && (
+        <div className='step-sup'>
+          <button id="btn-back" type="button" onClick={() => goToStep(1)}>
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          <div>
+            <h1>Paso 3 de 3</h1>
+            <h2>Precios del producto</h2>
+          </div>
         </div>
-      </div>
+      )}
 
       {priceBlocks.map((block, index) => {
         const cantidades = Array.isArray(block.cantidades) ? block.cantidades : [];
@@ -72,30 +73,16 @@ const InputPrices = ({
               <div className="tag-input size">
                 {cantidades.map((val, i) => (
                   <div className="tag" key={i}>
-                    {val} <span onClick={() => removeCantidad(block.id, i)}>×</span>
+                    {val}
+                    {allowEdit && <span onClick={() => removeCantidad(block.id, i)}>×</span>}
                   </div>
                 ))}
-                <input
-                  type="text"
-                  value={inputCantidad}
-                  onChange={(e) => handleCantidadInput(e, block.id)}
-                  onBlur={() => {
-                    const value = inputCantidad.trim();
-                    if (
-                      value &&
-                      !isNaN(value) &&
-                      Number.isInteger(Number(value)) &&
-                      Number(value) > 0 &&
-                      !cantidades.includes(value)
-                    ) {
-                      const updatedCantidades = [...cantidades, value];
-                      updatePriceBlock(block.id, 'cantidades', updatedCantidades);
-                    }
-                    updatePriceBlock(block.id, 'inputCantidad', '');
-                  }}
-                  onKeyDown={(e) => {
-                    if (['Enter', 'Tab'].includes(e.key)) {
-                      e.preventDefault();
+                {allowEdit && (
+                  <input
+                    type="text"
+                    value={inputCantidad}
+                    onChange={(e) => handleCantidadInput(e, block.id)}
+                    onBlur={() => {
                       const value = inputCantidad.trim();
                       if (
                         value &&
@@ -108,12 +95,28 @@ const InputPrices = ({
                         updatePriceBlock(block.id, 'cantidades', updatedCantidades);
                       }
                       updatePriceBlock(block.id, 'inputCantidad', '');
-                    }
-                  }}
-                  placeholder="Ej: 1, 2, 5..."
-                  className="size-input"
-                />
-
+                    }}
+                    onKeyDown={(e) => {
+                      if (['Enter', 'Tab'].includes(e.key)) {
+                        e.preventDefault();
+                        const value = inputCantidad.trim();
+                        if (
+                          value &&
+                          !isNaN(value) &&
+                          Number.isInteger(Number(value)) &&
+                          Number(value) > 0 &&
+                          !cantidades.includes(value)
+                        ) {
+                          const updatedCantidades = [...cantidades, value];
+                          updatePriceBlock(block.id, 'cantidades', updatedCantidades);
+                        }
+                        updatePriceBlock(block.id, 'inputCantidad', '');
+                      }
+                    }}
+                    placeholder="Ej: 1, 2, 5..."
+                    className="size-input"
+                  />
+                )}
               </div>
 
               <p className="input-length">Cantidad en unidades</p>
@@ -127,6 +130,7 @@ const InputPrices = ({
                   min="0"
                   step="1"
                   value={block.precio}
+                  disabled={!allowEdit}
                   onKeyDown={(e) => {
                     if (['e', 'E', '+', '-', ','].includes(e.key)) {
                       e.preventDefault();
@@ -159,7 +163,7 @@ const InputPrices = ({
               </div>
             </fieldset>
 
-            {priceBlocks.length > 1 && (
+            {allowEdit && priceBlocks.length > 1 && (
               <button
                 type="button"
                 className="add-price delete"
@@ -169,11 +173,12 @@ const InputPrices = ({
               </button>
             )}
           </div>
-        )}
-      )}
+        );
+      })}
 
-      {priceBlocks.length < 3 && (
+      {allowEdit && priceBlocks.length < 3 && (
         <button
+          style={{ translate: '-16px' }}
           type="button"
           className="add-price"
           onClick={handleAddPriceBlock}
@@ -182,7 +187,9 @@ const InputPrices = ({
         </button>
       )}
 
-      <button type="submit">Guardar producto</button>
+      {!editMode && (
+        <button type="submit">Guardar producto</button>
+      )}
     </div>
   );
 };

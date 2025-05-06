@@ -130,6 +130,10 @@
     transition: background-color 0.2s;
     font-size: 20px;
   }
+
+  .edit-icon{
+    color: #001634;
+  }
   
   .add-to-cart-button:hover {
     color: black;

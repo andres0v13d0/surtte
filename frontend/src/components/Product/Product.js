@@ -13,13 +13,15 @@ const Product = ({
     stars,
     prices,
     favorites,
-    isProvider = false,
 }) => {
-    const effectiveFavorites = favorites ?? !isProvider;
     const navigate = useNavigate();
     const [isFavorite, setIsFavorite] = useState(false);
-    const userId = JSON.parse(localStorage.getItem('usuario'))?.id;
-     
+
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const userId = usuario?.id;
+    const userEmpresa = usuario?.proveedorInfo?.nombre_empresa;
+    const isOwnProduct = userEmpresa && provider && userEmpresa === provider;
+    const effectiveFavorites = favorites ?? !isOwnProduct;
 
     useEffect(() => {
         const fetchFavorites = async () => {
@@ -63,14 +65,14 @@ const Product = ({
     };
 
     const handleClick = () => {
-        const path = isProvider ? `/edito-product/${uuid}` : `/product/${uuid}`;
+        const path = `/product/${uuid}`;
         navigate(path);
     };
 
     const handleAddToCartClick = (e) => {
         e.stopPropagation();
         sessionStorage.setItem('scrollToQuantity', 'true');
-        const path = isProvider ? `/edito-product/${uuid}` : `/product/${uuid}`;
+        const path = isOwnProduct ? `/edit-product/${uuid}` : `/product/${uuid}`;
         navigate(path);
     };
 
@@ -98,7 +100,6 @@ const Product = ({
                 loading="lazy"
             />
 
-
             <div className='product-info'>
                 <p className="product-name">{name}</p>
 
@@ -112,21 +113,20 @@ const Product = ({
                 <div className="tooltip-wrapper">
                     {prices.length > 1 ? (
                         <>
-                        <span className="price-more-info">+{prices.length - 1} precios disponibles</span>
-                        <div className="tooltip-content">
-                            {prices.slice(1).map((price, i) => (
-                                <p key={i}><strong>${price.amount}</strong> {price.condition}</p>
-                            ))}
-                        </div>
+                            <span className="price-more-info">+{prices.length - 1} precios disponibles</span>
+                            <div className="tooltip-content">
+                                {prices.slice(1).map((price, i) => (
+                                    <p key={i}><strong>${price.amount}</strong> {price.condition}</p>
+                                ))}
+                            </div>
                         </>
                     ) : (
                         <>
-                        <span className="price-more-info" style={{ visibility: 'hidden' }}>.</span>
-                        <div className="tooltip-content" style={{ display: 'none' }}></div>
+                            <span className="price-more-info" style={{ visibility: 'hidden' }}>.</span>
+                            <div className="tooltip-content" style={{ display: 'none' }}></div>
                         </>
                     )}
                 </div>
-
 
                 <div className='product-price-inf'>
                     <div className="product-price-highlight">
@@ -134,7 +134,10 @@ const Product = ({
                         <p className="price-note">{mainPrice.condition}</p>
                     </div>
                     <button className="add-to-cart-button" onClick={handleAddToCartClick}>
-                        <FontAwesomeIcon icon={isProvider ? faPen : faCartPlus} />
+                        <FontAwesomeIcon 
+                            icon={isOwnProduct ? faPen : faCartPlus} 
+                            className={isOwnProduct ? 'edit-icon' : ''}
+                        />
                     </button>
                 </div>
             </div>

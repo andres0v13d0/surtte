@@ -1,0 +1,68 @@
+.edit-product-container{
+    font-family: 'Ubuntu', sans-serif;
+    overflow-x: hidden;
+    padding: 16px;
+}
+
+.edit-block .step{
+    border-radius: 0;
+}
+
+.edit-block h2{
+    font-size: 20px;
+    font-weight: 500;
+}
+
+
+.edit-product-container .step input,
+.edit-product-container .step textarea {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 20px 0 20px;
+    font-size: 15px;
+    font-family: 'Ubuntu', sans-serif;
+    height: 20px;
+    padding: 10px;
+}
+
+.edit-product-container .step textarea {
+    height: 100px;
+    resize: none;
+}
+
+.edit-controls{
+    width: 100%;
+    display: flex;
+    justify-content: end;
+}
+
+.edit-controls .edit-btn, .edit-controls .save-btn, .edit-controls .cancel-btn, .delete-btn{
+    padding: 15px 30px;
+    margin: 5px 0 0 0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: bold;
+}
+
+.edit-controls .edit-btn{
+    background-color: #001634;
+}
+
+.edit-controls .save-btn{
+    background-color: #fa7e17;
+}
+
+.edit-controls .cancel-btn{
+    border: 1px solid #001634;
+    background-color: white;
+    color: #001634;
+    margin-right: 10px;
+}
+
+.edit-controls .delete-btn{
+    background-color: red;
+}

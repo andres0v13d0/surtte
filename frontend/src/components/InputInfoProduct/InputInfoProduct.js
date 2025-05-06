@@ -21,7 +21,10 @@ const InputInfoProduct = ({
   setCamposInvalidos,
   variantList,
   setVariantList,
+  editMode = false,
+  editActive = false,
 }) => {
+  const allowEdit = !editMode || editActive;
 
   const handleVariantInput = (index, input) => {
     const updatedList = [...variantList];
@@ -65,15 +68,17 @@ const InputInfoProduct = ({
 
   return (
     <div className="step slide-in">
-      <div className='step-sup'>
-        <button id="btn-back" type="button" onClick={() => goToStep(0)}>
-          <FontAwesomeIcon icon={faChevronLeft} />
-        </button>
-        <div>
-          <h1>Paso 2 de 3</h1>
-          <h2>Información del producto</h2>
+      {!editMode && (
+        <div className='step-sup'>
+          <button id="btn-back" type="button" onClick={() => goToStep(0)}>
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          <div>
+            <h1>Paso 2 de 3</h1>
+            <h2>Información del producto</h2>
+          </div>
         </div>
-      </div>
+      )}
 
       <label>Nombre del producto</label>
       <input
@@ -88,6 +93,7 @@ const InputInfoProduct = ({
         }}
         placeholder="Ej: Vestido floral de verano para mujer"
         className={camposInvalidos?.productName ? 'input-error' : ''}
+        disabled={!allowEdit}
       />
       <p className="input-length">
         <b>Caracteres:</b> {productName.length} / 50
@@ -103,8 +109,9 @@ const InputInfoProduct = ({
           }
         }}
         maxLength={200}
-        placeholder="Ej: Vestido casual con estampado floral, ideal para días soleados. Tela ligera y fresca. Disponible en varias tallas y colores."
+        placeholder="Ej: Vestido casual con estampado floral..."
         className={camposInvalidos?.description ? 'input-error' : ''}
+        disabled={!allowEdit}
       />
       <p className="input-length">
         <b>Caracteres:</b> {description.length} / 200
@@ -123,6 +130,7 @@ const InputInfoProduct = ({
         }}
         placeholder="Ej: SM-360L"
         className={camposInvalidos?.productReference ? 'input-error' : ''}
+        disabled={!allowEdit}
       />
 
       <div className='category-container'>
@@ -137,6 +145,7 @@ const InputInfoProduct = ({
             setSubcategoria(null);
           }}
           isClearable
+          isDisabled={!allowEdit}
         />
 
         <label>Subcategoría</label>
@@ -146,7 +155,7 @@ const InputInfoProduct = ({
           placeholder="Seleccionar subcategoría..."
           value={subcategoria}
           onChange={setSubcategoria}
-          isDisabled={!categoria}
+          isDisabled={!categoria || !allowEdit}
           isClearable
         />
       </div>
@@ -161,103 +170,106 @@ const InputInfoProduct = ({
               placeholder="Seleccionar tipo..."
               value={variant.type ? { value: variant.type, label: variant.type } : null}
               isClearable
-              isDisabled={variantList.length > 1 && index === 0 && !!variant.type}
+              isDisabled={!allowEdit || (variantList.length > 1 && index === 0 && !!variant.type)}
             />
 
             {variant.type === 'Talla' && (
               <div className="tag-input size">
                 {variant.values.map((val, i) => (
                   <div className="tag" key={i}>
-                    {val} <span onClick={() => removeVariantValue(index, i)}>×</span>
+                    {val} {allowEdit && <span onClick={() => removeVariantValue(index, i)}>×</span>}
                   </div>
                 ))}
-                <input
-                  type="text"
-                  value={variant.input}
-                  onChange={(e) => handleVariantInput(index, e.target.value)}
-                  onBlur={() => {
-                    if (variant.input.trim()) {
-                      const updatedList = [...variantList];
-                      const val = variant.input.trim();
-                      if (!updatedList[index].values.includes(val)) {
-                        updatedList[index].values.push(val);
+                {allowEdit && (
+                  <input
+                    type="text"
+                    value={variant.input}
+                    onChange={(e) => handleVariantInput(index, e.target.value)}
+                    onBlur={() => {
+                      if (variant.input.trim()) {
+                        const updatedList = [...variantList];
+                        const val = variant.input.trim();
+                        if (!updatedList[index].values.includes(val)) {
+                          updatedList[index].values.push(val);
+                        }
+                        updatedList[index].input = '';
+                        setVariantList(updatedList);
                       }
-                      updatedList[index].input = '';
-                      setVariantList(updatedList);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (['Enter', 'Tab'].includes(e.key)) {
-                      e.preventDefault();
-                      const updatedList = [...variantList];
-                      const val = variant.input.trim();
-                      if (val && !updatedList[index].values.includes(val)) {
-                        updatedList[index].values.push(val);
+                    }}
+                    onKeyDown={(e) => {
+                      if (['Enter', 'Tab'].includes(e.key)) {
+                        e.preventDefault();
+                        const updatedList = [...variantList];
+                        const val = variant.input.trim();
+                        if (val && !updatedList[index].values.includes(val)) {
+                          updatedList[index].values.push(val);
+                        }
+                        updatedList[index].input = '';
+                        setVariantList(updatedList);
                       }
-                      updatedList[index].input = '';
-                      setVariantList(updatedList);
-                    }
-                  }}
-                  placeholder="Ej: S, M, L..."
-                  className="size-input"
-                />
+                    }}
+                    placeholder="Ej: S, M, L..."
+                    className="size-input"
+                  />
+                )}
               </div>
             )}
-
 
             {variant.type === 'Color' && (
               <div className="tag-input size">
                 {variant.values.map((val, i) => (
                   <div className="tag" key={i}>
-                    {val} <span onClick={() => removeVariantValue(index, i)}>×</span>
+                    {val} {allowEdit && <span onClick={() => removeVariantValue(index, i)}>×</span>}
                   </div>
                 ))}
-                <input
-                  type="text"
-                  value={variant.input}
-                  onChange={(e) => handleVariantInput(index, e.target.value)}
-                  onBlur={() => {
-                    if (variant.input.trim()) {
-                      const updatedList = [...variantList];
-                      const val = variant.input.trim();
-                      if (!updatedList[index].values.includes(val)) {
-                        updatedList[index].values.push(val);
+                {allowEdit && (
+                  <input
+                    type="text"
+                    value={variant.input}
+                    onChange={(e) => handleVariantInput(index, e.target.value)}
+                    onBlur={() => {
+                      if (variant.input.trim()) {
+                        const updatedList = [...variantList];
+                        const val = variant.input.trim();
+                        if (!updatedList[index].values.includes(val)) {
+                          updatedList[index].values.push(val);
+                        }
+                        updatedList[index].input = '';
+                        setVariantList(updatedList);
                       }
-                      updatedList[index].input = '';
-                      setVariantList(updatedList);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (['Enter', 'Tab'].includes(e.key)) {
-                      e.preventDefault();
-                      const updatedList = [...variantList];
-                      const val = variant.input.trim();
-                      if (val && !updatedList[index].values.includes(val)) {
-                        updatedList[index].values.push(val);
+                    }}
+                    onKeyDown={(e) => {
+                      if (['Enter', 'Tab'].includes(e.key)) {
+                        e.preventDefault();
+                        const updatedList = [...variantList];
+                        const val = variant.input.trim();
+                        if (val && !updatedList[index].values.includes(val)) {
+                          updatedList[index].values.push(val);
+                        }
+                        updatedList[index].input = '';
+                        setVariantList(updatedList);
                       }
-                      updatedList[index].input = '';
-                      setVariantList(updatedList);
-                    }
-                  }}
-                  placeholder="Ej: Rojo, Azul..."
-                  className="size-input"
-                />
+                    }}
+                    placeholder="Rojo, Azul ..."
+                    className="size-input"
+                  />
+                )}
               </div>
             )}
 
-
-
-            <button
-              type="button"
-              className="add-price delete variants"
-              onClick={() => removeVariant(index)}
-            >
-              Eliminar variante
-            </button>
+            {allowEdit && (
+              <button
+                type="button"
+                className="add-price delete variants"
+                onClick={() => removeVariant(index)}
+              >
+                Eliminar variante
+              </button>
+            )}
           </div>
         ))}
 
-        {variantList.length < 2 && (
+        {allowEdit && variantList.length < 2 && (
           <button
             type="button"
             className="add-price"
@@ -270,7 +282,9 @@ const InputInfoProduct = ({
         )}
       </div>
 
-      <button type="button" onClick={() => goToStep(2)}>Siguiente</button>
+      {!editMode && (
+        <button type="button" onClick={() => goToStep(2)}>Siguiente</button>
+      )}
     </div>
   );
 };

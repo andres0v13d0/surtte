@@ -24,6 +24,10 @@ const ProductInfo = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const quantityRef = useRef(null);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  const userEmpresa = usuario?.proveedorInfo?.nombre_empresa;
+  const isOwnProduct = userEmpresa && provider?.nombre_empresa && userEmpresa === provider.nombre_empresa;
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -245,7 +249,18 @@ const ProductInfo = () => {
             </div>
           </div>
 
-          <button className="add-to-cart" onClick={handleAddToCart}>Añadir al carrito</button>
+          {isOwnProduct ? (
+            <button
+              className="edit-product-btn"
+              onClick={() => (window.location.href = `/edit-product/${product.id}`)}
+            >
+              Editar producto
+            </button>
+          ) : (
+            <button className="add-to-cart" onClick={handleAddToCart}>
+              Añadir al carrito
+            </button>
+          )}
 
           <div className="line"></div>
           <div className="product-provider-info">

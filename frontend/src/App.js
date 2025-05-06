@@ -15,6 +15,7 @@ import CartPage from './pages/CartPage/CartPage';
 import ProductInfoWrapper from './utils/ProductInfoWrapper/ProductInfoWrapper';
 import UserChat from './pages/UserChat/UserChat';
 import Favorites from './pages/Favorites/Favorites';
+import EditProduct from './pages/EditProduct/EditProduct';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -62,6 +63,7 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/messages/user-chat/:id" element={<UserChat />} />
         <Route path="/favorites" element={<Favorites />} />
+        <Route path="/edit-product/:uuid" element={<EditProduct />} />
       </Routes>
     </Router>
   );

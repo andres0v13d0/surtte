@@ -192,10 +192,9 @@
   border: 2px solid red !important;
 }
 
-.add-to-cart {
+.add-to-cart, .edit-product-btn {
   margin-top: 10px;
   padding: 1rem 1rem;
-  background-color: #fa7e17;
   color: white;
   border: none;
   border-radius: 25px;
@@ -203,6 +202,14 @@
   transition: background-color 0.2s;
   width: 100%;
   font-size: 1.2rem;
+}
+
+.add-to-cart{
+  background-color: #fa7e17;
+}
+
+.edit-product-btn {
+  background-color: #001634;
 }
 
 .add-to-cart:hover {

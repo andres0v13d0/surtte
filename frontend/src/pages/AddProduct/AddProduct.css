@@ -166,7 +166,7 @@
     }
   }
 
-  .add-product-container .input-length {
+ .input-length {
     font-size: 12px;
     color: gray;
     margin: auto;
@@ -228,14 +228,14 @@
   }
 
   .step button.add-price {
-    background: none;
+    background: #001634;
     border: none;
-    color: #fa7e17;
+    color: white;
     cursor: pointer;
-    font: inherit;
     margin: 0 0 0 auto;
-    font-weight: bold;
-    padding: 0 20px 0 0;
+    font-weight: normal;
+    padding: 10px 20px !important;
+    margin-top: 10px;
   }
 
   .step button.add-price:hover{
@@ -246,6 +246,10 @@
     color: red;
     font-size: 13px;
     margin-left: 20px;
+    background-color: transparent;
+    padding: 0 !important;
+    font-weight: bold;
+    font: inherit;
   }
   
   button{
