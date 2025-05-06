@@ -228,6 +228,8 @@ const CartPage = () => {
             headers: { Authorization: `Bearer ${token}` },
           });
         }
+
+        console.log(`Pedido enviado a ${provider}`);
       }
   
       setCartItems((prev) => prev.filter((item) => !item.isChecked));
