@@ -102,15 +102,6 @@ const CartPage = () => {
     setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const onClearCart = async () => {
-    const token = localStorage.getItem('token');
-    await fetch('https://api.surtte.com/cart', {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setCartItems([]);
-  };
-
   const grouped = cartItems.reduce((acc, item) => {
     const prov = item.providerNameSnapshot || 'Proveedor desconocido';
     if (!acc[prov]) acc[prov] = [];
@@ -278,7 +269,7 @@ const CartPage = () => {
               <p>Total general</p>
               <div className='prices-shower'>
                 <h1>COP</h1>
-                <h2>450000</h2>
+                <h2>{calculateTotalGlobal().toLocaleString('es-CO')}</h2>
               </div>
             </div>
             <p>Ordenar todos los pedidos de todos los proveedores</p>
@@ -287,7 +278,9 @@ const CartPage = () => {
             </button>
           </div>
 
-          <button className='trash-all-btn'>Seleccionar todo / No seleccionar nada</button>
+          <button className='trash-all-btn' onClick={toggleSelectAll}>
+            {selectAll ? 'Seleccionar todo' : 'No seleccionar nada'}
+          </button>
 
         {Object.entries(grouped).map(([provider, items]) => (
           <fieldset key={provider} className="provider-group">
@@ -333,7 +326,9 @@ const CartPage = () => {
                     </div>
                   </div>
                   <p className="unit-price">Unidad: ${(unitPrice / 12).toLocaleString('es-CO')}</p>
-                  <p className="product-total">Total: ${(unitPrice * item.quantity).toLocaleString('es-CO')}</p>
+                  <p className="product-total">
+                    Total: ${((unitPrice / 12) * item.quantity).toLocaleString('es-CO')}
+                  </p>
                   <div className="item-controls">
                     <select
                       className="quantity-selector"
