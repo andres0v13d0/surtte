@@ -16,7 +16,6 @@ import ProductInfoWrapper from './utils/ProductInfoWrapper/ProductInfoWrapper';
 import UserChat from './pages/UserChat/UserChat';
 import Favorites from './pages/Favorites/Favorites';
 import EditProduct from './pages/EditProduct/EditProduct';
-import TokenGuard from './utils/TokenGuard/TokenGuard';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -47,27 +46,25 @@ const TitleUpdater = () => {
 function App() {
   return (
     <Router>
-      <TokenGuard>
-        <TitleUpdater />
-        <Routes>
-          <Route path="/" element={<Home />} />    
-          <Route path="/login" element={<Login />} />
-          <Route path="/logout" element={<Logout />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/messages" element={<Chat />} />
-          <Route path="/my-products" element={<MyProducts />} />
-          <Route path="/add-product" element={<AddProduct />} />
-          <Route path="/sub-category/:subCategorySlug" element={<CategoryPage />} />
-          <Route path="/category/:categorySlug" element={<CategoryPage />} />
-          <Route path="/product/:uuid" element={<ProductInfoWrapper />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/messages/user-chat/:id" element={<UserChat />} />
-          <Route path="/favorites" element={<Favorites />} />
-          <Route path="/edit-product/:uuid" element={<EditProduct />} />
-        </Routes>
-      </TokenGuard>
+      <TitleUpdater />
+      <Routes>
+        <Route path="/" element={<Home />} />    
+        <Route path="/login" element={<Login />} />
+        <Route path="/logout" element={<Logout   />} />
+        <Route path="/register" element={<Register   />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/messages" element={<Chat />} />
+        <Route path="/my-products" element={<MyProducts />} />
+        <Route path="/add-product" element={<AddProduct />} />
+        <Route path="/sub-category/:subCategorySlug" element={<CategoryPage />} />
+        <Route path="/category/:categorySlug" element={<CategoryPage />} />
+        <Route path="/product/:uuid" element={<ProductInfoWrapper />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/messages/user-chat/:id" element={<UserChat />} />
+        <Route path="/favorites" element={<Favorites />} />
+        <Route path="/edit-product/:uuid" element={<EditProduct />} />
+      </Routes>
     </Router>
   );
 }
