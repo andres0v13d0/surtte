@@ -6,6 +6,7 @@ import { CustomersService } from './customers.service';
 import { Customer } from './entity/customer.entity';
 import { User } from '../users/entity/user.entity';
 import { Provider } from '../providers/entity/provider.entity';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { Provider } from '../providers/entity/provider.entity';
       User,
       Provider,
     ]),
+    UsersModule,
   ],
   controllers: [CustomersController],
   providers: [CustomersService],
