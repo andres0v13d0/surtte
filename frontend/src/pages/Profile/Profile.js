@@ -41,7 +41,7 @@ const Profile = () => {
                                 </Link>
                             )}
 
-                            <Link to="/profile" className="user-button">
+                            <Link to="/my-orders" className="user-button">
                                 <span className="icon-left">
                                     <FontAwesomeIcon icon={faReceipt} />
                                 </span>

@@ -1,0 +1,140 @@
+.order-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.363);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Ubuntu', sans-serif;
+    overflow: hidden;
+}
+
+.order-card:hover {
+    transform: scale(1.01);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.order-header .order-time {
+    font-size: 15px;
+    color: #555;
+    margin: 0;
+    padding: 0;
+    }
+
+.order-header .order-time p {
+    margin: 0;
+    padding: 0;
+}
+
+.order-status {
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+    font-weight: normal;
+}
+
+.order-status.pending {
+  background-color: #f9e79f;
+}
+
+.order-status.processing {
+  background-color: #aed6f1;
+}
+
+.order-status.shipped {
+  background-color: #d6eaf8;
+}
+
+.order-status.delivered {
+  background-color: #abebc6;
+}
+
+.order-status.canceled {
+  background-color: #f5b7b1;
+}
+
+.order-card .order-num, .order-card .order-client {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 10px 0 0 0;
+}
+
+.order-client span {
+    font-weight: 400;
+    color: #555;
+}
+
+.order-items {
+    margin-top: 1rem;
+    display: flex;
+}
+
+.order-images-wrapper {
+    position: relative;
+    width: 60%;
+    height: 60px;
+    overflow: hidden;
+}
+
+.order-images {
+    display: flex;
+    gap: 0.5rem;
+    height: 100%;
+    overflow-x: auto;
+    align-items: center;
+    scrollbar-width: none;
+    padding: 0 15px 0 0;
+}
+
+.order-images::-webkit-scrollbar {
+    display: none;
+}
+
+.order-images-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), white);
+    pointer-events: none;
+}
+
+.order-images img {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.order-quantity {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: end;
+    margin-left: auto;
+}
+
+.order-quantity p {
+    font-size: 12px;
+    margin: 0;
+}
+
+.order-button {
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    margin: 0;
+}

@@ -272,7 +272,7 @@ const CartPage = () => {
             type={alertType}
             message={alertMessage}
             onClose={() => setShowAlert(null)}
-            redirectTo={alertType === 'success' ? '/my-products' : null}
+            redirectTo={alertType === 'success' ? '/' : null}
           />
       )}
       <Header />
