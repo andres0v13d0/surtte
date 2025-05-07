@@ -203,14 +203,14 @@ const ProductInfo = () => {
 
           <div className="dynamic-price-highlight">
             <h3><b>COP</b> {parseFloat(applicablePrice?.price || 0).toLocaleString('es-CO')}</h3>
-            <div className="dozens-info">
-              <p className="dozenz-info-text">Docena</p>
+            <div className="dozens-info">              
               <div className='dozenz-unit'>
                 <p className="dozenz-unit-text">Unidad</p>
                 <p className="dozenz-unit-number">$ {parseFloat(applicablePrice?.price / 12 || 0).toLocaleString('es-CO')}</p>
               </div>
-            </div>
+            </div>            
           </div>
+          <p className="p-info-prices docenas">Por docena</p>
 
           <p className='p-info-prices'>Este producto tiene precios según la cantidad. Mira las tarifas disponibles:</p>
           <div className="price-scroll-list">

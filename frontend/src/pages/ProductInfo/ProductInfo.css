@@ -4,6 +4,7 @@
   font-family: 'Ubuntu', sans-serif;
   background-color: #fff;
   color: #222;
+  margin-top: 10vh;
 }
 
 .product-image-section {
@@ -84,7 +85,7 @@
   margin: 16px 0;
 }
 .dynamic-price-highlight {
-  margin-bottom: 16px;
+  margin-bottom: 0;
   margin-top: 0;
   display: flex;
   align-items: end;
@@ -97,7 +98,7 @@
 }
 
 .dynamic-price-highlight h3 {
-  font-size: 60px;
+  font-size: 40px;
   color: #fa7e17;
   margin: 0;
   display: flex;
@@ -107,10 +108,10 @@
 }
 
 .dynamic-price-highlight b {
-  font-size: 20px;
+  font-size: 15px;
   height: 100%;
   font-weight: normal;
-  margin: 10px 5px 0 0;
+  margin: 6px 5px 0 0;
 }
 
 .dynamic-price-highlight p {
@@ -132,8 +133,12 @@
   display: none;
 }
 
-.product-details .p-info-prices{
+.product-details p.p-info-prices{
   font-size: 12px;
+}
+
+.product-details p.p-info-prices.docenas {
+  margin: 0 0 20px 30%;
 }
 
 .price-block {
@@ -216,7 +221,6 @@
   background-color: #444;
 }
 
-/* Info proveedor */
 .product-provider-info {
   padding: 0;
 }

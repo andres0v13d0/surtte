@@ -32,8 +32,6 @@
   position: relative;
   transform: translateX(-100%);
   animation: slideFromLeft 0.3s forwards ease-out;
-  border-top-right-radius: 30px;
-  border-bottom-right-radius: 30px;
 }
 
 @keyframes slideFromLeft {

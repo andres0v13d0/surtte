@@ -12,6 +12,28 @@ const CartPage = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const [selectAll, setSelectAll] = useState(true);
+
+  const toggleSelectAll = async () => {
+    const token = localStorage.getItem('token');
+
+    const updated = await Promise.all(cartItems.map(async (item) => {
+      await fetch(`https://api.surtte.com/cart/${item.id}/check`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isChecked: selectAll }),
+      });
+      return { ...item, isChecked: selectAll };
+    }));
+
+    setCartItems(updated);
+    setSelectAll(!selectAll);
+  };
+
+
   useEffect(() => {
     const fetchCart = async () => {
       try {
@@ -105,11 +127,15 @@ const CartPage = () => {
 
   const calculateSubtotal = (item) => {
     const price = parseFloat(getApplicablePrice(item)?.price || '0');
-    return price * item.quantity;
+    const unitPrice = price / 12;
+    return unitPrice * item.quantity;
   };
 
   const calculateProviderTotal = (items) =>
     items.reduce((sum, item) => sum + calculateSubtotal(item), 0);
+  
+  const calculateTotalGlobal = () =>
+    cartItems.reduce((sum, item) => sum + calculateSubtotal(item), 0);
 
   const handleRequestByProvider = async (providerId, items) => {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -246,16 +272,22 @@ const CartPage = () => {
     <>
       <Header />
       <div className="cart-page">
-        {Object.keys(grouped).length > 0 && (
-          <div className="cart-actions">
-            <button className="clear-cart-btn" onClick={onClearCart}>
-              <FontAwesomeIcon icon={faTrash} /> Vaciar carrito
-            </button>
+          
+          <div className="request-all">
+            <div className="total-global">
+              <p>Total general</p>
+              <div className='prices-shower'>
+                <h1>COP</h1>
+                <h2>450000</h2>
+              </div>
+            </div>
+            <p>Ordenar todos los pedidos de todos los proveedores</p>
             <button className="request-all-btn" onClick={handleRequestAll}>
               Solicitar todos los pedidos
             </button>
           </div>
-        )}
+
+          <button className='trash-all-btn'>Seleccionar todo / No seleccionar nada</button>
 
         {Object.entries(grouped).map(([provider, items]) => (
           <fieldset key={provider} className="provider-group">
@@ -264,15 +296,15 @@ const CartPage = () => {
               const applicablePrice = getApplicablePrice(item);
               const unitPrice = parseFloat(applicablePrice?.price || 0);
               return (
-                <div key={item.id} className={`cart-item ${item.isChecked ? 'checked' : ''}`}>
-                  <input
-                    type="checkbox"
-                    className="check-product"
-                    checked={item.isChecked}
-                    onChange={(e) => onToggleCheck(item.id, e.target.checked)}
-                  />
+                <div key={item.id} className={`cart-item ${item.isChecked ? 'checked' : ''}`}>                  
                   <div className="item-info">
                     <div className="item-image">
+                      <input
+                        type="checkbox"
+                        className="check-product"
+                        checked={item.isChecked}
+                        onChange={(e) => onToggleCheck(item.id, e.target.checked)}
+                      />
                       <img src={item.imageUrlSnapshot} alt={item.productNameSnapshot} />
                     </div>
                     <div className="item-details">
@@ -297,12 +329,11 @@ const CartPage = () => {
                       <span className="product-price">
                         <p>COP</p>{unitPrice.toLocaleString('es-CO', { minimumFractionDigits: 0 })}
                       </span>
-                      {item.quantity % 12 === 0 && (
-                        <p className="unit-price">Unidad: ${(unitPrice / 12).toLocaleString('es-CO')}</p>
-                      )}
-                      <p className="product-total">Total: ${(unitPrice * item.quantity).toLocaleString('es-CO')}</p>
+                      <p className='docena-info-cart'>Por docena</p>
                     </div>
                   </div>
+                  <p className="unit-price">Unidad: ${(unitPrice / 12).toLocaleString('es-CO')}</p>
+                  <p className="product-total">Total: ${(unitPrice * item.quantity).toLocaleString('es-CO')}</p>
                   <div className="item-controls">
                     <select
                       className="quantity-selector"

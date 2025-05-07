@@ -92,7 +92,6 @@ legend {
 
 .item-info {
   display: flex;
-  justify-content: space-between;
   font-weight: 500;
   color: #444;
 }
@@ -100,22 +99,35 @@ legend {
 .item-info .item-image {
   display: flex;
   width: 100px;
-  height: auto;
+  height: 100px;
   margin-right: 10px;
+  position: relative;
 }
 
 .item-info .item-image img {
   width: 100%;
   height: auto;
+  object-fit: cover;
+  display: block;
+  transition: filter 0.5s ease;
+}
+
+.product-variant {
+  font-size: 12px;
+  color: #666;
+  margin: 5px 0 0 0;
+}
+
+.item-details .tooltip-wrapper {
+  margin-top: 0 !important;
 }
 
 .item-info .item-details {
   display: flex;
   flex-direction: column;
   justify-content: start;
-  margin: 0;
-  width: 200px;
-
+  margin: 0 !important;
+  width: auto;
 }
 
 .product-name {
@@ -172,4 +184,40 @@ legend {
 .provider-total p{
   font-size: 12px;
   margin: 0 2px 0 10px;
+}
+
+.trash-all-btn {
+  background-color: transparent;
+  color: #2162a1;
+  border: none;
+  border-radius: 25px;
+  font-size: 15px;
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  margin: 20px 0;
+}
+
+.item-image input[type="checkbox"] {
+  position: absolute;
+  accent-color: #2162a1;
+  width: 20px;
+  height: 20px;
+}
+
+.unit-price {
+  font-size: 12px;
+  color: #666;
+  margin: 5px 0 0 0;
+}
+
+.product-total {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.item-details .docena-info-cart{
+  font-size: 12px;
+  margin: 0;
 }
