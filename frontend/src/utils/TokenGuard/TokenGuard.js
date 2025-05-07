@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const TokenGuard = ({ children }) => {
   const location = useLocation();
+  const [validando, setValidando] = useState(true);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -13,12 +14,12 @@ const TokenGuard = ({ children }) => {
 
     const tokenGuardado = localStorage.getItem('surtte_token');
     const timestampGuardado = localStorage.getItem('surtte_token_time');
-
     const ahora = Date.now();
 
     if (tokenFromUrl === tokenValido) {
       localStorage.setItem('surtte_token', tokenFromUrl);
       localStorage.setItem('surtte_token_time', ahora.toString());
+      setValidando(false);
       return;
     }
 
@@ -31,8 +32,12 @@ const TokenGuard = ({ children }) => {
       localStorage.removeItem('surtte_token');
       localStorage.removeItem('surtte_token_time');
       window.location.href = 'https://surtte.com';
+    } else {
+      setValidando(false);
     }
   }, [location.search]);
+
+  if (validando) return null; 
 
   return children;
 };
