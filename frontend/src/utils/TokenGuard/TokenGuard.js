@@ -10,7 +10,7 @@ const TokenGuard = ({ children }) => {
     const tokenFromUrl = searchParams.get('token');
 
     const tokenValido = '7d4f1e93-927b-4817-89d1-b27a8ea96347';
-    const duracionMaxima = 10 * 60 * 1000;
+    const duracionMaxima = 10 * 60 * 1000; // 10 minutos
 
     const tokenGuardado = localStorage.getItem('surtte_token');
     const timestampGuardado = localStorage.getItem('surtte_token_time');
@@ -23,17 +23,20 @@ const TokenGuard = ({ children }) => {
       return;
     }
 
-    if (
-      !tokenGuardado ||
-      tokenGuardado !== tokenValido ||
-      !timestampGuardado ||
-      ahora - parseInt(timestampGuardado, 10) > duracionMaxima
-    ) {
+    if (!tokenFromUrl) {
       localStorage.removeItem('surtte_token');
       localStorage.removeItem('surtte_token_time');
-      window.location.href = 'https://surtte.com';
-    } else {
+    }
+
+    if (
+      tokenGuardado &&
+      tokenGuardado === tokenValido &&
+      timestampGuardado &&
+      ahora - parseInt(timestampGuardado, 10) <= duracionMaxima
+    ) {
       setValidando(false);
+    } else {
+      window.location.href = 'https://surtte.com';
     }
   }, [location.search]);
 
