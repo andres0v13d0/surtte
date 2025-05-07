@@ -1,6 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany } from 'typeorm';
 import { Provider } from '../../providers/entity/provider.entity';
-import { CartItem } from 'src/modules/cart/entity/cart.entity';
+import { CartItem } from '../../cart/entity/cart.entity';
+import { Order } from '../../orders/entities/order.entity';
+import { Customer } from 'src/modules/customers/entity/customer.entity';
  
 export enum RolUsuario {
     ADMIN = 'admin',
@@ -9,6 +11,7 @@ export enum RolUsuario {
     SOPORTE = 'soporte',
     PROVEEDOR = 'proveedor',
     COMERCIANTE = 'comerciante',
+    VENDEDOR = 'vendedor',
 }
   
 
@@ -44,4 +47,11 @@ export class User {
 
     @OneToMany(() => CartItem, (cartItem) => cartItem.user)
     cartItems: CartItem[];
+
+    @OneToMany(() => Order, (order) => order.user)
+    orders: Order[];
+
+    @OneToMany(() => Customer, (customer) => customer.user)
+    customers: Customer[];
+
 }

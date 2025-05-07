@@ -1,5 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 import { User } from '../../users/entity/user.entity';
+import { Order } from 'src/modules/orders/entities/order.entity';
+import { Customer } from 'src/modules/customers/entity/customer.entity';
 
 export type EstadoVerificacion = 'pendiente' | 'en_revision' | 'verificado' | 'rechazado';
 
@@ -44,4 +46,11 @@ export class Provider {
 
   @Column({ default: false })
   proveedorConfiable: boolean;
+
+  @OneToMany(() => Order, (order) => order.provider)
+  orders: Order[];
+
+  @OneToMany(() => Customer, (customer) => customer.provider)
+  customers: Customer[];
+
 }
