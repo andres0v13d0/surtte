@@ -47,9 +47,9 @@ const Order = ({ id, status, total, cantidad, images }) => {
         <div className='order-items'>
             <div className="order-images-wrapper">
                 <div className="order-images">
-                {[...Array(10)].map((_, index) => (
-                    <img key={index} src={images[0]} alt={`Producto ${index + 1}`} />
-                ))}
+                    {images.map((img, index) => (
+                        <img key={index} src={img} alt={`Producto ${index + 1}`} />
+                    ))}
                 </div>
             </div>
 
