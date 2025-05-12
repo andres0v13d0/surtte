@@ -53,8 +53,4 @@ export class User {
 
     @OneToMany(() => Customer, (customer) => customer.user)
     customers: Customer[];
-
-    @JoinColumn({ name: 'usuario_id' })
-    @Index()
-    usuario: User;
 }
