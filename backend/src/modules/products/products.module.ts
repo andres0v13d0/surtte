@@ -23,6 +23,8 @@ import { Provider } from '../providers/entity/provider.entity';
 import { Category } from '../categories/entities/category.entity';
 import { SubCategory } from '../categories/entities/sub-category.entity';
 
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -35,6 +37,7 @@ import { SubCategory } from '../categories/entities/sub-category.entity';
       Category,
       SubCategory,
     ]),
+    SubscriptionsModule,
   ],
   controllers: [
     ProductsController,

@@ -12,6 +12,7 @@ import { Category } from '../../categories/entities/category.entity';
 import { SubCategory } from '../../categories/entities/sub-category.entity';
 import { Size } from '../../products/entities/size.entity';
 import { Color } from '../../products/entities/color.entity';
+import { SubscriptionsService } from '../../subscriptions/subscriptions.service';
 
 @Injectable()
 export class ProductsService {
@@ -38,11 +39,15 @@ export class ProductsService {
     
     @InjectRepository(Size)
     private readonly sizeRepo: Repository<Size>,
+
+    private readonly subscriptionsService: SubscriptionsService,
   ) {}
 
   async create(dto: CreateProductDto): Promise<Product> {
     const provider = await this.providerRepo.findOne({ where: { id: dto.providerId } });
     if (!provider) throw new NotFoundException('Proveedor no encontrado.');
+
+    await this.subscriptionsService.validateProviderCanAddProduct(dto.providerId);
   
     const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
     if (!category) throw new NotFoundException('Categoría no encontrada.');

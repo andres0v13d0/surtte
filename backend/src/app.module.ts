@@ -16,6 +16,10 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { CustomersModule } from './modules/customers/customers.module';
+import { PlansModule } from './modules/plans/plans.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 
 async function getDatabaseSecrets() {
   const client = new SecretsManagerClient({ region: 'us-east-2' });
@@ -74,6 +78,10 @@ async function getDatabaseSecrets() {
     FavoritesModule,
     OrdersModule,
     CustomersModule,
+    PlansModule,
+    PaymentsModule,
+    SubscriptionsModule,
+    TasksModule,
   ],
 })
 export class AppModule {}
