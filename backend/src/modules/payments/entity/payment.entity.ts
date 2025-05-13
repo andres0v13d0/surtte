@@ -17,9 +17,9 @@ export class Payment {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => Provider, { eager: true })
+    @ManyToOne(() => Provider, { eager: true, nullable: true }) // 👈 esto
     @JoinColumn({ name: 'provider_id' })
-    provider: Provider;
+    provider?: Provider; // 👈 opcional
 
     @ManyToOne(() => Plan, { eager: true })
     @JoinColumn({ name: 'plan_id' })
