@@ -9,10 +9,6 @@ import {
 } from 'class-validator';
 
 export class CreatePaymentDto {
-    @IsNumber()
-    @IsNotEmpty({ message: 'El ID del proveedor es obligatorio.' })
-    providerId: number;
-
     @IsUUID()
     @IsNotEmpty({ message: 'El ID del plan es obligatorio.' })
     planId: string;
