@@ -32,7 +32,7 @@ const Header = ({ minimal = false, searchBar = false, menuProvider = false, prov
                         currentPage={currentPage}
                     />
                 )}
-                <h1 onClick={() => window.location.href = "/"} id='h-title'>SUR<b>TT</b>E</h1>
+                <h1 onClick={() => window.location.href = "/"} id='h-title'>Sur<b>tt</b>e</h1>
                 {!minimal && <Cart />}
             </div>
 

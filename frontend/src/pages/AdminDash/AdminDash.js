@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './AdminDash.css';
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
 
 const AdminDash = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -101,104 +103,108 @@ const AdminDash = () => {
   };
 
   return (
-    <div className="admin-dash-container">
-      {/* CREAR PLAN */}
-      <div className="crear-plan">
-        <h2>Crear Nuevo Plan</h2>
-        <input
-          type="text"
-          placeholder="Nombre del plan"
-          value={nuevoPlan.name}
-          onChange={(e) => handleChangePlan('name', e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Precio (ej. 19.99)"
-          value={nuevoPlan.price}
-          onChange={(e) => handleChangePlan('price', e.target.value)}
-        />
-        <textarea
-          placeholder="Descripción (opcional)"
-          value={nuevoPlan.description}
-          onChange={(e) => handleChangePlan('description', e.target.value)}
-        />
-        <textarea
-          placeholder="Características (una por línea)"
-          value={nuevoPlan.features}
-          onChange={(e) => handleChangePlan('features', e.target.value)}
-          rows={5}
-        />
-        <button className="btn-crear-plan" onClick={crearPlan}>
-          Crear Plan
-        </button>
-      </div>
+    <>
+      <Header minimal={true} />
+      <div className="admin-dash-container">
+        {/* CREAR PLAN */}
+        <div className="crear-plan">
+          <h2>Crear Nuevo Plan</h2>
+          <input
+            type="text"
+            placeholder="Nombre del plan"
+            value={nuevoPlan.name}
+            onChange={(e) => handleChangePlan('name', e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Precio (ej. 19.99)"
+            value={nuevoPlan.price}
+            onChange={(e) => handleChangePlan('price', e.target.value)}
+          />
+          <textarea
+            placeholder="Descripción (opcional)"
+            value={nuevoPlan.description}
+            onChange={(e) => handleChangePlan('description', e.target.value)}
+          />
+          <textarea
+            placeholder="Características (una por línea)"
+            value={nuevoPlan.features}
+            onChange={(e) => handleChangePlan('features', e.target.value)}
+            rows={5}
+          />
+          <button className="btn-crear-plan" onClick={crearPlan}>
+            Crear Plan
+          </button>
+        </div>
 
-      {/* SOLICITUDES */}
-      <h2>Solicitudes de Proveedor</h2>
-      {solicitudes.length === 0 ? (
-        <p>No hay solicitudes registradas.</p>
-      ) : (
-        solicitudes.map((s) => (
-          <div key={s.id} className="solicitud-card">
-            <p><strong>Usuario:</strong> {s.usuario?.nombre}</p>
-            <p><strong>Empresa:</strong> {s.nombre_empresa}</p>
+        {/* SOLICITUDES */}
+        <h2>Solicitudes de Proveedor</h2>
+        {solicitudes.length === 0 ? (
+          <p>No hay solicitudes registradas.</p>
+        ) : (
+          solicitudes.map((s) => (
+            <div key={s.id} className="solicitud-card">
+              <p><strong>Usuario:</strong> {s.usuario?.nombre}</p>
+              <p><strong>Empresa:</strong> {s.nombre_empresa}</p>
 
-            {(s.archivoRUT || s.archivoCamaraComercio) && (
-              <div className="docs-preview">
-                <p><strong>Documentos subidos:</strong></p>
-                {s.archivoRUT && (
-                  <a href={s.archivoRUT} target="_blank" rel="noopener noreferrer">
-                    Ver RUT
-                  </a>
-                )}
-                <br />
-                {s.archivoCamaraComercio && (
-                  <a href={s.archivoCamaraComercio} target="_blank" rel="noopener noreferrer">
-                    Ver Cámara de Comercio
-                  </a>
-                )}
-              </div>
-            )}
+              {(s.archivoRUT || s.archivoCamaraComercio) && (
+                <div className="docs-preview">
+                  <p><strong>Documentos subidos:</strong></p>
+                  {s.archivoRUT && (
+                    <a href={s.archivoRUT} target="_blank" rel="noopener noreferrer">
+                      Ver RUT
+                    </a>
+                  )}
+                  <br />
+                  {s.archivoCamaraComercio && (
+                    <a href={s.archivoCamaraComercio} target="_blank" rel="noopener noreferrer">
+                      Ver Cámara de Comercio
+                    </a>
+                  )}
+                </div>
+              )}
 
-            <label>Número RUT</label>
-            <input
-              type="text"
-              value={s.numeroRUT || ''}
-              onChange={(e) => actualizarCampo(s.id, 'numeroRUT', e.target.value)}
-            />
+              <label>Número RUT</label>
+              <input
+                type="text"
+                value={s.numeroRUT || ''}
+                onChange={(e) => actualizarCampo(s.id, 'numeroRUT', e.target.value)}
+              />
 
-            <label>Número Cámara de Comercio</label>
-            <input
-              type="text"
-              value={s.numeroCamaraComercio || ''}
-              onChange={(e) => actualizarCampo(s.id, 'numeroCamaraComercio', e.target.value)}
-            />
+              <label>Número Cámara de Comercio</label>
+              <input
+                type="text"
+                value={s.numeroCamaraComercio || ''}
+                onChange={(e) => actualizarCampo(s.id, 'numeroCamaraComercio', e.target.value)}
+              />
 
-            <label>Estado</label>
-            <select
-              value={s.estado}
-              onChange={(e) => actualizarCampo(s.id, 'estado', e.target.value)}
-            >
-              <option value="pendiente">Pendiente</option>
-              <option value="aprobado">Aprobado</option>
-              <option value="rechazado">Rechazado</option>
-            </select>
+              <label>Estado</label>
+              <select
+                value={s.estado}
+                onChange={(e) => actualizarCampo(s.id, 'estado', e.target.value)}
+              >
+                <option value="pendiente">Pendiente</option>
+                <option value="aprobado">Aprobado</option>
+                <option value="rechazado">Rechazado</option>
+              </select>
 
-            <p><strong>Pago:</strong> {s.pagoRealizado ? '✅' : '❌'}</p>
+              <p><strong>Pago:</strong> {s.pagoRealizado ? '✅' : '❌'}</p>
 
-            <button className="btn-revisar" onClick={() => revisarSolicitud(s)}>
-              Guardar revisión
-            </button>
-
-            {s.estado === 'aprobado' && s.pagoRealizado && (
-              <button className="btn-convertir" onClick={() => convertirEnProveedor(s.id)}>
-                Convertir en proveedor
+              <button className="btn-revisar" onClick={() => revisarSolicitud(s)}>
+                Guardar revisión
               </button>
-            )}
-          </div>
-        ))
-      )}
-    </div>
+
+              {s.estado === 'aprobado' && s.pagoRealizado && (
+                <button className="btn-convertir" onClick={() => convertirEnProveedor(s.id)}>
+                  Convertir en proveedor
+                </button>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+      < Footer />
+    </>
   );
 };
 
