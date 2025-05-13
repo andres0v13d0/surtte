@@ -71,8 +71,15 @@ export class ProviderRequestsService {
         solicitud.numeroCamaraComercio = dto.numeroCamaraComercio;
         solicitud.estado = dto.estado;
 
-        await this.borrarArchivoDeS3(solicitud.archivoRUT);
-        await this.borrarArchivoDeS3(solicitud.archivoCamaraComercio);
+        if (solicitud.archivoRUT) {
+            await this.borrarArchivoDeS3(solicitud.archivoRUT);
+            solicitud.archivoRUT = null;
+          }
+        
+        if (solicitud.archivoCamaraComercio) {
+            await this.borrarArchivoDeS3(solicitud.archivoCamaraComercio);
+            solicitud.archivoCamaraComercio = null;
+        }
 
         solicitud.archivoRUT = null;
         solicitud.archivoCamaraComercio = null;
@@ -108,20 +115,22 @@ export class ProviderRequestsService {
     }
 
     private async borrarArchivoDeS3(url: string) {
-        if (!url) return;
-
+        if (!url || typeof url !== 'string') return;
+      
         const key = url.replace(`${this.cloudFrontUrl}/`, '');
+      
         const command = new DeleteObjectCommand({
-            Bucket: this.bucketName,
-            Key: key,
+          Bucket: this.bucketName,
+          Key: key,
         });
-
+      
         try {
-            await this.s3.send(command);
+          await this.s3.send(command);
         } catch (err) {
-            console.error(`Error al borrar archivo de S3: ${key}`, err);
+          console.error(`Error al borrar archivo de S3: ${key}`, err);
         }
     }
+
 
     async findAll(): Promise<ProviderRequest[]> {
         return this.requestRepo.find({
