@@ -22,10 +22,10 @@ export class ProviderRequest {
     @Column({ type: 'varchar', length: 255 })
     nombre_empresa: string;
 
-    @Column({ type: 'text' })
+    @Column({ type: 'text', nullable: true })
     archivoRUT: string; // URL temporal en S3
 
-    @Column({ type: 'text' })
+    @Column({ type: 'text', nullable: true })
     archivoCamaraComercio: string; // URL temporal en S3
 
     @Column({ type: 'varchar', length: 50, nullable: true })
