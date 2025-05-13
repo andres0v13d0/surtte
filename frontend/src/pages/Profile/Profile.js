@@ -41,6 +41,18 @@ const Profile = () => {
                                 </Link>
                             )}
 
+                            {usuario.rol === 'admin' && (
+                                <Link to="/admin" className="user-button mg">
+                                    <span className="icon-left">
+                                    <FontAwesomeIcon icon={faShoppingBasket} />
+                                    </span>
+                                    <span className="text">Panel de administrador</span>
+                                    <span className="icon-right">
+                                    <FontAwesomeIcon icon={faChevronRight} />
+                                    </span>
+                                </Link>
+                            )}
+
                             <Link to="/my-orders" className="user-button">
                                 <span className="icon-left">
                                     <FontAwesomeIcon icon={faReceipt} />

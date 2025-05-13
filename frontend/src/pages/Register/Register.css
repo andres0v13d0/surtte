@@ -118,6 +118,25 @@
     text-decoration: underline;
 }
 
+.step .select-city__control{
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 20px;
+    font-size: 15px;
+}
+
+.step .select-city__control--is-focused{
+    border: 1px solid #fa7e17;
+}
+
+.step .select-city__menu-list {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 20px;
+    font-size: 15px;
+    max-height: 120px;
+}
+
 .slide-in {
     opacity: 0;
     transform: translateX(100%);

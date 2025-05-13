@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Select from 'react-select';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,6 +11,11 @@ import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 
 const Register = () => {
+  const [cities, setCities] = useState([]);
+  const [setFilteredCities] = useState([]);
+  const [selectedCity, setSelectedCity] = useState('');
+
+
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [showPass, setShowPass] = useState(false);
@@ -76,6 +82,25 @@ const Register = () => {
       }
     }
   };
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('registerEmail');
+    if (savedEmail) {
+      setFormData(prev => ({ ...prev, email: savedEmail }));
+    }
+
+    if (step === 3 && cities.length === 0) {
+      axios.get('https://raw.githubusercontent.com/marcovega/colombia-json/master/colombia.json')
+        .then((res) => {
+          const allCities = res.data.flatMap(dpto => dpto.ciudades);
+          setCities(allCities);
+          setFilteredCities(allCities);
+        })
+        .catch((err) => {
+          console.error('Error al cargar ciudades:', err);
+        });
+    }
+  }, [step, cities.length, setFilteredCities]);
   
 
   const handleSubmit = async (e) => {
@@ -211,6 +236,16 @@ const Register = () => {
                 value={formData.lastName}
                 onChange={handleChange}
               />
+              <label>Ciudad</label>
+              <Select
+                options={cities.map(city => ({ value: city, label: city }))}
+                placeholder="Selecciona tu ciudad..."
+                value={selectedCity ? { value: selectedCity, label: selectedCity } : null}
+                onChange={(selected) => setSelectedCity(selected?.value || '')}
+                isClearable
+                classNamePrefix="select-city"
+              />
+
               <button id="last-btn" type="submit" onClick={handleSubmit}>Registrarme</button>
             </div>
           )}

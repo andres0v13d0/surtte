@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { auth, googleProvider } from '../../config/firebase';
+import { auth } from '../../config/firebase';
 import {
-  signInWithPopup,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import axios from 'axios';
 import './Login.css';
 import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
-import BrandLogo from '../../utils/BrandLogo/BrandLogo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
@@ -40,17 +38,6 @@ const Login = () => {
       } else {
         alert('No se pudo autenticar con el servidor');
       }
-    }
-  };
-
-  const loginWithGoogle = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const token = await result.user.getIdToken();
-      await sendTokenToBackend(token);
-    } catch (err) {
-      console.error('Error con Google:', err);
-      alert('Error al iniciar sesión con Google');
     }
   };
 
@@ -89,29 +76,7 @@ const Login = () => {
 
       {!showPasswordSection && (
         <div className="login-section">
-          <h2 id='h-login'>Inicia sesión o crea tu cuenta</h2>
-
-          <button className='btn-login' onClick={loginWithGoogle}>
-            <BrandLogo name="google" size={20} />
-            Continuar con Google
-          </button>
-
-          <button className='btn-login' onClick={loginWithGoogle}>
-            <BrandLogo name="facebook" size={20} />
-            Continuar con Facebook
-          </button>
-
-          <button className='btn-login' onClick={loginWithGoogle}>
-            <BrandLogo name="apple" size={20} />
-            Continuar con Apple
-          </button>
-
-          <div className='line-bw'>
-            <div className='line'></div>
-            <span>O</span>
-            <div className='line'></div>
-          </div>
-
+          
           <p id='p-login'>Usa tu correo electrónico para iniciar sesión</p>
 
           <form className="data-cont" onSubmit={handleEmailSubmit}>

@@ -17,6 +17,9 @@ import UserChat from './pages/UserChat/UserChat';
 import Favorites from './pages/Favorites/Favorites';
 import EditProduct from './pages/EditProduct/EditProduct';
 import OrdersPage from './pages/OrdersPage/OrdersPage';
+import AdminDash from './pages/AdminDash/AdminDash';
+import ProviderRequest from './pages/ProviderRequest/ProviderRequest';
+import Plans from './pages/Plans/Plans';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -32,6 +35,8 @@ const titles = {
   '/user-chat': 'Chat de usuario - SURTTE',
   '/favorites': 'Favoritos - SURTTE',
   '/my-orders': 'Mis pedidos - SURTTE',
+  '/admin': 'Panel de administración - SURTTE',
+  '/solicitud': 'Solicitar ser proveedor - SURTTE'
 };
 
 const TitleUpdater = () => {
@@ -67,6 +72,9 @@ function App() {
         <Route path="/favorites" element={<Favorites />} />
         <Route path="/edit-product/:uuid" element={<EditProduct />} />
         <Route path="/my-orders" element={<OrdersPage />} />
+        <Route path="/admin" element={<AdminDash />} />
+        <Route path='/solicitud' element={<ProviderRequest />} />
+        <Route path='/plans' element={<Plans />} />
       </Routes>
     </Router>
   );

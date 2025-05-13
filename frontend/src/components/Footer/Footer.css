@@ -4,6 +4,7 @@
     color: white;
     display: flex;
     justify-content: center;
+    flex-direction: column;
     height: 20vh;
     align-items: center;
     font-weight: normal;
@@ -14,4 +15,13 @@
     font-size: 15px;
     text-align: center;
     width: 80vw;
+}
+
+.footer a{
+    text-decoration: none;
+    color: white;
+}
+
+.footer a:hover{
+    text-decoration: underline;
 }
