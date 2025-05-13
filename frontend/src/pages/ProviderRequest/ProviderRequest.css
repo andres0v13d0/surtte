@@ -1,0 +1,63 @@
+
+.input-provider {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 20px 0 20px;
+    font-size: 15px;
+    font-family: 'Ubuntu', sans-serif;
+    height: 20px;
+    padding: 10px;
+  }
+
+.input-provider.normal{
+    width: 89%;
+}
+
+.register-container.request label {
+    margin-top: 10px !important;
+}
+
+
+.register-container.request .step button{
+    margin-bottom: 50px !important;
+}
+
+
+.custom-upload-group {
+  margin-bottom: 20px;
+}
+
+.custom-upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.upload-button {
+  background-color: #0f172a;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-button:hover {
+  background-color: #1e293b;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.filename {
+  font-size: 14px;
+  color: #333;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

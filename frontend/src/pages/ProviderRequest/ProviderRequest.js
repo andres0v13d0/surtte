@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
+import './ProviderRequest.css';
 
 const ProviderRequest = () => {
   const [step, setStep] = useState(1);
@@ -101,74 +104,104 @@ const ProviderRequest = () => {
   };
 
   return (
-    <div className="register-container">
-      <h2 id="r-title">Solicitud para ser proveedor</h2>
-      <form className={`step-wrapper step-${step}`}>
-        {step === 1 && (
-          <div className="step slide-in">
-            <div className="step-sup">
-              <div>
-                <h1>Paso 1 de 2</h1>
-                <h2>Datos de la empresa</h2>
+    <>
+      <Header minimal={true}/>
+      <div className="register-container request">
+        <h2 id="r-title">Solicitud para ser proveedor</h2>
+        <form className={`step-wrapper step-${step}`}>
+          {step === 1 && (
+            <div className="step slide-in">
+              <div className="step-sup">
+                <div>
+                  <h1>Paso 1 de 2</h1>
+                  <h2>Datos de la empresa</h2>
+                </div>
               </div>
+
+              <label>Nombre de la empresa</label>
+              <input
+                type="text"
+                name="nombre_empresa"
+                placeholder="Ej: Distribuidora Surtte"
+                value={formData.nombre_empresa}
+                onChange={handleChange}
+                className='input-provider normal'
+              />
+
+              <label>Descripción (opcional)</label>
+              <textarea
+                name="descripcion"
+                placeholder="Cuéntanos sobre tu empresa"
+                value={formData.descripcion}
+                onChange={handleChange}
+                className='input-provider'
+              />
+
+              <button type="button" onClick={nextStep}>Siguiente</button>
             </div>
+          )}
 
-            <label>Nombre de la empresa</label>
-            <input
-              type="text"
-              name="nombre_empresa"
-              placeholder="Ej: Distribuidora Surtte"
-              value={formData.nombre_empresa}
-              onChange={handleChange}
-            />
+          {step === 2 && (
+            <div className="step slide-in">
+              <div className="step-sup">
+                <button id="btn-back" type="button" onClick={prevStep}>
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </button>
+                <div>
+                  <h1>Paso 2 de 2</h1>
+                  <h2>Documentación requerida</h2>
+                </div>
+              </div>
 
-            <label>Descripción (opcional)</label>
-            <textarea
-              name="descripcion"
-              placeholder="Cuéntanos sobre tu empresa"
-              value={formData.descripcion}
-              onChange={handleChange}
-            />
+              <div className="custom-upload-group">
+                <label>RUT</label>
+                <div className="custom-upload">
+                  <label htmlFor="archivoRUT" className="upload-button">
+                    <FontAwesomeIcon icon={faPlus} />
+                  </label>
+                  <span className="filename">
+                    {formData.archivoRUT ? formData.archivoRUT.name : 'No se ha seleccionado ningún archivo'}
+                  </span>
+                  <input
+                    type="file"
+                    id="archivoRUT"
+                    name="archivoRUT"
+                    accept=".pdf,.jpg,.png"
+                    onChange={handleFileChange}
+                    className="hidden-file-input"
+                  />
+                </div>
+              </div>
 
-            <button type="button" onClick={nextStep}>Siguiente</button>
-          </div>
-        )}
+              <div className="custom-upload-group">
+                <label>Cámara de comercio</label>
+                <div className="custom-upload">
+                  <label htmlFor="archivoCamaraComercio" className="upload-button">
+                    <FontAwesomeIcon icon={faPlus} />
+                  </label>
+                  <span className="filename">
+                    {formData.archivoCamaraComercio ? formData.archivoCamaraComercio.name : 'No se ha seleccionado ningún archivo'}
+                  </span>
+                  <input
+                    type="file"
+                    id="archivoCamaraComercio"
+                    name="archivoCamaraComercio"
+                    accept=".pdf,.jpg,.png"
+                    onChange={handleFileChange}
+                    className="hidden-file-input"
+                  />
+                </div>
+              </div>
 
-        {step === 2 && (
-          <div className="step slide-in">
-            <div className="step-sup">
-              <button id="btn-back" type="button" onClick={prevStep}>
-                <FontAwesomeIcon icon={faChevronLeft} />
+              <button type="submit" onClick={handleSubmit} disabled={loading}>
+                {loading ? 'Enviando...' : 'Enviar solicitud'}
               </button>
-              <div>
-                <h1>Paso 2 de 2</h1>
-                <h2>Documentación requerida</h2>
-              </div>
             </div>
-
-            <label>Cargar RUT</label>
-            <input
-              type="file"
-              name="archivoRUT"
-              accept=".pdf,.jpg,.png"
-              onChange={handleFileChange}
-            />
-
-            <label>Cámara de comercio</label>
-            <input
-              type="file"
-              name="archivoCamaraComercio"
-              accept=".pdf,.jpg,.png"
-              onChange={handleFileChange}
-            />
-
-            <button type="submit" onClick={handleSubmit} disabled={loading}>
-              {loading ? 'Enviando...' : 'Enviar solicitud'}
-            </button>
-          </div>
-        )}
-      </form>
-    </div>
+          )}
+        </form>
+      </div>
+      <Footer />
+    </>
   );
 };
 
