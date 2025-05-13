@@ -30,9 +30,6 @@ export class MercadoPagoService {
                 unit_price: +amount,
             },
         ],
-        payer: {
-            email: providerEmail,
-        },
         external_reference: externalReference,
         back_urls: {
             success: `${baseUrl}/planes/success`,
