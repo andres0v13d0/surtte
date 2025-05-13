@@ -12,31 +12,35 @@ export class MercadoPagoService {
     async createPreference({
         amount,
         planName,
-        providerEmail,
         externalReference,
     }: {
         amount: number;
         planName: string;
-        providerEmail: string;
-        providerId: number;
         externalReference: string;
     }) {
         const baseUrl = process.env.FRONTEND_BASE_URL;
+
         const preference = await mercadopago.preferences.create({
-        items: [
-            {
-                title: `${providerEmail} - Pago Plan ${planName} - $${amount}`,
-                quantity: 1,
-                unit_price: +amount,
+            items: [
+                {
+                    title: `Pago Plan ${planName} - $${amount}`,
+                    quantity: 1,
+                    unit_price: +amount,
+                    currency_id: 'USD',
+                },
+            ],
+            external_reference: externalReference,
+            payment_methods: {
+                excluded_payment_types: [],
+                excluded_payment_methods: [],
             },
-        ],
-        external_reference: externalReference,
-        back_urls: {
-            success: `${baseUrl}/planes/success`,
-            pending: `${baseUrl}/planes/pending`,
-            failure: `${baseUrl}/planes/failure`,
-        },
-        auto_return: 'approved',
+            back_urls: {
+                success: `${baseUrl}/planes/success`,
+                pending: `${baseUrl}/planes/pending`,
+                failure: `${baseUrl}/planes/failure`,
+            },
+            auto_return: 'approved',
+            // NO ENVIAMOS payer — como en Postman
         });
 
         return {
