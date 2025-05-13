@@ -1,62 +1,65 @@
 import { Injectable } from '@nestjs/common';
-import * as mercadopago from 'mercadopago';
+import fetch from 'node-fetch'; // Asegurate de tener esto instalado
 
 @Injectable()
 export class MercadoPagoService {
-    constructor() {
-        mercadopago.configure({
-            access_token: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
-        });
-    }
+    private readonly accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN!;
+    private readonly baseUrl = process.env.FRONTEND_BASE_URL;
 
     async createPreference({
         amount,
         planName,
-        externalReference,
     }: {
         amount: number;
         planName: string;
-        externalReference: string;
     }) {
-        const baseUrl = process.env.FRONTEND_BASE_URL;
-
-        const preference = await mercadopago.preferences.create({
+        const body = {
             items: [
                 {
-                    title: `Pago Plan ${planName} - $${amount}`,
+                    title: `Pago Plan ${planName}`,
                     quantity: 1,
                     unit_price: +amount,
-                    currency_id: 'USD',
-                },
+                    currency_id: 'COP',
+                }
             ],
-            external_reference: externalReference,
-            payment_methods: {
-                excluded_payment_types: [],
-                excluded_payment_methods: [],
-            },
             back_urls: {
-                success: `${baseUrl}/planes/success`,
-                pending: `${baseUrl}/planes/pending`,
-                failure: `${baseUrl}/planes/failure`,
+                success: `${this.baseUrl}/planes/success`,
+                pending: `${this.baseUrl}/planes/pending`,
+                failure: `${this.baseUrl}/planes/failure`,
             },
             auto_return: 'approved',
-            // NO ENVIAMOS payer — como en Postman
+        };
+
+        const res = await fetch('https://api.mercadopago.com/checkout/preferences', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${this.accessToken}`,
+            },
+            body: JSON.stringify(body),
         });
 
+        const preference = await res.json();
+
         return {
-            id: preference.body.id,
-            init_point: preference.body.init_point,
+            id: preference.id,
+            init_point: preference.init_point,
         };
     }
 
     async getPaymentStatusById(mercadoPagoId: string) {
-        const payment = await mercadopago.payment.findById(+mercadoPagoId);
-        const { status, transaction_amount, external_reference } = payment.body;
+        const res = await fetch(`https://api.mercadopago.com/v1/payments/${mercadoPagoId}`, {
+            headers: {
+                Authorization: `Bearer ${this.accessToken}`,
+            },
+        });
+
+        const payment = await res.json();
 
         return {
-            status,
-            amount: transaction_amount,
-            external_reference,
+            status: payment.status,
+            amount: payment.transaction_amount,
+            external_reference: payment.external_reference,
         };
     }
 }
