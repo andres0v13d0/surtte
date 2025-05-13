@@ -43,7 +43,7 @@ export class MercadoPagoService {
 
         return {
             id: preference.id,
-            init_point: preference.sandbox_init_point,
+            init_point: preference.init_point,
         };
     }
 
