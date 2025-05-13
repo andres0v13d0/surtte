@@ -36,7 +36,7 @@ export class ProviderRequestsController {
         @Request() req,
         @Body() dto: ProviderRequestDto,
     ) {
-        return this.service.createRequest(dto, req.user);
+        return this.service.createRequest(dto, req.userDB);
     }
 
     @UseGuards(FirebaseAuthGuard, RolesGuard)
