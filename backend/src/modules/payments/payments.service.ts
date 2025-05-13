@@ -10,6 +10,7 @@ import { CreatePaymentDto, UpdatePaymentStatusDto } from './dto/payment.dto';
 import { MercadoPagoService } from './mercado-pago/mercado-pago.service';
 import { ProvidersService } from '../providers/providers.service';
 import { PlansService } from '../plans/plans.service';
+import { User } from '../users/entity/user.entity';
 
 @Injectable()
 export class PaymentsService {
@@ -21,53 +22,52 @@ export class PaymentsService {
         private readonly plansService: PlansService,
     ) {}
 
-   async create(
-      dto: CreatePaymentDto,
-      user: UsuarioEntity,
+    async create(
+        dto: CreatePaymentDto,
+        user: User,
     ): Promise<{
-      init_point: string;
-      mercadoPagoId: string;
-      paymentId: string;
+        init_point: string;
+        mercadoPagoId: string;
+        paymentId: string;
     }> {
-      const plan = await this.plansService.findOne(dto.planId);
-      const realAmount = +plan.price;
-    
-      if (+dto.amount !== realAmount) {
-        throw new BadRequestException('Monto inválido para el plan.');
-      }
-    
-      const providerEmail = user.email;
-      const externalReference = `payment-${Date.now()}-${user.id}`;
-    
-      const payment = this.paymentRepository.create({
-        plan,
-        amount: realAmount,
-        status: 'pending',
-        externalReference,
-        usuario: user, // ← si tienes esta relación en la entidad
-      });
-    
-      const saved = await this.paymentRepository.save(payment);
-    
-      const preference = await this.mercadoPagoService.createPreference({
-        amount: realAmount,
-        planName: plan.name,
-        providerEmail,
-        providerId: user.id, // opcional
-        externalReference,
-      });
-    
-      return {
-        init_point: preference.init_point,
-        mercadoPagoId: preference.id,
-        paymentId: saved.id,
-      };
-    }
+        const plan = await this.plansService.findOne(dto.planId);
+        const realAmount = +plan.price;
 
+        if (+dto.amount !== realAmount) {
+            throw new BadRequestException('Monto inválido para el plan.');
+        }
+
+        const providerEmail = user.email;
+        const externalReference = `payment-${Date.now()}-${user.id}`;
+
+        const payment = this.paymentRepository.create({
+            plan,
+            amount: realAmount,
+            status: 'pending',
+            externalReference,
+            // No se asigna proveedor ni usuario porque no están en la entidad
+        });
+
+        const saved: Payment = await this.paymentRepository.save(payment);
+
+        const preference = await this.mercadoPagoService.createPreference({
+            amount: realAmount,
+            planName: plan.name,
+            providerEmail,
+            providerId: user.id,
+            externalReference,
+        });
+
+        return {
+            init_point: preference.init_point,
+            mercadoPagoId: preference.id,
+            paymentId: saved.id,
+        };
+    }
 
     async updateStatus(dto: UpdatePaymentStatusDto): Promise<Payment> {
         const payment = await this.paymentRepository.findOne({
-        where: { id: dto.paymentId },
+            where: { id: dto.paymentId },
         });
 
         if (!payment) throw new NotFoundException('Pago no encontrado');
@@ -75,10 +75,10 @@ export class PaymentsService {
         const info = await this.mercadoPagoService.getPaymentStatusById(dto.mercadoPagoId);
 
         if (
-        +info.amount !== +payment.amount ||
-        info.external_reference !== payment.externalReference
+            +info.amount !== +payment.amount ||
+            info.external_reference !== payment.externalReference
         ) {
-        throw new BadRequestException('Validación fallida del pago.');
+            throw new BadRequestException('Validación fallida del pago.');
         }
 
         payment.status = dto.status;
@@ -89,14 +89,14 @@ export class PaymentsService {
 
     async findAll(): Promise<Payment[]> {
         return this.paymentRepository.find({
-        order: { createdAt: 'DESC' },
+            order: { createdAt: 'DESC' },
         });
     }
 
     async findByProvider(providerId: number): Promise<Payment[]> {
         return this.paymentRepository.find({
-        where: { provider: { id: providerId } },
-        order: { createdAt: 'DESC' },
+            where: { provider: { id: providerId } },
+            order: { createdAt: 'DESC' },
         });
     }
 
@@ -120,11 +120,11 @@ export class PaymentsService {
     }> {
         const payment = await this.findOne(paymentId);
         return {
-        provider: payment.provider.usuario.email,
-        plan: payment.plan.name,
-        amount: +payment.amount,
-        status: payment.status,
-        createdAt: payment.createdAt,
+            provider: payment.provider?.usuario?.email ?? 'N/A',
+            plan: payment.plan.name,
+            amount: +payment.amount,
+            status: payment.status,
+            createdAt: payment.createdAt,
         };
     }
 }
