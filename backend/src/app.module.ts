@@ -20,6 +20,7 @@ import { PlansModule } from './modules/plans/plans.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { ProviderRequestsModule } from './modules/provider-requests/provider-requests.module';
 
 async function getDatabaseSecrets() {
   const client = new SecretsManagerClient({ region: 'us-east-2' });
@@ -82,6 +83,7 @@ async function getDatabaseSecrets() {
     PaymentsModule,
     SubscriptionsModule,
     TasksModule,
+    ProviderRequestsModule,
   ],
 })
 export class AppModule {}
