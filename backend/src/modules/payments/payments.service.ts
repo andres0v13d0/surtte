@@ -26,7 +26,9 @@ export class PaymentsService {
         mercadoPagoId: string;
         paymentId: string;
     }> {
-        const provider = await this.providersService.findOne(dto.providerId);
+        const user = req.userDB; // viene del FirebaseAuthGuard
+        const providerEmail = user.email;
+
         const plan = await this.plansService.findOne(dto.planId);
 
         const realAmount = +plan.price;
