@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import fetch from 'node-fetch'; // Asegurate de tener esto instalado
+import fetch from 'node-fetch';
 
 @Injectable()
 export class MercadoPagoService {

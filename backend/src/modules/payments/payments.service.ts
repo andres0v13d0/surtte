@@ -53,9 +53,6 @@ export class PaymentsService {
         const preference = await this.mercadoPagoService.createPreference({
             amount: realAmount,
             planName: plan.name,
-            providerEmail,
-            providerId: user.id,
-            externalReference,
         });
 
         return {
