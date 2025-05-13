@@ -20,11 +20,12 @@ import { RolUsuario } from '../users/entity/user.entity';
 export class PaymentsController {
     constructor(private readonly paymentsService: PaymentsService) {}
 
-    @UseGuards(FirebaseAuthGuard, RolesGuard)
     @Post('create')
-    create(@Body() dto: CreatePaymentDto) {
-        return this.paymentsService.create(dto);
+    @UseGuards(FirebaseAuthGuard)
+    create(@Body() dto: CreatePaymentDto, @Req() req) {
+        return this.paymentsService.create(dto, req.userDB);
     }
+
 
     @Patch('update-status')
     updateStatus(@Body() dto: UpdatePaymentStatusDto) {
