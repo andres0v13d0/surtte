@@ -21,52 +21,49 @@ export class PaymentsService {
         private readonly plansService: PlansService,
     ) {}
 
-    async create(dto: CreatePaymentDto): Promise<{
-        init_point: string;
-        mercadoPagoId: string;
-        paymentId: string;
+   async create(
+      dto: CreatePaymentDto,
+      user: UsuarioEntity,
+    ): Promise<{
+      init_point: string;
+      mercadoPagoId: string;
+      paymentId: string;
     }> {
-        const user = req.userDB; // viene del FirebaseAuthGuard
-        const providerEmail = user.email;
-
-        const plan = await this.plansService.findOne(dto.planId);
-
-        const realAmount = +plan.price;
-        if (+dto.amount !== realAmount) {
+      const plan = await this.plansService.findOne(dto.planId);
+      const realAmount = +plan.price;
+    
+      if (+dto.amount !== realAmount) {
         throw new BadRequestException('Monto inválido para el plan.');
-        }
-
-        const providerEmail = provider.usuario?.email;
-        if (!providerEmail) {
-        throw new BadRequestException('El proveedor no tiene un correo válido.');
-        }
-
-        const externalReference = `payment-${Date.now()}-${dto.providerId}`;
-
-        const payment = this.paymentRepository.create({
-        provider,
+      }
+    
+      const providerEmail = user.email;
+      const externalReference = `payment-${Date.now()}-${user.id}`;
+    
+      const payment = this.paymentRepository.create({
         plan,
         amount: realAmount,
         status: 'pending',
         externalReference,
-        });
-
-        const saved = await this.paymentRepository.save(payment);
-
-        const preference = await this.mercadoPagoService.createPreference({
-            amount: realAmount,
-            planName: plan.name,
-            providerEmail,
-            providerId: provider.id,
-            externalReference,
-        });
-
-        return {
+        usuario: user, // ← si tienes esta relación en la entidad
+      });
+    
+      const saved = await this.paymentRepository.save(payment);
+    
+      const preference = await this.mercadoPagoService.createPreference({
+        amount: realAmount,
+        planName: plan.name,
+        providerEmail,
+        providerId: user.id, // opcional
+        externalReference,
+      });
+    
+      return {
         init_point: preference.init_point,
         mercadoPagoId: preference.id,
         paymentId: saved.id,
-        };
+      };
     }
+
 
     async updateStatus(dto: UpdatePaymentStatusDto): Promise<Payment> {
         const payment = await this.paymentRepository.findOne({
