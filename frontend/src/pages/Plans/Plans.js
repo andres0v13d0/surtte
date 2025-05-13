@@ -24,13 +24,12 @@ export default function Plans() {
     fetchPlans();
   }, []);
 
-  const handleBuy = async (planId) => {
+  const handleBuy = async (plan) => {
     try {
-      setLoadingPayment(planId);
+      setLoadingPayment(plan.id);
       const token = localStorage.getItem('token');
       console.log('📦 Token desde localStorage:', token);
-      console.log('🛒 ID del plan:', planId);
-    
+      console.log('🛒 ID del plan:', plan.id);
 
       const res = await fetch('https://api.surtte.com/payments/create', {
         method: 'POST',
@@ -38,7 +37,10 @@ export default function Plans() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ planId })
+        body: JSON.stringify({
+          planId: plan.id,
+          amount: plan.price
+        })
       });
 
       const data = await res.json();
@@ -54,6 +56,7 @@ export default function Plans() {
       setLoadingPayment(null);
     }
   };
+
 
   if (loading) return <p className="loading-text">Cargando planes...</p>;
 
@@ -86,7 +89,7 @@ export default function Plans() {
 
               <button
                 className={`plan-button ${plan.name.toLowerCase() === 'premium' ? 'primary' : 'outline'}`}
-                onClick={() => handleBuy(plan.id)}
+                onClick={() => handleBuy(plan)}
                 disabled={loadingPayment === plan.id}
               >
                 {loadingPayment === plan.id ? 'Redirigiendo...' : 'Elegir Plan'}
