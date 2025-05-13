@@ -21,7 +21,6 @@ export class PaymentsController {
     constructor(private readonly paymentsService: PaymentsService) {}
 
     @UseGuards(FirebaseAuthGuard, RolesGuard)
-    @Roles(RolUsuario.PROVEEDOR, RolUsuario.COMERCIANTE)
     @Post('create')
     create(@Body() dto: CreatePaymentDto) {
         return this.paymentsService.create(dto);
