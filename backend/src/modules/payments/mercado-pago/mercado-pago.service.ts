@@ -29,6 +29,9 @@ export class MercadoPagoService {
             auto_return: 'approved',
         };
 
+        console.log('📤 [MercadoPago] Enviando preferencia de pago:');
+        console.dir(body, { depth: null });
+
         const res = await fetch('https://api.mercadopago.com/checkout/preferences', {
             method: 'POST',
             headers: {
@@ -39,6 +42,11 @@ export class MercadoPagoService {
         });
 
         const preference = await res.json();
+
+        console.log('✅ [MercadoPago] Preferencia creada:');
+        console.log('➡️ init_point:', preference.init_point);
+        console.log('➡️ ID:', preference.id);
+        console.dir(preference, { depth: null });
 
         return {
             id: preference.id,
@@ -54,6 +62,10 @@ export class MercadoPagoService {
         });
 
         const payment = await res.json();
+
+        console.log('🔍 [MercadoPago] Verificando estado del pago:');
+        console.log('➡️ ID:', mercadoPagoId);
+        console.dir(payment, { depth: null });
 
         return {
             status: payment.status,
