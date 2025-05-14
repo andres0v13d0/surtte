@@ -19,14 +19,9 @@ export class MercadoPagoService {
                     title: `Pago Plan ${planName}`,
                     quantity: 1,
                     unit_price: +amount,
+                    currency_id: 'USD',
                 }
-            ],
-            back_urls: {
-                success: `${this.baseUrl}/planes/success`,
-                pending: `${this.baseUrl}/planes/pending`,
-                failure: `${this.baseUrl}/planes/failure`,
-            },
-            auto_return: 'approved',
+            ]
         };
 
         console.log('📤 [MercadoPago] Enviando preferencia de pago:');
