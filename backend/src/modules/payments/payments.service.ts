@@ -45,7 +45,6 @@ export class PaymentsService {
             amount: realAmount,
             status: 'pending',
             externalReference,
-            // No se asigna proveedor ni usuario porque no están en la entidad
         });
 
         const saved: Payment = await this.paymentRepository.save(payment);

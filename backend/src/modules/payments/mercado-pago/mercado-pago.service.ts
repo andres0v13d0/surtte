@@ -19,7 +19,6 @@ export class MercadoPagoService {
                     title: `Pago Plan ${planName}`,
                     quantity: 1,
                     unit_price: +amount,
-                    currency_id: 'COP',
                 }
             ],
             back_urls: {
