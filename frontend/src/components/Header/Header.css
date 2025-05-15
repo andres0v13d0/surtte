@@ -25,6 +25,7 @@
     font-size: 40px;
     width: 80vw;
     text-align: center;
+    cursor: pointer;
 }
 
 .header .buttons{

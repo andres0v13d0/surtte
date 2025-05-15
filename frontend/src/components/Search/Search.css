@@ -14,7 +14,19 @@
     margin-left: 5px;
     height: 80%;
     font-size: 15px;
-    width: 85%;
+    width: 90%;
     font-weight: normal;
     padding-left: 1rem;
+}
+
+.search #search-button{
+    cursor: pointer;
+    background-color: #fa7e17;
+    border: none;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 0 1rem;
+    height: 100%;
+    margin: 0;
+    color: white;
 }

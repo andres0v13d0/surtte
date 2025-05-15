@@ -20,6 +20,8 @@ import OrdersPage from './pages/OrdersPage/OrdersPage';
 import AdminDash from './pages/AdminDash/AdminDash';
 import ProviderRequest from './pages/ProviderRequest/ProviderRequest';
 import Plans from './pages/Plans/Plans';
+import MyOrders from './pages/MyOrder/MyOrders';
+import SearchPage from './pages/SearchPage/SearchPage';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -36,7 +38,8 @@ const titles = {
   '/favorites': 'Favoritos - SURTTE',
   '/my-orders': 'Mis pedidos - SURTTE',
   '/admin': 'Panel de administración - SURTTE',
-  '/solicitud': 'Solicitar ser proveedor - SURTTE'
+  '/solicitud': 'Solicitar ser proveedor - SURTTE',
+  '/mis-pedidos': 'Mis pedidos - SURTTE',
 };
 
 const TitleUpdater = () => {
@@ -75,6 +78,8 @@ function App() {
         <Route path="/admin" element={<AdminDash />} />
         <Route path='/solicitud' element={<ProviderRequest />} />
         <Route path='/plans' element={<Plans />} />
+        <Route path='/mis-pedidos' element={<MyOrders />} />
+        <Route path="/buscar/:text" element={<SearchPage />} />
       </Routes>
     </Router>
   );

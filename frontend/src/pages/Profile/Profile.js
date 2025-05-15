@@ -53,7 +53,7 @@ const Profile = () => {
                                 </Link>
                             )}
 
-                            <Link to="/my-orders" className="user-button">
+                            <Link to="/mis-pedidos" className="user-button">
                                 <span className="icon-left">
                                     <FontAwesomeIcon icon={faReceipt} />
                                 </span>
