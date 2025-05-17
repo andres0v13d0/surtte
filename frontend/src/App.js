@@ -24,6 +24,7 @@ import MyOrders from './pages/MyOrder/MyOrders';
 import SearchPage from './pages/SearchPage/SearchPage';
 import TermsAndConditions from './pages/TermsAndConditions/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy';
+import OrderInfo from './pages/OrderInfo/OrderInfo';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -44,6 +45,7 @@ const titles = {
   '/mis-pedidos': 'Mis pedidos - SURTTE',
   '/condiciones': 'Condiciones de uso - SURTTE',
   '/politica': 'Política de privacidad - SURTTE',
+  '/orden': 'Información de pedido - SURTTE',
 };
 
 const TitleUpdater = () => {
@@ -86,6 +88,7 @@ function App() {
         <Route path="/buscar/:text" element={<SearchPage />} />
         <Route path="/condiciones" element={<TermsAndConditions />} />
         <Route path="/politica" element={<PrivacyPolicy />} />
+        <Route path="/orden/:uuid" element={<OrderInfo />} />
       </Routes>
     </Router>
   );
