@@ -31,7 +31,7 @@ const Cart = () => {
   }, []);
 
   return (
-    <div className='cart' onClick={() => window.location.href = '/cart'}>
+    <div className='cart'>
       <span id='number'>{count}</span>
       <FontAwesomeIcon id='icon-cart' icon={faCartShopping} />
     </div>

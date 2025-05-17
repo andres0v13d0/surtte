@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './Header.css';
-import Cart from '../Cart/Cart';
 import Search from '../Search/Search';
 import BarSup from '../BarSup/BarSup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -33,7 +32,6 @@ const Header = ({ minimal = false, searchBar = false, menuProvider = false, prov
                     />
                 )}
                 <h1 onClick={() => window.location.href = "/"} id='h-title'>Sur<b>tt</b>e</h1>
-                {!minimal && <Cart />}
             </div>
 
             {!minimal && (
