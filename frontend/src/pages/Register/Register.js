@@ -60,6 +60,11 @@ const Register = () => {
       setShowAlert(true);
       return;
     }
+    if (step === 1) {
+      setAlertType('success');
+      setAlertMessage('¡Listo! Te enviamos un código de verificación a tu correo. Revisa tu bandeja de entrada o correo no deseado.');
+      setShowAlert(true);
+    }
     if (step === 3) {
       if (!formData.password.trim() || !formData.repeatPassword.trim()) {
         setAlertType('error');
@@ -195,7 +200,6 @@ const Register = () => {
           type={alertType}
           message={alertMessage}
           onClose={() => setShowAlert(false)}
-          redirectTo={alertType === 'success' ? '/my-products' : null}
         />
       )}
       <Header minimal={true} />
@@ -352,8 +356,10 @@ const Register = () => {
                 placeholder="Ej.: +573101234567"
                 value={formData.lastName}
                 onChange={handleChange}
-                className='input-register last-name'
+                className='input-register'
               />
+
+              <button className='send-code' type="button" onClick={nextStep}>Enviar código de confirmación</button>
 
               <label className='label-register' htmlFor="cell">Código de confirmación de celular</label>
               <input
@@ -364,6 +370,7 @@ const Register = () => {
                 onChange={handleChange}
                 className='input-register last-name'
               />
+
 
               <div className='address-cont'>
                 <label className='label-register address' htmlFor="department">Departamento</label>
