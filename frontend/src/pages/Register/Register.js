@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
+import Alert from '../../components/Alert/Alert';
 
 const Register = () => {
   const [departments, setDepartments] = useState([]);
@@ -16,7 +17,9 @@ const Register = () => {
   const [filteredCities, setFilteredCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState(null);
 
-
+  const [alertType, setAlertType] = useState(null); 
+  const [alertMessage, setAlertMessage] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
 
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -49,12 +52,25 @@ const Register = () => {
 
   const nextStep = () => {
     if (step === 1 && !formData.email) {
-      alert('Por favor ingresa tu correo');
+      setAlertType('error');
+      setAlertMessage('Por favor ingresa tu correo.');
+      setShowAlert(true);
       return;
     }
-    if (step === 2 && formData.password !== formData.repeatPassword) {
-      alert('Las contraseñas no coinciden');
-      return;
+    if (step === 3) {
+      if (!formData.password.trim() || !formData.repeatPassword.trim()) {
+        setAlertType('error');
+        setAlertMessage('Debes completar ambos campos de contraseña.');
+        setShowAlert(true);
+        return;
+      }
+
+      if (formData.password !== formData.repeatPassword) {
+        setAlertType('error');
+        setAlertMessage('Las contraseñas no coinciden.');
+        setShowAlert(true);
+        return;
+      }
     }
     setStep(step + 1);
   };
@@ -78,9 +94,13 @@ const Register = () => {
     } catch (error) {
       console.error('Error desde el backend:', error);
       if (error.response?.status === 401) {
-        alert('Token inválido o usuario no autorizado');
+        setAlertType('error');
+        setAlertMessage('Intentelo de nuevo.');
+        setShowAlert(true);
       } else {
-        alert('No se pudo autenticar con el servidor');
+        setAlertType('error');
+        setAlertMessage('No se pudo autenticar con el servidor');
+        setShowAlert(true);
       }
     }
   };
@@ -131,15 +151,28 @@ const Register = () => {
       const token = await result.user.getIdToken(true);
 
       await sendTokenToBackend(token);
+      setAlertType('success');
+      setAlertMessage('Registro existoso.');
+      setShowAlert(true);
     } catch (err) {
       console.error('Error al registrar:', err);
-      alert('Hubo un error al registrar el usuario');
+      setAlertType('error');
+      setAlertMessage('Hubo un error al registrar el usuario');
+      setShowAlert(true);
     }
   };
   
 
   return (
     <>
+      {showAlert && (
+        <Alert
+          type={alertType}
+          message={alertMessage}
+          onClose={() => setShowAlert(false)}
+          redirectTo={alertType === 'success' ? '/my-products' : null}
+        />
+      )}
       <Header minimal={true} />
       <div className="register-container">
         <h2 id="r-title">Crea una nueva cuenta</h2>
@@ -156,7 +189,7 @@ const Register = () => {
               <input
                 type="email"
                 name="email"
-                placeholder="nombre@dominio.com"
+                placeholder="Ej.: nombre@dominio.com"
                 value={formData.email}
                 onChange={handleChange}
                 className='input-register'
@@ -187,7 +220,7 @@ const Register = () => {
                     type='text'
                     value={formData.code}
                     onChange={handleChange}
-                    placeholder='Código de confirmación'
+                    placeholder='Ej.: 123456'
                   />
                 </div>
 
@@ -218,6 +251,7 @@ const Register = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  placeholder='Ingrese la contraseña'
                 />
                 <span className="toggle-pass" onClick={() => setShowPass(!showPass)}>
                   <FontAwesomeIcon icon={showPass ? faEyeSlash : faEye} />
@@ -231,6 +265,7 @@ const Register = () => {
                   name="repeatPassword"
                   value={formData.repeatPassword}
                   onChange={handleChange}
+                  placeholder='Repita la contraseña'
                 />
                 <span className="toggle-pass" onClick={() => setShowRepeat(!showRepeat)}>
                   <FontAwesomeIcon icon={showRepeat ? faEyeSlash : faEye} />
@@ -269,7 +304,7 @@ const Register = () => {
               <input
                 type="text"
                 name="firstName"
-                placeholder="Nombre"
+                placeholder="Ej.: Juan"
                 value={formData.firstName}
                 onChange={handleChange}
                 className='input-register'
@@ -279,7 +314,7 @@ const Register = () => {
               <input
                 type="text"
                 name="lastName"
-                placeholder="Apellido"
+                placeholder="Ej.: Pérez"
                 value={formData.lastName}
                 onChange={handleChange}
                 className='input-register last-name'
@@ -289,7 +324,17 @@ const Register = () => {
               <input
                 type="text"
                 name="cell"
-                placeholder="Número de celular"
+                placeholder="Ej.: +573101234567"
+                value={formData.lastName}
+                onChange={handleChange}
+                className='input-register last-name'
+              />
+
+              <label className='label-register' htmlFor="cell">Código de confirmación de celular</label>
+              <input
+                type="text"
+                name="cell"
+                placeholder="Ej.: 123456"
                 value={formData.lastName}
                 onChange={handleChange}
                 className='input-register last-name'
