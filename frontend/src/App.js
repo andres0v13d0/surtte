@@ -22,6 +22,8 @@ import ProviderRequest from './pages/ProviderRequest/ProviderRequest';
 import Plans from './pages/Plans/Plans';
 import MyOrders from './pages/MyOrder/MyOrders';
 import SearchPage from './pages/SearchPage/SearchPage';
+import TermsAndConditions from './pages/TermsAndConditions/TermsAndConditions';
+import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -40,6 +42,8 @@ const titles = {
   '/admin': 'Panel de administración - SURTTE',
   '/solicitud': 'Solicitar ser proveedor - SURTTE',
   '/mis-pedidos': 'Mis pedidos - SURTTE',
+  '/condiciones': 'Condiciones de uso - SURTTE',
+  '/politica': 'Política de privacidad - SURTTE',
 };
 
 const TitleUpdater = () => {
@@ -80,6 +84,8 @@ function App() {
         <Route path='/plans' element={<Plans />} />
         <Route path='/mis-pedidos' element={<MyOrders />} />
         <Route path="/buscar/:text" element={<SearchPage />} />
+        <Route path="/condiciones" element={<TermsAndConditions />} />
+        <Route path="/politica" element={<PrivacyPolicy />} />
       </Routes>
     </Router>
   );

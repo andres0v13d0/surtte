@@ -6,16 +6,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import ProviderMenu from '../ProviderMenu/ProviderMenu';
 
-const Header = ({ minimal = false, searchBar = false, menuProvider = false, providerName = '', currentPage = '' }) => {
+const Header = ({ minimal = false, searchBar = false, menuProvider = false, providerName = '', currentPage = '', backOn = false }) => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     if (searchBar) {
         return (
             <header className="header search-bar">
-                <div className='back-button-header' onClick={() => window.history.back()}>
+                <div className={backOn ? "back-button-header only" : "back-button-header"} onClick={() => window.history.back()}>
                     <FontAwesomeIcon icon={faArrowLeft} />
+                    {backOn && (
+                        <h1 id='h-title'>Sur<b>tt</b>e</h1>
+                    )}
                 </div>
-                <Search />
+                {!backOn && (
+                    <Search />
+                )}
             </header>
         );
     }

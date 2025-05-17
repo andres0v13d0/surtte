@@ -27,10 +27,13 @@ const Register = () => {
   const [showRepeat, setShowRepeat] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
+    code: '',
     password: '',
     repeatPassword: '',
     firstName: '',
     lastName: '',
+    cell: '',
+    confirmCellCode: '',
   });
 
   useEffect(() => {
@@ -139,6 +142,28 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (
+      !formData.firstName.trim() ||
+      !formData.lastName.trim() ||
+      !formData.cell.trim() ||
+      !formData.confirmCellCode.trim() ||
+      !selectedDepartment ||
+      !selectedCity
+    ) {
+      setAlertType('error');
+      setAlertMessage('Todos los campos son obligatorios. Por favor completa todos los datos.');
+      setShowAlert(true);
+      return;
+    }
+
+    if (!/^\+\d{6,15}$/.test(formData.cell.trim())) {
+      setAlertType('error');
+      setAlertMessage('El número de celular debe comenzar con "+" seguido del código del país. Ej: +573001112233');
+      setShowAlert(true);
+      return;
+    }
+    
     try {
       const result = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       
@@ -195,7 +220,7 @@ const Register = () => {
                 className='input-register'
               />
               <button type="button" onClick={nextStep}>Siguiente</button>
-              <span id='link-terms'>Al continuar, aceptas los <a href="/">Términos y condiciones</a></span>
+              <span id='link-terms'>Al continuar, aceptas los <a href="/condiciones">Términos y condiciones</a></span>
               <div className='line'></div>
               <span id='link-login'>¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></span>  
             </div>

@@ -101,3 +101,15 @@
     display: flex;
     align-items: center;
 }
+
+.only{
+    height: 5vh;
+    display: flex;
+    align-items: start;
+    justify-content: start;
+}
+
+.only h1{
+    width: 80vw;
+    text-align: start !important;
+}
