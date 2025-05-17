@@ -31,6 +31,9 @@ const Header = ({ minimal = false, searchBar = false, menuProvider = false, prov
                         currentPage={currentPage}
                     />
                 )}
+                {(minimal || menuProvider) && (
+                    <h1 onClick={() => window.location.href = "/"} id='h-title'>Sur<b>tt</b>e</h1>
+                )}
             </div>
 
             {!minimal && (

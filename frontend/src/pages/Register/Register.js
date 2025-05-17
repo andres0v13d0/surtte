@@ -11,9 +11,11 @@ import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 
 const Register = () => {
-  const [cities, setCities] = useState([]);
-  const [setFilteredCities] = useState([]);
-  const [selectedCity, setSelectedCity] = useState('');
+  const [departments, setDepartments] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [filteredCities, setFilteredCities] = useState([]);
+  const [selectedCity, setSelectedCity] = useState(null);
+
 
 
   const navigate = useNavigate();
@@ -89,18 +91,30 @@ const Register = () => {
       setFormData(prev => ({ ...prev, email: savedEmail }));
     }
 
-    if (step === 3 && cities.length === 0) {
+    if (step === 4 && departments.length === 0) {
       axios.get('https://raw.githubusercontent.com/marcovega/colombia-json/master/colombia.json')
         .then((res) => {
-          const allCities = res.data.flatMap(dpto => dpto.ciudades);
-          setCities(allCities);
-          setFilteredCities(allCities);
+          setDepartments(res.data);
         })
         .catch((err) => {
           console.error('Error al cargar ciudades:', err);
         });
     }
-  }, [step, cities.length, setFilteredCities]);
+  }, [step, departments.length]);
+
+  const handleDepartmentChange = (selected) => {
+    const dept = selected?.value;
+    setSelectedDepartment(dept);
+    setSelectedCity(null);
+
+    const selectedDept = departments.find((d) => d.departamento === dept);
+    if (selectedDept) {
+      setFilteredCities(selectedDept.ciudades.map(c => ({ value: c, label: c })));
+    } else {
+      setFilteredCities([]);
+    }
+  };
+
   
 
   const handleSubmit = async (e) => {
@@ -134,17 +148,18 @@ const Register = () => {
             <div className="step slide-in">
               <div className='step-sup'>
                 <div>
-                  <h1>Paso 1 de 3</h1>
+                  <h1>Paso 1 de 4</h1>
                   <h2>Ingresa tu correo</h2>
                 </div>
               </div>
-              <label htmlFor="email">Dirección de correo electrónico</label>
+              <label className='label-register' htmlFor="email">Dirección de correo electrónico</label>
               <input
                 type="email"
                 name="email"
                 placeholder="nombre@dominio.com"
                 value={formData.email}
                 onChange={handleChange}
+                className='input-register'
               />
               <button type="button" onClick={nextStep}>Siguiente</button>
               <span id='link-terms'>Al continuar, aceptas los <a href="/">Términos y condiciones</a></span>
@@ -153,19 +168,50 @@ const Register = () => {
             </div>
           )}
 
-          {step === 2 && (
+          {
+            step === 2 && (
+              <div className="step slide-in">
+                <div className='step-sup'>
+                  <button id="btn-back" type="button" onClick={prevStep}>
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                  </button>
+                  <div>
+                    <h1>Paso 2 de 4</h1>
+                    <h2>Confirma tu correo electrónico</h2>
+                  </div>
+                </div>
+
+                <label className='label-register' htmlFor="password">Ingresa el código de confirmación</label>
+                <div className="pass-wrapper">
+                  <input
+                    type='text'
+                    value={formData.code}
+                    onChange={handleChange}
+                    placeholder='Código de confirmación'
+                  />
+                </div>
+
+                <button className='send-code' type="button" onClick={nextStep}>Volver a enviar código</button>
+
+                <button id="last-btn" type="button" onClick={nextStep}>Siguiente</button>
+
+              </div>
+            )
+          }
+
+          {step === 3 && (
             <div className="step slide-in">
               <div className='step-sup'>
                 <button id="btn-back" type="button" onClick={prevStep}>
                   <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
                 <div>
-                  <h1>Paso 2 de 3</h1>
+                  <h1>Paso 3 de 4</h1>
                   <h2>Crea una contraseña</h2>
                 </div>
               </div>
 
-              <label htmlFor="password">Contraseña</label>
+              <label className='label-register' htmlFor="password">Contraseña</label>
               <div className="pass-wrapper">
                 <input
                   type={showPass ? 'text' : 'password'}
@@ -207,25 +253,26 @@ const Register = () => {
             </div>
           )}
 
-          {step === 3 && (
+          {step === 4 && (
             <div className="step slide-in">
               <div className='step-sup'>
                 <button id="btn-back" type="button" onClick={prevStep}>
                   <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
                 <div>
-                  <h1>Paso 3 de 3</h1>
+                  <h1>Paso 4 de 4</h1>
                   <h2>Información personal</h2>
                 </div>
               </div>
 
-              <label htmlFor="firstName">Nombre</label>
+              <label className='label-register' htmlFor="firstName">Nombre</label>
               <input
                 type="text"
                 name="firstName"
                 placeholder="Nombre"
                 value={formData.firstName}
                 onChange={handleChange}
+                className='input-register'
               />
 
               <label htmlFor="lastName">Apellido</label>
@@ -235,16 +282,44 @@ const Register = () => {
                 placeholder="Apellido"
                 value={formData.lastName}
                 onChange={handleChange}
+                className='input-register last-name'
               />
-              <label>Ciudad</label>
-              <Select
-                options={cities.map(city => ({ value: city, label: city }))}
-                placeholder="Selecciona tu ciudad..."
-                value={selectedCity ? { value: selectedCity, label: selectedCity } : null}
-                onChange={(selected) => setSelectedCity(selected?.value || '')}
-                isClearable
-                classNamePrefix="select-city"
+
+              <label className='label-register' htmlFor="cell">Número de celular</label>
+              <input
+                type="text"
+                name="cell"
+                placeholder="Número de celular"
+                value={formData.lastName}
+                onChange={handleChange}
+                className='input-register last-name'
               />
+
+              <div className='address-cont'>
+                <label className='label-register address' htmlFor="department">Departamento</label>
+                <Select
+                  options={departments.map(dep => ({ value: dep.departamento, label: dep.departamento }))}
+                  placeholder="Selecciona tu departamento..."
+                  value={selectedDepartment ? { value: selectedDepartment, label: selectedDepartment } : null}
+                  onChange={handleDepartmentChange}
+                  isClearable
+                  classNamePrefix="mi"
+                  name='departamento'
+                />
+
+                <div className='blank'></div>
+
+                <label className='city address' htmlFor="city">Ciudad</label>
+                <Select
+                  options={filteredCities}
+                  placeholder="Selecciona tu ciudad..."
+                  value={selectedCity ? { value: selectedCity, label: selectedCity } : null}
+                  onChange={(selected) => setSelectedCity(selected?.value || null)}
+                  isClearable
+                  classNamePrefix="mi"
+                  name='city'
+                />
+              </div>
 
               <button id="last-btn" type="submit" onClick={handleSubmit}>Registrarme</button>
             </div>
