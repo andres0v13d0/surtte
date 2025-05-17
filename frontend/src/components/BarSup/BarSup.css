@@ -3,11 +3,12 @@
     color: white;
     overflow-x: auto;
     white-space: nowrap;
-    height: 60px;
     align-items: center;
     width: 100vw;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    margin: 0;
+    padding: 0;
 }
 
 .bar-sup::-webkit-scrollbar {
@@ -20,6 +21,7 @@
     font-family: 'Ubuntu', sans-serif;
     font-size: 15px;
     font-weight: normal;
+    margin-top: 0;
     margin-left: 20px;
     height: 100%;
     display: flex;

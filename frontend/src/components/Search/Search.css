@@ -1,22 +1,24 @@
 .search{
-    width: 90%;
     background-color: white;
-    height: 50px;
+    height: 40px;
     border-radius: 10px;
     display: flex;
     align-items: center;
+    margin: 0 10px 0 0;
 }
 
 .search #search-input{
     font-family: 'Ubuntu', sans-serif;
     outline: none;
     border: none;
-    margin-left: 5px;
-    height: 80%;
+    border-radius: 0%;
+    background-color: transparent;
+    height: 100%;
     font-size: 15px;
     width: 90%;
     font-weight: normal;
     padding-left: 1rem;
+    margin: 0;
 }
 
 .search #search-button{
