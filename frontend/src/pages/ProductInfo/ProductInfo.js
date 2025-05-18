@@ -8,8 +8,13 @@ import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
 import Product from '../../components/Product/Product';
 import Alert from '../../components/Alert/Alert';
+import Loader from '../../components/Loader/Loader';
 
 const ProductInfo = () => {
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
+  const mainImageRef = useRef(null);
+
   const [alert, setAlert] = useState(null);
   const { uuid  } = useParams();
   const id = uuid;
@@ -27,6 +32,47 @@ const ProductInfo = () => {
   const usuario = JSON.parse(localStorage.getItem('usuario'));
   const userEmpresa = usuario?.proveedorInfo?.nombre_empresa;
   const isOwnProduct = userEmpresa && provider?.nombre_empresa && userEmpresa === provider.nombre_empresa;
+
+  useEffect(() => {
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+    handleSwipe();
+  };
+
+  const handleSwipe = () => {
+      const delta = touchStartX.current - touchEndX.current;
+      const sensitivity = 50; // mínimo de px para que cuente como swipe
+
+      if (delta > sensitivity) {
+        // Swipe izquierdo → siguiente imagen
+        const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
+        const newIndex = (currentIndex + 1) % images.length;
+        setMainImage(images[newIndex].imageUrl);
+      } else if (delta < -sensitivity) {
+        // Swipe derecho → imagen anterior
+        const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
+        const newIndex = (currentIndex - 1 + images.length) % images.length;
+        setMainImage(images[newIndex].imageUrl);
+      }
+    };
+
+    const imgElement = mainImageRef.current;
+    if (imgElement) {
+      imgElement.addEventListener('touchstart', handleTouchStart);
+      imgElement.addEventListener('touchend', handleTouchEnd);
+    }
+
+    return () => {
+      if (imgElement) {
+        imgElement.removeEventListener('touchstart', handleTouchStart);
+        imgElement.removeEventListener('touchend', handleTouchEnd);
+      }
+    };
+  }, [mainImage, images]);
 
 
   useEffect(() => {
@@ -143,12 +189,7 @@ const ProductInfo = () => {
   if (!id || !product || !provider) {
     return (
       <>
-        <Header />
-        <div className="error-container">
-          <h2>No se pudo cargar el producto 😓</h2>
-          <p>Revisa la URL o intenta más tarde.</p>
-        </div>
-        <Footer />
+        <Loader />
       </>
     );
   }
@@ -171,6 +212,7 @@ const ProductInfo = () => {
         <div className="product-image-section">
           <div className="main-image-wrapper">
             <img 
+              ref={mainImageRef}
               src={mainImage} 
               alt="Producto" 
               className={`main-image ${imgLoaded ? 'loaded' : ''}`}

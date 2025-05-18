@@ -94,12 +94,13 @@ const Login = () => {
 
       {showPasswordSection && (
         <div className="login-ps-cont">
-          <h2>Iniciar sesión</h2>
+          <p id='p-login'>Usa tu correo electrónico para iniciar sesión</p>
           <form onSubmit={loginWithEmail}>
             <input
               type="email"
               value={email}
               disabled
+              className='input-email-login'
             />
             <Link onClick={() => {
               setShowPasswordSection(false);

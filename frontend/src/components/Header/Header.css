@@ -12,7 +12,7 @@
 .header{
     display: flex;
     background-color: #001634;
-    height: 12vh;
+    height: 10vh;
     width: 100vw;
     align-items: center;
     flex-direction: column;

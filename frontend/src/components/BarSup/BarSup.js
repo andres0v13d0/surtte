@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './BarSup.css';
 
 const BarSup = () => {
   const [subcategorias, setSubcategorias] = useState([]);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchSubcategorias = async () => {
@@ -19,11 +20,25 @@ const BarSup = () => {
     fetchSubcategorias();
   }, []);
 
+  const currentSlug = location.pathname.split('/sub-category/')[1];
+
   return (
     <div className='bar-sup'>
-      <Link to="/" id="link-sup">Todos</Link>
+      <Link
+        to="/"
+        id="link-sup"
+        className={location.pathname === '/' ? 'selected' : ''}
+      >
+        Todos
+      </Link>
+
       {subcategorias.map((sub) => (
-        <Link key={sub.id} to={`/sub-category/${sub.slug}`} id="link-sup">
+        <Link
+          key={sub.id}
+          to={`/sub-category/${sub.slug}`}
+          id="link-sup"
+          className={currentSlug === sub.slug ? 'selected' : ''}
+        >
           {sub.name}
         </Link>
       ))}

@@ -31,3 +31,7 @@
 .bar-sup #link-sup:last-of-type{
     margin-right: 2rem;
 }
+
+.bar-sup .selected{
+    color: #fa7e17 !important;
+}

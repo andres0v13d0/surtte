@@ -58,7 +58,7 @@
     margin: 0 10px;
 }
 
-.login-section #p-login{
+#p-login{
     font-size: 15px;
     font-weight: normal;
     color: black;
@@ -71,10 +71,12 @@
     justify-content: center;
     margin-top: 1rem;
     font-family: 'Ubuntu', sans-serif;
+    width: auto;
 }
 
 .data-cont input{
-    width: 91%;
+    width: 100%;
+    margin: auto;
     padding: 1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -89,12 +91,14 @@
     background-color: #fa7e17;
     border: none;
     padding: 1rem 0;
+    border-radius: 25px;
 }
 
 .login-ps-cont{
-    padding: 1rem 2rem;
+    padding: 1rem;
     font-family: 'Ubuntu', sans-serif;
     height: 300px;
+    width: auto;
 }
 
 .login-ps-cont h2{
@@ -126,14 +130,12 @@
     margin: 1rem 0;
     width: 100%;
     align-items: center;
+    
 }
 
-.login-ps-cont .btn-login{
-    border-radius: 25px;
-}
 
 .pass-input-lg input {
-    width: 80%;
+    width: 100%;
     margin: 0;
     padding: 1rem;
     font-size: 15px;
@@ -143,6 +145,14 @@
 
 .pass-input-lg .toggle-pass {
     cursor: pointer;
-    margin: 0;
+    margin: 0 5px;
     padding: 0;
+}
+
+.login-ps-cont form{
+    width: 100%;
+}
+
+.login-ps-cont form .input-email-login{
+    width: 100%;
 }
