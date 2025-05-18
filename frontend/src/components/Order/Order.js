@@ -16,8 +16,7 @@ const Order = ({ id, status, total, cantidad, images }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="order-card" onClick={() => navigate(`/order/${id}`)}>
-        
+    <div className="order-card" onClick={() => navigate(`/orden/${id}`)}>
         
         <div className="order-header">
             <div className='order-time'>
