@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import './ProductInfo.css';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import NavInf from '../../components/NavInf/NavInf';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
 import Product from '../../components/Product/Product';
 import Alert from '../../components/Alert/Alert';
@@ -14,6 +12,17 @@ const ProductInfo = () => {
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
   const mainImageRef = useRef(null);
+
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+    const handleTouchMove = useCallback((e) => {
+    if (!isDragging) return;
+    const moveX = e.touches[0].clientX;
+    const delta = moveX - touchStartX.current;
+    setDragOffset(delta);
+  }, [isDragging]);
+
 
   const [alert, setAlert] = useState(null);
   const { uuid  } = useParams();
@@ -33,47 +42,44 @@ const ProductInfo = () => {
   const userEmpresa = usuario?.proveedorInfo?.nombre_empresa;
   const isOwnProduct = userEmpresa && provider?.nombre_empresa && userEmpresa === provider.nombre_empresa;
 
-  useEffect(() => {
-  const handleTouchStart = (e) => {
+  const handleTouchStart = useCallback((e) => {
     touchStartX.current = e.touches[0].clientX;
-  };
+    setIsDragging(true);
+  }, []);
 
-  const handleTouchEnd = (e) => {
+  const handleTouchEnd = useCallback((e) => {
     touchEndX.current = e.changedTouches[0].clientX;
-    handleSwipe();
-  };
+    setIsDragging(false);
+    const delta = touchStartX.current - touchEndX.current;
+    setDragOffset(0); // resetea el desplazamiento visual
 
-  const handleSwipe = () => {
-      const delta = touchStartX.current - touchEndX.current;
-      const sensitivity = 50; // mínimo de px para que cuente como swipe
+    const sensitivity = 50;
+    const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
+    if (delta > sensitivity) {
+      const newIndex = (currentIndex + 1) % images.length;
+      setMainImage(images[newIndex].imageUrl);
+    } else if (delta < -sensitivity) {
+      const newIndex = (currentIndex - 1 + images.length) % images.length;
+      setMainImage(images[newIndex].imageUrl);
+    }
+  }, [images, mainImage]);
 
-      if (delta > sensitivity) {
-        // Swipe izquierdo → siguiente imagen
-        const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
-        const newIndex = (currentIndex + 1) % images.length;
-        setMainImage(images[newIndex].imageUrl);
-      } else if (delta < -sensitivity) {
-        // Swipe derecho → imagen anterior
-        const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
-        const newIndex = (currentIndex - 1 + images.length) % images.length;
-        setMainImage(images[newIndex].imageUrl);
-      }
-    };
+  useEffect(() => {
+    if (!imgLoaded) return;
 
     const imgElement = mainImageRef.current;
-    if (imgElement) {
-      imgElement.addEventListener('touchstart', handleTouchStart);
-      imgElement.addEventListener('touchend', handleTouchEnd);
-    }
+    if (!imgElement) return;
+
+    imgElement.addEventListener('touchstart', handleTouchStart);
+    imgElement.addEventListener('touchmove', handleTouchMove);
+    imgElement.addEventListener('touchend', handleTouchEnd);
 
     return () => {
-      if (imgElement) {
-        imgElement.removeEventListener('touchstart', handleTouchStart);
-        imgElement.removeEventListener('touchend', handleTouchEnd);
-      }
+      imgElement.removeEventListener('touchstart', handleTouchStart);
+      imgElement.removeEventListener('touchmove', handleTouchMove);
+      imgElement.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [mainImage, images]);
-
+  }, [imgLoaded, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -218,18 +224,12 @@ const ProductInfo = () => {
               className={`main-image ${imgLoaded ? 'loaded' : ''}`}
               onLoad={() => setImgLoaded(true)}
               loading='lazy' 
+              style={{
+                transform: `translateX(${dragOffset}px)`,
+                transition: isDragging ? 'none' : 'transform 0.3s ease',
+              }}
             />
           </div>
-          <FontAwesomeIcon icon={faAngleLeft} className="arrow left" onClick={() => {
-            const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
-            const newIndex = (currentIndex - 1 + images.length) % images.length;
-            setMainImage(images[newIndex].imageUrl);
-          }} />
-          <FontAwesomeIcon icon={faAngleRight} className="arrow right" onClick={() => {
-            const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
-            const newIndex = (currentIndex + 1) % images.length;
-            setMainImage(images[newIndex].imageUrl);
-          }} />
           {images.length > 1 && (
             <div className="thumbnail-container">
               {images.map((img, i) => (

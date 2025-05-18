@@ -290,30 +290,6 @@
   }
 }
 
-
-.arrow {
-  font-size: 50px;
-  color: black;
-  cursor: pointer;
-  transition: color 0.2s;
-  font-weight: bold;
-  position: absolute;
-  padding: 0 !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 15% !important;
-}
-
-.arrow.left {
-  left: 0;
-  margin-left: 16px;
-}
-.arrow.right {
-  right: 0;
-  margin-right: 16px;
-}
-
 .dozens-info {
   display: flex;
   flex-direction: column;
