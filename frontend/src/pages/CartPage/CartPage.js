@@ -6,6 +6,7 @@ import NavInf from '../../components/NavInf/NavInf';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Alert from '../../components/Alert/Alert';
+import Loader from '../../components/Loader/Loader';
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -58,6 +59,9 @@ const CartPage = () => {
         setLoading(false);
       } catch (err) {
         console.error('Error al cargar el carrito:', err);
+        setCartItems([]);
+      } finally{
+        setLoading(false);
       }
     };
 
@@ -263,7 +267,21 @@ const CartPage = () => {
   };
   
   
-  if (loading) return <p>Cargando carrito...</p>;
+  if (loading) return <Loader />;
+
+  if (!loading && cartItems.length === 0) {
+    return (
+      <>
+        <Header />
+        <div className="cart-page-empty">
+          <h2>No hay productos en el carrito</h2>
+        </div>
+        <NavInf />
+        <Footer />
+      </>
+    );
+  }
+
 
   return (
     <>

@@ -1,0 +1,65 @@
+import { useEffect, useState } from 'react';
+import Product from '../Product/Product';
+
+function ListProducts() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const res = await fetch('https://api.surtte.com/products/public');
+        const data = await res.json();
+
+        const productosFormateados = await Promise.all(
+          data.map(async (prod) => {
+            const [imagesRes, pricesRes] = await Promise.all([
+              fetch(`https://api.surtte.com/images/by-product/${prod.id}`),
+              fetch(`https://api.surtte.com/product-prices/product/${prod.id}`)
+            ]);
+
+            const images = await imagesRes.json();
+            const prices = await pricesRes.json();
+
+            return {
+              uuid: prod?.id || 'uuid-desconocido',
+              name: prod?.name || 'Producto sin nombre',
+              provider: prod?.provider?.nombre_empresa || 'Proveedor desconocido',
+              stars: 5,
+              image: images?.[0]?.imageUrl || '/default.jpg',
+              prices: Array.isArray(prices) && prices.length > 0
+                ? prices.map(p => ({
+                    amount: parseFloat(p?.price || '0').toLocaleString('es-CO', {
+                      minimumFractionDigits: 0
+                    }),
+                    condition: p?.description ?? 'Sin condición'
+
+                  }))
+                : [{
+                    amount: '0',
+                    condition: 'Sin condición'
+                  }]
+            };            
+          })
+        );
+
+        setProducts(productosFormateados);
+      } catch (error) {
+        console.error('Error al cargar productos:', error);
+      }
+    };
+
+    fetchProductos();
+  }, []);
+
+  return (
+    <>
+      <div className='products-cont'>
+        {products.map((prod, index) => (
+          <Product key={index} {...prod} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+export default ListProducts;

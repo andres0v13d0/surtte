@@ -4,6 +4,14 @@
   font-family: 'Ubuntu', sans-serif;
 }
 
+.cart-page-empty {
+  padding: 50px;
+  text-align: center;
+  color: #999;
+  font-size: 15px;
+}
+
+
 .request-all {
   padding-top: 1rem;
   text-align: start;

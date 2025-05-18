@@ -6,6 +6,7 @@ import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import NavInf from '../../components/NavInf/NavInf';
 import { Link } from 'react-router-dom';
+import ListProducts from '../../components/ListProducts/ListProducts';
 
 const Profile = () => {
     const [usuario, setUsuario] = useState(null);
@@ -112,6 +113,7 @@ const Profile = () => {
                     </div>
                 )}  
             </div>
+            <ListProducts />
             <NavInf selected={"profile"} /> 
             <Footer />
         </>

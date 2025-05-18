@@ -89,6 +89,7 @@ const Categories = () => {
                             )
                         )}
                     </div>
+                    
                 </section>
             </div>
             <NavInf selected="categories" />

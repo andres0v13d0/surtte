@@ -5,6 +5,7 @@ import NavInf from '../../components/NavInf/NavInf';
 import Footer from '../../components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronLeft, faMoneyBill, faShop, faUser } from '@fortawesome/free-solid-svg-icons';
+import ListProducts from '../../components/ListProducts/ListProducts';
 
 const mockOrder = {
   id: 1001,
@@ -143,6 +144,7 @@ const OrderInfo = () => {
             </div>
             <div className='space'></div>
         </div>
+        <ListProducts />
         <NavInf />
         <Footer />
     </>
