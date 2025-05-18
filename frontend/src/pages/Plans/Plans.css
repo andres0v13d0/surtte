@@ -4,9 +4,10 @@
   gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   align-items: center;
   justify-content: left;
+  font-family: 'Ubuntu', sans-serif;
 }
 
 @media (min-width: 992px) {
@@ -133,3 +134,22 @@
   font-size: 1.2rem;
   color: #6b7280;
 }
+
+.plans-intro {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 0 20px;
+}
+
+.plans-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.plans-description {
+  font-size: 1.1rem;
+  color: #555;
+  margin-top: 10px;
+}
+

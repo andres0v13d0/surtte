@@ -3,13 +3,14 @@ import { useLocation } from 'react-router-dom';
 import './Plans.css';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
-import Alert from '../../components/Alert/Alert'; // importa tu componente Alert
+import Alert from '../../components/Alert/Alert';
+import Loader from '../../components/Loader/Loader';
 
 export default function Plans() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingPayment, setLoadingPayment] = useState(null);
-  const [alertConfig, setAlertConfig] = useState(null); // para mostrar el alert
+  const [alertConfig, setAlertConfig] = useState(null); 
   const location = useLocation();
 
   useEffect(() => {
@@ -84,7 +85,7 @@ export default function Plans() {
     }
   };
 
-  if (loading) return <p className="loading-text">Cargando planes...</p>;
+  if (loading) return <Loader />;
 
   return (
     <>
@@ -98,6 +99,13 @@ export default function Plans() {
         />
       )}
       <div className="plans-container">
+        <div className="plans-intro">
+          <h1 className="plans-title">El <b>impulso</b> que tu marca estaba esperando </h1>
+          <p className="plans-description">
+            Más herramientas, más visibilidad, más clientes. Elige el plan que te lleva al siguiente nivel.
+          </p>
+        </div>
+
         {plans.map((plan) => (
           <div key={plan.id} className="plan-card">
             {plan.name.toLowerCase() === 'premium' && (
