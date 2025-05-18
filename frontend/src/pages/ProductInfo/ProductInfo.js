@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import './ProductInfo.css';
+import 'number-flow';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import NavInf from '../../components/NavInf/NavInf';
@@ -12,6 +13,8 @@ const ProductInfo = () => {
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
   const mainImageRef = useRef(null);
+  const animatedPriceRef = useRef(null);
+
 
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -190,7 +193,20 @@ const ProductInfo = () => {
       window.location.href = '/login';
     }
   };
-  
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (animatedPriceRef.current && applicablePrice?.price) {
+        animatedPriceRef.current.locales = 'es-CO';
+        animatedPriceRef.current.format = { style: 'decimal' };
+        animatedPriceRef.current.update(applicablePrice.price);
+        clearInterval(interval);
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [applicablePrice]);
+
 
   if (!id || !product || !provider) {
     return (
@@ -241,10 +257,17 @@ const ProductInfo = () => {
 
         <div className="product-details">
           <p className="product-description">{product.description}</p>
-          <p className='p-calf-provider'><strong>Calificación: </strong>⭐ {provider.calificacion}</p>
 
           <div className="dynamic-price-highlight">
-            <h3><b>COP</b> {parseFloat(applicablePrice?.price || 0).toLocaleString('es-CO')}</h3>
+            <div className="dynamic-price-principal">
+              <b className="cop-label">COP</b>
+              <number-flow
+                ref={animatedPriceRef}
+                locales="es-CO"
+                className='number-shower'
+              ></number-flow>
+            </div>
+
             <div className="dozens-info">              
               <div className='dozenz-unit'>
                 <p className="dozenz-unit-text">Unidad</p>
@@ -308,6 +331,7 @@ const ProductInfo = () => {
           <div className="product-provider-info">
             <h1>Información del proveedor</h1>
             <p className='p-name-provider'>{provider.nombre_empresa}</p>
+            <p className='p-calf-provider'><strong>Calificación: </strong>⭐ {provider.calificacion}</p>
             <p className='p-desc-provider'>{provider.descripcion}</p>
           </div>
 

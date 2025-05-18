@@ -3,10 +3,12 @@ import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
 import NavInf from '../../components/NavInf/NavInf';
 import Product from '../../components/Product/Product';
+import { ClipLoader } from 'react-spinners';
 import './Home.css';
 
 function Home() {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -47,8 +49,10 @@ function Home() {
         );
 
         setProducts(productosFormateados);
+        setLoading(false);
       } catch (error) {
         console.error('Error al cargar productos:', error);
+        setLoading(false);
       }
     };
 
@@ -58,11 +62,22 @@ function Home() {
   return (
     <>
       <Header />
-      <div className='products-cont'>
-        {products.map((prod, index) => (
-          <Product key={index} {...prod} />
-        ))}
-      </div>
+      {loading ? (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '10vh'
+        }}>
+          <ClipLoader color="#fa7e17" size={30} />
+        </div>
+      ) : (
+        <div className='products-cont'>
+          {products.map((prod, index) => (
+            <Product key={index} {...prod} />
+          ))}
+        </div>
+      )}
       <NavInf selected={"home"} />
       <Footer />
     </>

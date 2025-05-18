@@ -21,15 +21,11 @@
 .main-image-wrapper {
   width: 100%;
   aspect-ratio: 1 / 1;
-  overflow: auto;
+  overflow: hidden;
   border-radius: 10px;
   position: relative;
   scrollbar-width: none;
   -ms-overflow-style: none; 
-}
-
-.main-image-wrapper::-webkit-scrollbar {
-  display: none;
 }
 
 .main-image {
@@ -97,12 +93,17 @@
   margin: 0 0 11px 5px;
 }
 
-.dynamic-price-highlight h3 {
+.dynamic-price-principal{
+  display: flex;
+  color: #fa7e17;
+  height: 50px;
+  align-items: start;
+}
+
+.dynamic-price-principal .number-shower {
   font-size: 40px;
   color: #fa7e17;
   margin: 0;
-  display: flex;
-  align-items: start;
   font-weight: 500;
   padding: 0;
 }
@@ -111,7 +112,7 @@
   font-size: 15px;
   height: 100%;
   font-weight: normal;
-  margin: 6px 5px 0 0;
+  margin: 15px 5px 0 0;
 }
 
 .dynamic-price-highlight p {
