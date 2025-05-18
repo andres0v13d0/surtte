@@ -1,83 +1,86 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faPlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import './ProviderRequest.css';
+import Alert from '../../components/Alert/Alert';
 
 const ProviderRequest = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     nombre_empresa: '',
     descripcion: '',
-    archivoRUT: null,
-    archivoCamaraComercio: null,
   });
-
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const [alertType, setAlertType] = useState(null); 
+  const [alertMessage, setAlertMessage] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    setFormData({ ...formData, [name]: files[0] });
+  const handleLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
   };
 
   const nextStep = () => {
-    if (!formData.nombre_empresa.trim()) {
-      alert('Debes ingresar el nombre de la empresa.');
-      return;
-    }
     setStep(2);
   };
 
-  const prevStep = () => setStep(1);
+  const prevStep = () => {
+    setStep(1);
+  };
 
   const subirArchivo = async (archivo) => {
-  const token = localStorage.getItem('token');
-  const contentType = archivo.type || 'application/octet-stream'; // fallback por si el navegador no detecta MIME
+    const token = localStorage.getItem('token');
+    const contentType = archivo.type || 'application/octet-stream';
 
-  console.log('Archivo:', archivo.name, 'Tipo:', contentType); // debug
+    const { data } = await axios.post(
+      'https://api.surtte.com/provider-requests/generate-url',
+      {
+        filename: archivo.name,
+        mimeType: contentType,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
-  const { data } = await axios.post(
-    'https://api.surtte.com/provider-requests/generate-url',
-    {
-      filename: archivo.name,
-      mimeType: contentType,
-    },
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+    await axios.put(data.signedUrl, archivo, {
+      headers: { 'Content-Type': contentType },
+    });
 
-  await axios.put(data.signedUrl, archivo, {
-    headers: { 'Content-Type': contentType },
-  });
-
-  return data.finalUrl;
-};
-
+    return data.finalUrl;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.archivoRUT || !formData.archivoCamaraComercio) {
-      alert('Debes subir ambos archivos.');
+    if (!formData.nombre_empresa.trim()) {
+      setAlertType('error');
+      setAlertMessage('Debes ingresar el nombre de la empresa.');
+      setShowAlert(true);
       return;
     }
 
     try {
       setLoading(true);
       const archivoRUTUrl = await subirArchivo(formData.archivoRUT);
-        const archivoCamaraUrl = await subirArchivo(formData.archivoCamaraComercio);
-
-        if (!archivoRUTUrl || !archivoCamaraUrl) {
-        alert('Error al subir los archivos, intenta de nuevo.');
-        setLoading(false);
-        return;
-        }
+      const archivoCamaraUrl = await subirArchivo(formData.archivoCamaraComercio);
+      const logoUrl = await subirArchivo(logoFile);
 
       const token = localStorage.getItem('token');
       await axios.post(
@@ -87,17 +90,22 @@ const ProviderRequest = () => {
           descripcion: formData.descripcion,
           archivoRUT: archivoRUTUrl,
           archivoCamaraComercio: archivoCamaraUrl,
+          logoEmpresa: logoUrl,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      alert('¡Solicitud enviada con éxito!');
+      setAlertType('success');
+      setAlertMessage('¡Solicitud enviada con éxito!');
+      setShowAlert(true);
       window.location.href = '/plans';
     } catch (err) {
       console.error(err);
-      alert('Error al enviar la solicitud');
+      setAlertType('error');
+      setAlertMessage('Error al enviar la solicitud');
+      setShowAlert(true);
     } finally {
       setLoading(false);
     }
@@ -105,7 +113,15 @@ const ProviderRequest = () => {
 
   return (
     <>
-      <Header minimal={true}/>
+      {showAlert && (
+        <Alert
+          type={alertType}
+          message={alertMessage}
+          onClose={() => setShowAlert(false)}
+          redirectTo={alertType === 'success' ? '/my-products' : null}
+        />
+      )}
+      <Header minimal={true} />
       <div className="register-container request">
         <h2 id="r-title">Solicitud para ser proveedor</h2>
         <form className={`step-wrapper step-${step}`}>
@@ -114,7 +130,54 @@ const ProviderRequest = () => {
               <div className="step-sup">
                 <div>
                   <h1>Paso 1 de 2</h1>
-                  <h2>Datos de la empresa</h2>
+                  <h2>Sube el logo de tu empresa</h2>
+                </div>
+              </div>
+              <div className="image-preview-container">
+                {logoPreview ? (
+                  <div className="preview-box">
+                    <img src={logoPreview} alt="preview-logo" />
+                    <FontAwesomeIcon
+                      icon={faCircleXmark}
+                      className="delete-icon"
+                      onClick={handleRemoveLogo}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="preview-box"
+                    onClick={() =>
+                      document.getElementById('hidden-file-input').click()
+                    }
+                  >
+                    <span className="add-image">
+                      <FontAwesomeIcon icon={faPlus} />
+                    </span>
+                    <input
+                      id="hidden-file-input"
+                      type="file"
+                      accept="image/png, image/jpeg"
+                      onChange={handleLogoUpload}
+                      style={{ display: 'none' }}
+                    />
+                  </div>
+                )}
+              </div>
+              <button type="button" onClick={nextStep}>
+                Siguiente
+              </button>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="step slide-in">
+              <div className='step-sup'>
+                <button className='btn-back-request' id="btn-back" type="button" onClick={prevStep}>
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </button>
+                <div>
+                  <h1>Paso 2 de 2</h1>
+                  <h2>Información de la empresa</h2>
                 </div>
               </div>
 
@@ -125,7 +188,7 @@ const ProviderRequest = () => {
                 placeholder="Ej: Distribuidora Surtte"
                 value={formData.nombre_empresa}
                 onChange={handleChange}
-                className='input-provider normal'
+                className="input-provider normal"
               />
 
               <label>Descripción (opcional)</label>
@@ -134,67 +197,11 @@ const ProviderRequest = () => {
                 placeholder="Cuéntanos sobre tu empresa"
                 value={formData.descripcion}
                 onChange={handleChange}
-                className='input-provider'
+                className="input-provider"
               />
 
-              <button type="button" onClick={nextStep}>Siguiente</button>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="step slide-in">
-              <div className="step-sup">
-                <button id="btn-back" type="button" onClick={prevStep}>
-                  <FontAwesomeIcon icon={faChevronLeft} />
-                </button>
-                <div>
-                  <h1>Paso 2 de 2</h1>
-                  <h2>Documentación requerida</h2>
-                </div>
-              </div>
-
-              <div className="custom-upload-group">
-                <label>RUT</label>
-                <div className="custom-upload">
-                  <label htmlFor="archivoRUT" className="upload-button">
-                    <FontAwesomeIcon icon={faPlus} />
-                  </label>
-                  <span className="filename">
-                    {formData.archivoRUT ? formData.archivoRUT.name : 'No se ha seleccionado ningún archivo'}
-                  </span>
-                  <input
-                    type="file"
-                    id="archivoRUT"
-                    name="archivoRUT"
-                    accept=".pdf,.jpg,.png"
-                    onChange={handleFileChange}
-                    className="hidden-file-input"
-                  />
-                </div>
-              </div>
-
-              <div className="custom-upload-group">
-                <label>Cámara de comercio</label>
-                <div className="custom-upload">
-                  <label htmlFor="archivoCamaraComercio" className="upload-button">
-                    <FontAwesomeIcon icon={faPlus} />
-                  </label>
-                  <span className="filename">
-                    {formData.archivoCamaraComercio ? formData.archivoCamaraComercio.name : 'No se ha seleccionado ningún archivo'}
-                  </span>
-                  <input
-                    type="file"
-                    id="archivoCamaraComercio"
-                    name="archivoCamaraComercio"
-                    accept=".pdf,.jpg,.png"
-                    onChange={handleFileChange}
-                    className="hidden-file-input"
-                  />
-                </div>
-              </div>
-
-              <button type="submit" onClick={handleSubmit} disabled={loading}>
-                {loading ? 'Enviando...' : 'Enviar solicitud'}
+              <button type="button" onClick={handleSubmit}>
+                {loading ? 'Convertirse en proveedor' : 'Enviando'}
               </button>
             </div>
           )}

@@ -128,11 +128,21 @@ const CartPage = () => {
     return unitPrice * item.quantity;
   };
 
+  useEffect(() => {
+    const allSelected = cartItems.length > 0 && cartItems.every(item => item.isChecked);
+    setSelectAll(allSelected);
+  }, [cartItems]);
+
+
   const calculateProviderTotal = (items) =>
-    items.reduce((sum, item) => sum + calculateSubtotal(item), 0);
+    items
+      .filter((item) => item.isChecked)
+      .reduce((sum, item) => sum + calculateSubtotal(item), 0);
   
   const calculateTotalGlobal = () =>
-    cartItems.reduce((sum, item) => sum + calculateSubtotal(item), 0);
+    cartItems
+        .filter((item) => item.isChecked)
+        .reduce((sum, item) => sum + calculateSubtotal(item), 0);
 
   const handleRequestByProvider = async (providerId, items) => {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -311,7 +321,7 @@ const CartPage = () => {
           </div>
 
           <button className='trash-all-btn' onClick={toggleSelectAll}>
-            {selectAll ? 'Seleccionar todo' : 'No seleccionar nada'}
+            {selectAll ? 'No seleccionar nada' : 'Seleccionar todo'}
           </button>
 
         {Object.entries(grouped).map(([provider, items]) => (

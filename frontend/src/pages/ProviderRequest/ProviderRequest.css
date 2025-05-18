@@ -61,3 +61,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.btn-back-request{
+  height: 60px;
+}
+
+.register-container .step-sup{
+  height: 60px;
+}

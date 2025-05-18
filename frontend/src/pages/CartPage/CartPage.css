@@ -145,13 +145,13 @@ legend {
 }
 
 .product-price {
-  font-size: 25px;
+  font-size: 15px;
   display: flex;
 }
 
 .product-price p{
   margin: 3px 2px 0 0;
-  font-size: 14px;
+  font-size: 8px;
   font-weight: normal;
 }
 
