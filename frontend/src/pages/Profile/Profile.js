@@ -115,7 +115,7 @@ const Profile = () => {
             </div>
             <ListProducts />
             <NavInf selected={"profile"} /> 
-            <Footer />
+            <Footer navinf={true}/>
         </>
     );
 };

@@ -1,27 +1,46 @@
 .footer{
-    background-color: black;
+    background-color: #141c24;
     font-family: 'Ubuntu', sans-serif;
     color: white;
     display: flex;
     justify-content: center;
     flex-direction: column;
-    height: 20vh;
+    height: 12vh;
     align-items: center;
     font-weight: normal;
-    margin-bottom: 40px;
 }
 
-.footer #h-footer{
+.footer.margin{
+    margin-bottom: 35px;
+}
+
+.footer p{
     font-size: 15px;
     text-align: center;
-    width: 80vw;
+    display: flex;
+    align-items: start;
+    margin: 0 0 5px 0;
+}
+
+.footer p b{
+    font-weight: normal;
+    font-size: 10px;
 }
 
 .footer a{
     text-decoration: none;
     color: white;
+    font-weight: 500;
 }
 
 .footer a:hover{
     text-decoration: underline;
+}
+
+.footer .links-foot{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
 }

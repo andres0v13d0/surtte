@@ -403,7 +403,7 @@ const CartPage = () => {
         ))}
       </div>
       <NavInf />
-      <Footer />
+      <Footer navinf={true}/>
     </>
   );
 };

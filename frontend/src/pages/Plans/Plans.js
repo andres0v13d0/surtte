@@ -5,6 +5,8 @@ import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import Alert from '../../components/Alert/Alert';
 import Loader from '../../components/Loader/Loader';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 export default function Plans() {
   const [plans, setPlans] = useState([]);
@@ -88,7 +90,7 @@ export default function Plans() {
   if (loading) return <Loader />;
 
   return (
-    <>
+    <div style={{backgroundColor:'whitesmoke'}}>
       <Header minimal={true} />
       {alertConfig && (
         <Alert
@@ -98,14 +100,15 @@ export default function Plans() {
           redirectTo={alertConfig.redirectTo}
         />
       )}
-      <div className="plans-container">
-        <div className="plans-intro">
+
+      <div className="plans-intro">
           <h1 className="plans-title">El <b>impulso</b> que tu marca estaba esperando </h1>
           <p className="plans-description">
             Más herramientas, más visibilidad, más clientes. Elige el plan que te lleva al siguiente nivel.
           </p>
-        </div>
+      </div>
 
+      <div className="plans-container">
         {plans.map((plan) => (
           <div key={plan.id} className="plan-card">
             {plan.name.toLowerCase() === 'premium' && (
@@ -121,7 +124,7 @@ export default function Plans() {
               <ul className="plan-features">
                 {plan.features?.map((feature, i) => (
                   <li key={i} className="plan-feature-item">
-                    <i className="fas fa-check check-icon" />
+                    <FontAwesomeIcon className='check-icon' icon={faCheck} />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -138,6 +141,6 @@ export default function Plans() {
         ))}
       </div>
       <Footer />
-    </>
+    </div>
   );
 }

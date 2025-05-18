@@ -79,7 +79,7 @@ function Home() {
         </div>
       )}
       <NavInf selected={"home"} />
-      <Footer />
+      <Footer navinf={true}/>
     </>
   );
 }
