@@ -51,7 +51,7 @@ const ProductInfo = () => {
     touchEndX.current = e.changedTouches[0].clientX;
     setIsDragging(false);
     const delta = touchStartX.current - touchEndX.current;
-    setDragOffset(0); // resetea el desplazamiento visual
+    setDragOffset(0);
 
     const sensitivity = 50;
     const currentIndex = images.findIndex(img => img.imageUrl === mainImage);
