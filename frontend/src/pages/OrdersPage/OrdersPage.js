@@ -45,8 +45,11 @@ function OrdersPage() {
         minimal={true}
         providerName={JSON.parse(localStorage.getItem('usuario'))?.proveedorInfo?.nombre_empresa}
         menuProvider={true}
-        currentPage='products'
+        currentPage='orders'
       />
+      <button className='new-order-btn' onClick={() => window.location.href = '/nueva-orden'}>
+        Crear orden
+      </button>
       <div className="orders-page">
         {orders.map((order) => (
           <Order key={order.id} {...order} />

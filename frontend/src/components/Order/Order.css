@@ -71,9 +71,10 @@
     color: #555;
 }
 
-.order-items {
+.order-card .order-items {
     margin-top: 1rem;
     display: flex;
+    flex-direction: row;
 }
 
 .order-images-wrapper {
