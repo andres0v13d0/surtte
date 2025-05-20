@@ -93,6 +93,7 @@ export class OrdersService {
       Bucket: this.bucket,
       Key: key,
       ContentType: mimeType,
+      ContentDisposition: 'attachment; filename="' + filename + '"',
     });
 
     const signedUrl = await getSignedUrl(this.s3, command, { expiresIn: 300 });
