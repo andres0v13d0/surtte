@@ -12,6 +12,7 @@ import { User } from '../users/entity/user.entity';
 
 import { PlansModule } from '../plans/plans.module';
 import { ProvidersModule } from '../providers/providers.module';
+import { forwardRef } from '@nestjs/common';
 import { PaymentsModule } from '../payments/payments.module';
 import { UsersModule } from '../users/users.module';
 import { Product } from '../products/entities/product.entity';
@@ -21,7 +22,7 @@ import { Product } from '../products/entities/product.entity';
     TypeOrmModule.forFeature([Subscription, Plan, Provider, Payment, User, Product]),
     PlansModule,
     ProvidersModule,
-    PaymentsModule,
+    forwardRef(() => PaymentsModule),
     UsersModule,
   ],
   controllers: [SubscriptionsController],
