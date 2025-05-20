@@ -121,11 +121,21 @@ export default function PDF() {
       const { signedUrl, finalUrl } = await signedRes.json();
 
       const buffer = await blob.arrayBuffer();
-      await fetch(signedUrl, {
+      const resUpload = await fetch(signedUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/pdf' },
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="${filename}"`, // 👈 Agrega esto
+        },
         body: buffer,
       });
+
+      if (!resUpload.ok) {
+        const text = await resUpload.text();
+        console.error('❌ Error al subir a S3:', resUpload.status, text);
+        throw new Error('Upload failed');
+      }
+
 
       const message = `Hola ${content.nombre_cliente}, aquí tienes tu pedido: ${finalUrl}`;
       const whatsappUrl = `https://wa.me/57${content.celular}?text=${encodeURIComponent(message)}`;

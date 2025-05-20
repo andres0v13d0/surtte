@@ -104,7 +104,7 @@ const OrderPDF = ({ content }) => (
         </View>
 
         <View style={styles.orderBox}>
-          <Text style={{ fontSize: '20px', fontWeight: 'bold' }}>Orden # {content.orden_num || '1001'}</Text>
+          <Text style={{ fontSize: '20px', fontWeight: 'bold' }}>Pedido # {content.orden_num || '1001'}</Text>
           <Text>Fecha: {content.fecha || '01/01/2025'}</Text>
         </View>
       </View>
