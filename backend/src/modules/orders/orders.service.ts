@@ -17,6 +17,7 @@ import {
 import { User } from '../users/entity/user.entity';
 import { Provider } from '../providers/entity/provider.entity';
 import { Customer } from '../customers/entity/customer.entity';
+import fetch from 'node-fetch';
 
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -176,5 +177,23 @@ export class OrdersService {
     if (dto.endDate) query.andWhere('order.createdAt <= :endDate', { endDate: dto.endDate });
 
     return query.orderBy('order.createdAt', 'DESC').getMany();
+  }
+
+  async getImageAsBase64FromCDN(url: string): Promise<string> {
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new BadRequestException('No se pudo obtener la imagen del CDN');
+      }
+
+      const contentType = response.headers.get('content-type') || 'image/webp';
+      const buffer = await response.buffer();
+      const base64 = buffer.toString('base64');
+
+      return `data:${contentType};base64,${base64}`;
+    } catch (error) {
+      throw new BadRequestException('Error al convertir la imagen');
+    }
   }
 }

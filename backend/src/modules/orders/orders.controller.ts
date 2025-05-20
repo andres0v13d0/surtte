@@ -83,4 +83,11 @@ export class OrdersController {
   async filterOrders(@Query() dto: FilterOrdersDto) {
     return this.ordersService.filter(dto);
   }
+
+  @Get('image-base64')
+  async getImageBase64(@Query('url') url: string) {
+    return {
+      base64: await this.ordersService.getImageAsBase64FromCDN(url),
+    };
+  }
 }

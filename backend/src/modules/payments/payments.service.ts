@@ -11,6 +11,9 @@ import { MercadoPagoService } from './mercado-pago/mercado-pago.service';
 import { ProvidersService } from '../providers/providers.service';
 import { PlansService } from '../plans/plans.service';
 import { User } from '../users/entity/user.entity';
+import { ProviderRequestsService } from '../provider-requests/provider-requests.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
+
 
 @Injectable()
 export class PaymentsService {
@@ -20,7 +23,9 @@ export class PaymentsService {
         private readonly mercadoPagoService: MercadoPagoService,
         private readonly providersService: ProvidersService,
         private readonly plansService: PlansService,
-    ) {}
+        private readonly providerRequestsService: ProviderRequestsService,
+        private readonly subscriptionsService: SubscriptionsService,
+    ) { }
 
     async create(
         dto: CreatePaymentDto,
@@ -52,6 +57,7 @@ export class PaymentsService {
         const preference = await this.mercadoPagoService.createPreference({
             amount: realAmount,
             planName: plan.name,
+            externalReference,
         });
 
         return {
@@ -123,4 +129,55 @@ export class PaymentsService {
             createdAt: payment.createdAt,
         };
     }
+
+    private extractUserIdFromReference(reference: string): number {
+        const parts = reference.split('-');
+        const userId = parts[2];
+
+        if (!userId || isNaN(+userId)) {
+            throw new BadRequestException('Referencia externa inválida');
+        }
+
+        return +userId;
+    }
+
+
+    async markSuccess(dto: UpdatePaymentStatusDto) {
+        const payment = await this.paymentRepository.findOne({ where: { id: dto.paymentId } });
+        if (!payment) throw new NotFoundException('Pago no encontrado');
+
+        const info = await this.mercadoPagoService.getPaymentStatusById(dto.mercadoPagoId);
+        if (info.status !== 'approved') {
+            throw new BadRequestException('El pago no fue aprobado');
+        }
+
+        payment.status = 'approved';
+        payment.mercadoPagoId = dto.mercadoPagoId;
+        await this.paymentRepository.save(payment);
+
+        const userId = this.extractUserIdFromReference(payment.externalReference);
+        const solicitud = await this.providerRequestsService.findLatestByUser(userId);
+        if (!solicitud) throw new NotFoundException('Solicitud no encontrada');
+
+        await this.providerRequestsService.marcarPagoYConvertir(solicitud.id);
+
+        const provider = await this.providersService.findByUserId(userId);
+        if (!provider) throw new NotFoundException('Proveedor no encontrado');
+
+        const now = new Date();
+        const endDate = new Date(now);
+        endDate.setMonth(now.getMonth() + 1);
+
+        await this.subscriptionsService.create({
+            providerId: provider.id,
+            planId: payment.plan.id,
+            paymentId: payment.id,
+            startDate: now.toISOString(),
+            endDate: endDate.toISOString(),
+        });
+
+
+        return { success: true };
+    }
+
 }

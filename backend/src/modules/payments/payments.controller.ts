@@ -58,4 +58,9 @@ export class PaymentsController {
     getSummary(@Param('id', ParseUUIDPipe) id: string) {
         return this.paymentsService.getPaymentSummary(id);
     }
+
+    @Post('mark-success')
+    async markPaymentSuccess(@Body() dto: UpdatePaymentStatusDto) {
+        return this.paymentsService.markSuccess(dto);
+    }
 }

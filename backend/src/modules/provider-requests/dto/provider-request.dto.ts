@@ -18,12 +18,12 @@ export class ProviderRequestDto {
     nombre_empresa: string;
 
     @IsString()
-    @IsNotEmpty()
-    archivoRUT: string; 
+    @IsOptional()
+    archivoRUT?: string; 
 
     @IsString()
-    @IsNotEmpty()
-    archivoCamaraComercio: string; 
+    @IsOptional()
+    archivoCamaraComercio?: string; 
 
     @IsOptional()
     @IsString()
@@ -44,4 +44,9 @@ export class ProviderRequestDto {
     @IsOptional()
     @IsBoolean()
     pagoRealizado?: boolean;
+
+    @IsString()
+    @IsNotEmpty()
+    logoEmpresa: string;
+
 }

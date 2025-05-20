@@ -4,6 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
 import { MercadoPagoService } from './mercado-pago/mercado-pago.service';
+import { ProviderRequestsModule } from '../provider-requests/provider-requests.module';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
+
 
 import { Payment } from './entity/payment.entity';
 import { Plan } from '../plans/entity/plan.entity';
@@ -20,6 +23,8 @@ import { UsersModule } from '../users/users.module';
     PlansModule,
     ProvidersModule,
     UsersModule,
+    ProviderRequestsModule, 
+    SubscriptionsModule, 
   ],
   controllers: [PaymentsController],
   providers: [PaymentsService, MercadoPagoService],

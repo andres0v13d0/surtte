@@ -9,9 +9,11 @@ export class MercadoPagoService {
     async createPreference({
         amount,
         planName,
+        externalReference,
     }: {
         amount: number;
         planName: string;
+        externalReference: string;
     }) {
         const body = {
             items: [
@@ -28,6 +30,7 @@ export class MercadoPagoService {
                 failure: `${this.baseUrl}/planes/failure`,
             },
             auto_return: 'approved',
+            external_reference: externalReference,
         };
 
         console.log('📤 [MercadoPago] Enviando preferencia de pago:');
