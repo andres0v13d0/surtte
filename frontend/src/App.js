@@ -26,6 +26,7 @@ import TermsAndConditions from './pages/TermsAndConditions/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy';
 import OrderInfo from './pages/OrderInfo/OrderInfo';
 import NewOrder from './pages/NewOrder/NewOrder';
+import PDF from './pages/PDF/PDF';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -92,6 +93,7 @@ function App() {
         <Route path="/politica" element={<PrivacyPolicy />} />
         <Route path="/orden/:uuid" element={<OrderInfo />} />
         <Route path='/nueva-orden' element={<NewOrder />} />
+        <Route path='/orden/pdf/:orderId' element={<PDF />} /> 
       </Routes>
     </Router>
   );

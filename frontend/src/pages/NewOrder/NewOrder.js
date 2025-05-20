@@ -8,11 +8,6 @@ import Footer from '../../components/Footer/Footer';
 import Alert from '../../components/Alert/Alert';
 import './NewOrder.css';
 
-const mockClientes = [
-  { id: 1, nombre: 'Carlos Pérez', celular: '3101234567', departamento: 'Antioquia', ciudad: 'Medellín' },
-  { id: 2, nombre: 'María Gómez', celular: '3109876543', departamento: 'Cundinamarca', ciudad: 'Bogotá' },
-];
-
 const mockProductos = [
   { id: 'SKU1234', nombre: 'Tennis', talla: 'M', color: 'Negro', precio: 400000 },
   { id: 'SKU5678', nombre: 'Camiseta', talla: 'L', color: 'Rojo', precio: 200000 },
@@ -21,7 +16,7 @@ const mockProductos = [
 const NewOrder = () => {
   const [step, setStep] = useState(1);
   const [mostrarNuevoCliente, setMostrarNuevoCliente] = useState(false);
-  const [clientes, setClientes] = useState(mockClientes);
+  const [clientes, setClientes] = useState([]);
   const [clienteBuscado, setClienteBuscado] = useState('');
   const [clienteFiltrado, setClienteFiltrado] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
@@ -33,6 +28,23 @@ const NewOrder = () => {
     departamento: '',
     ciudad: ''
   });
+
+  useEffect(() => {
+    const fetchClientes = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('https://api.surtte.com/customers', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setClientes(res.data);
+      } catch (error) {
+        console.error('Error al obtener clientes:', error);
+      }
+    };
+
+    fetchClientes();
+  }, []);
+
 
   const [departments, setDepartments] = useState([]);
   const [ciudades, setCiudades] = useState([]);
@@ -71,7 +83,7 @@ const NewOrder = () => {
     setClienteFiltrado([]);
   };
 
-  const guardarNuevoCliente = () => {
+  const guardarNuevoCliente = async () => {
     if (!nuevoCliente.nombre || !nuevoCliente.apellido || !nuevoCliente.celular || !selectedDept || !selectedCity) {
       setAlertType('error');
       setAlertMessage('Completa todos los campos del nuevo cliente.');
@@ -79,32 +91,31 @@ const NewOrder = () => {
       return;
     }
 
-    const nuevo = {
-      id: clientes.length + 1,
-      nombre: `${nuevoCliente.nombre} ${nuevoCliente.apellido}`,
-      celular: nuevoCliente.celular,
-      direccion: nuevoCliente.direccion,
-      departamento: selectedDept,
-      ciudad: selectedCity
-    };
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post('https://api.surtte.com/customers/manual', {
+        nombre: `${nuevoCliente.nombre} ${nuevoCliente.apellido}`,
+        celular: nuevoCliente.celular,
+        direccion: nuevoCliente.direccion,
+        departamento: selectedDept,
+        ciudad: selectedCity,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-    setClientes([...clientes, nuevo]);
-    setClienteSeleccionado(nuevo);
-    setClienteBuscado(`${nuevo.celular} | ${nuevo.nombre}`);
-    setNuevoCliente({
-      nombre: '',
-      apellido: '',
-      celular: '',
-      direccion: '',
-      departamento: '',
-      ciudad: ''
-    });
-    setSelectedCity(null);
-    setSelectedDept(null);
-    setAlertType('success');
-    setAlertMessage('Cliente creado correctamente.');
-    setShowAlert(true);
+      setClientes(prev => [...prev, res.data]);
+      setClienteSeleccionado(res.data);
+      setClienteBuscado(`${res.data.celular} | ${res.data.nombre}`);
+      setAlertType('success');
+      setAlertMessage('Cliente creado correctamente.');
+      setShowAlert(true);
+    } catch (error) {
+      setAlertType('error');
+      setAlertMessage(error?.response?.data?.message || 'Error al crear cliente.');
+      setShowAlert(true);
+    }
   };
+
 
   const handleDeptChange = (selected) => {
     setSelectedDept(selected?.value || null);
