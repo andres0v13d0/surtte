@@ -4,12 +4,15 @@ import 'number-flow';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import NavInf from '../../components/NavInf/NavInf';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Product from '../../components/Product/Product';
 import Alert from '../../components/Alert/Alert';
 import Loader from '../../components/Loader/Loader';
 
 const ProductInfo = () => {
+  const navigate = useNavigate();
+  const clienteEnSesion = sessionStorage.getItem('clienteTemporal');
+
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
   const mainImageRef = useRef(null);
@@ -314,18 +317,57 @@ const ProductInfo = () => {
             </div>
           </div>
 
-          {isOwnProduct ? (
-            <button
-              className="edit-product-btn"
-              onClick={() => (window.location.href = `/edit-product/${product.id}`)}
-            >
-              Editar producto
-            </button>
-          ) : (
+          {isOwnProduct && (
+            <>
+              <button
+                className="edit-product-btn"
+                onClick={() => (window.location.href = `/edit-product/${product.id}`)}
+              >
+                Editar producto
+              </button>
+
+              {clienteEnSesion && (
+                
+                <button
+                  className="add-to-cart"
+                  onClick={() => {
+                    const selectedColor = colors.length > 0
+                      ? document.querySelector('.selectors select[name="color"]')?.value
+                      : null;
+
+                    const selectedSize = sizes.length > 0
+                      ? document.querySelector('.selectors select[name="size"]')?.value
+                      : null;
+
+                    navigate('/nueva-orden', {
+                      state: {
+                        goToStep: 2,
+                        clienteSeleccionado: JSON.parse(sessionStorage.getItem('clienteTemporal')),
+                        productoSeleccionado: {
+                          id: product.id,
+                          nombre: product.name,
+                          talla: selectedSize,
+                          color: selectedColor,
+                          cantidad: quantity,
+                          precio: applicablePrice?.price || 0,
+                          productPrices: prices,
+                        }
+                      }
+                    });
+                  }}
+                >
+                  Añadir a la orden
+                </button>
+              )}
+            </>
+          )}
+
+          {!isOwnProduct && (
             <button className="add-to-cart" onClick={handleAddToCart}>
               Añadir al carrito
             </button>
           )}
+
 
           <div className="line"></div>
           <div className="product-provider-info">

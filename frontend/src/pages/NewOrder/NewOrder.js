@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faTrash } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
@@ -8,18 +9,19 @@ import Footer from '../../components/Footer/Footer';
 import Alert from '../../components/Alert/Alert';
 import './NewOrder.css';
 
-const mockProductos = [
-  { id: 'SKU1234', nombre: 'Tennis', talla: 'M', color: 'Negro', precio: 400000 },
-  { id: 'SKU5678', nombre: 'Camiseta', talla: 'L', color: 'Rojo', precio: 200000 },
-];
-
 const NewOrder = () => {
+  const [misProductos, setMisProductos] = useState([]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [notas, setNotas] = useState('');
   const [step, setStep] = useState(1);
   const [mostrarNuevoCliente, setMostrarNuevoCliente] = useState(false);
   const [clientes, setClientes] = useState([]);
   const [clienteBuscado, setClienteBuscado] = useState('');
   const [clienteFiltrado, setClienteFiltrado] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
+  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  const providerId = usuario?.proveedorInfo?.id;
   const [nuevoCliente, setNuevoCliente] = useState({
     nombre: '',
     apellido: '',
@@ -28,6 +30,23 @@ const NewOrder = () => {
     departamento: '',
     ciudad: ''
   });
+
+  useEffect(() => {
+    const fetchProductosDelProveedor = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get(`https://api.surtte.com/products/by-provider/${providerId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setMisProductos(res.data);
+      } catch (err) {
+        console.error('Error cargando productos del proveedor:', err);
+      }
+    };
+
+    fetchProductosDelProveedor();
+  }, [providerId]);
+
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -53,11 +72,73 @@ const NewOrder = () => {
 
   const [productoBuscado, setProductoBuscado] = useState('');
   const [productoFiltrado, setProductoFiltrado] = useState([]);
+  useEffect(() => {
+    const productosGuardados = localStorage.getItem('productosTemporal');
+    if (productosGuardados) {
+      setProductosSeleccionados(JSON.parse(productosGuardados));
+    }
+  }, []);
+
   const [productosSeleccionados, setProductosSeleccionados] = useState([]);
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState('success');
   const [alertMessage, setAlertMessage] = useState('');
+
+  useEffect(() => {
+    const clienteGuardado = sessionStorage.getItem('clienteTemporal');
+    if (!clienteSeleccionado && clienteGuardado) {
+      const parsed = JSON.parse(clienteGuardado);
+      setClienteSeleccionado(parsed);
+      setClienteBuscado(`${parsed.celular} | ${parsed.nombre}`);
+    }
+  }, [clienteSeleccionado]);
+
+
+
+  useEffect(() => {
+    const state = location.state;
+
+    if (state?.goToStep === 2) {
+      setStep(2);
+    }
+
+    if (state?.clienteSeleccionado) {
+      setClienteSeleccionado(state.clienteSeleccionado);
+      setClienteBuscado(`${state.clienteSeleccionado.celular} | ${state.clienteSeleccionado.nombre}`);
+      sessionStorage.setItem('clienteTemporal', JSON.stringify(state.clienteSeleccionado));
+    }
+
+    if (state?.productoSeleccionado) {
+      const producto = state.productoSeleccionado;
+
+      const fetchPrices = async () => {
+        try {
+          const res = await axios.get(`https://api.surtte.com/product-prices/product/${producto.id}`);
+          const prices = res.data;
+
+          setProductosSeleccionados(prev => {
+            const exists = prev.some(p => String(p.id) === String(producto.id));
+            if (!exists) {
+              const nuevos = [...prev, { ...producto, productPrices: prices, cantidad: producto.cantidad || 1 }];
+              localStorage.setItem('productosTemporal', JSON.stringify(nuevos));
+              return nuevos;
+            }
+            return prev;
+          });
+
+        } catch (err) {
+          console.error('Error al cargar precios del producto:', err);
+        }
+      };
+
+      fetchPrices();
+    }
+
+
+  }, [location.state]);
+
+
 
   useEffect(() => {
     axios.get('https://raw.githubusercontent.com/marcovega/colombia-json/master/colombia.json')
@@ -81,6 +162,7 @@ const NewOrder = () => {
     setClienteSeleccionado(cliente);
     setClienteBuscado(`${cliente.celular} | ${cliente.nombre}`);
     setClienteFiltrado([]);
+    sessionStorage.setItem('clienteTemporal', JSON.stringify(cliente));
   };
 
   const guardarNuevoCliente = async () => {
@@ -106,6 +188,7 @@ const NewOrder = () => {
       setClientes(prev => [...prev, res.data]);
       setClienteSeleccionado(res.data);
       setClienteBuscado(`${res.data.celular} | ${res.data.nombre}`);
+      sessionStorage.setItem('clienteTemporal', JSON.stringify(res.data));
       setAlertType('success');
       setAlertMessage('Cliente creado correctamente.');
       setShowAlert(true);
@@ -115,6 +198,17 @@ const NewOrder = () => {
       setShowAlert(true);
     }
   };
+
+  const cancelarPedido = () => {
+    sessionStorage.removeItem('clienteTemporal');
+    localStorage.removeItem('productosTemporal'); // <--- Agregado
+    setStep(1);
+    setClienteSeleccionado(null);
+    setClienteBuscado('');
+    setProductosSeleccionados([]);
+    navigate('/my-orders');
+  };
+
 
 
   const handleDeptChange = (selected) => {
@@ -145,33 +239,31 @@ const NewOrder = () => {
       setProductoFiltrado([]);
       return;
     }
-    const filtro = mockProductos.filter(p =>
-      p.nombre.toLowerCase().includes(texto.toLowerCase())
+    const filtro = misProductos.filter(p =>
+      p.name.toLowerCase().includes(texto.toLowerCase())
     );
     setProductoFiltrado(filtro);
   };
 
-  const agregarProducto = (prod) => {
-    if (productosSeleccionados.find(p => p.id === prod.id)) return;
-    setProductosSeleccionados([
-      ...productosSeleccionados,
-      { ...prod, cantidad: 1 }
-    ]);
-    setProductoBuscado('');
-    setProductoFiltrado([]);
+  const cambiarCantidad = (id, nuevaCantidad) => {
+    setProductosSeleccionados(prev => {
+      const actualizados = prev.map(p => p.id === id ? { ...p, cantidad: parseInt(nuevaCantidad) } : p);
+      localStorage.setItem('productosTemporal', JSON.stringify(actualizados));
+      return actualizados;
+    });
   };
 
-  const cambiarCantidad = (id, nuevaCantidad) => {
-    setProductosSeleccionados(prev =>
-      prev.map(p => p.id === id ? { ...p, cantidad: parseInt(nuevaCantidad) } : p)
-    );
-  };
 
   const eliminarProducto = (id) => {
-    setProductosSeleccionados(prev => prev.filter(p => p.id !== id));
+    setProductosSeleccionados(prev => {
+      const filtrados = prev.filter(p => String(p.id) !== String(id));
+      localStorage.setItem('productosTemporal', JSON.stringify(filtrados));
+      return filtrados;
+    });
   };
 
-  const crearOrden = () => {
+
+  const crearOrden = async () => {
     if (!clienteSeleccionado || productosSeleccionados.length === 0) {
       setAlertType('error');
       setAlertMessage('Debes seleccionar un cliente y al menos un producto.');
@@ -179,13 +271,52 @@ const NewOrder = () => {
       return;
     }
 
-    setAlertType('success');
-    setAlertMessage('¡Orden creada con éxito!');
-    setShowAlert(true);
-    setClienteSeleccionado(null);
-    setClienteBuscado('');
-    setProductosSeleccionados([]);
+    try {
+      const token = localStorage.getItem('token');
+      const totalPrice = productosSeleccionados.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
+
+      const body = {
+        providerId: providerId,
+        customerId: clienteSeleccionado.id,
+        items: productosSeleccionados.map(p => ({
+          productId: p.id,
+          quantity: p.cantidad,
+          unitPrice: p.precio,
+          productName: p.nombre,
+          unity: 'unidad'
+        })),
+        notes: notas, // Puedes obtenerlo del textarea si deseas
+        totalPrice,
+      };
+
+      const res = await axios.post('https://api.surtte.com/orders/manual', body, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const nuevaOrden = res.data;
+
+      setAlertType('success');
+      setAlertMessage('¡Orden creada con éxito!');
+      setShowAlert(true);
+
+      // Limpieza y redirección
+      setTimeout(() => {
+        sessionStorage.removeItem('clienteTemporal');
+        localStorage.removeItem('productosTemporal'); // <--- Agregado
+        setStep(1);
+        setClienteSeleccionado(null);
+        setClienteBuscado('');
+        setProductosSeleccionados([]);
+        window.location.href = `/orden/pdf/${nuevaOrden.id}`;
+      }, 1500);
+
+    } catch (err) {
+      setAlertType('error');
+      setAlertMessage(err?.response?.data?.message || 'Error al crear orden.');
+      setShowAlert(true);
+    }
   };
+
 
   return (
     <>
@@ -303,13 +434,18 @@ const NewOrder = () => {
                 )}
 
               <button type="button" className="btn-step1" onClick={() => setStep(2)}>Siguiente</button>
+              <button type='button' onClick={cancelarPedido} className="btn-cancel-order">Cancelar pedido</button>
             </div>
           )}
 
           {step === 2 && (
             <div className="step slide-in">
               <div className="step-sup">
-                <button id="btn-back" type="button" onClick={() => setStep(1)}>
+                <button id="btn-back" type="button" onClick={() => {
+                  sessionStorage.removeItem('clienteTemporal');
+                  setClienteSeleccionado(null);
+                  setStep(1);
+                }}>
                   <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
                 <div>
@@ -330,8 +466,8 @@ const NewOrder = () => {
                 <div className="list-search">
                   <div className="list-finded">
                     {productoFiltrado.map(p => (
-                      <button key={p.id} type="button" onClick={() => agregarProducto(p)}>
-                        {p.nombre} | {p.talla} | {p.color}
+                      <button key={p.id} type="button" onClick={() => window.location.href = `/product/${p.id}`}>
+                        {p.name}
                       </button>
                     ))}
                   </div>
@@ -350,43 +486,60 @@ const NewOrder = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {productosSeleccionados.map((p) => (
-                        <tr key={p.id}>
-                          <td>{p.id}</td>
-                          <td>
-                            <div className="product-name-table">
-                              <p>{p.nombre}</p>
-                              <p>Talla: {p.talla}</p>
-                              <p>Color: {p.color}</p>
-                            </div>
-                          </td>
-                          <td>
-                            <div className='product-quantity-table'>
+                      {productosSeleccionados.map((p) => {
+                        const precioAplicable = p.productPrices?.find(price =>
+                          price.quantity.split(',').map(q => parseInt(q.trim())).includes(p.cantidad)
+                        );
+
+                        return (
+                          <tr key={p.id}>
+                            <td>{p.reference || 'N/A'}</td>
+                            <td>
+                              <div className="product-name-table">
+                                <p>{p.nombre}</p>
+                                <p>Talla: {p.talla}</p>
+                                <p>Color: {p.color}</p>
+                              </div>
+                            </td>
+                            <td>
+                              <div className='product-quantity-table'>
                                 <select
-                                    value={p.cantidad}
-                                    onChange={(e) => cambiarCantidad(p.id, e.target.value)}
+                                  value={p.cantidad}
+                                  onChange={(e) => cambiarCantidad(p.id, e.target.value)}
                                 >
-                                    {[...Array(10)].map((_, i) => (
-                                        <option key={i + 1} value={i + 1}>{i + 1}</option>
-                                    ))}
+                                  {p.productPrices?.flatMap(price =>
+                                    price.quantity.split(',').map(qty => {
+                                      const val = parseInt(qty.trim());
+                                      return (
+                                        <option key={val} value={val}>
+                                          {val}
+                                        </option>
+                                      );
+                                    })
+                                  )}
                                 </select>
-                            </div>
-                          </td>
-                          <td>{p.precio.toLocaleString()}</td>
-                          <td>{(p.precio * p.cantidad).toLocaleString()}</td>
-                          <td>
-                            <FontAwesomeIcon icon={faTrash} onClick={() => eliminarProducto(p.id)} />
-                          </td>
-                        </tr>
-                      ))}
+                              </div>
+                            </td>
+                            <td>{Number(precioAplicable?.price).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'}</td>
+                            <td>{Number(precioAplicable?.price * p.cantidad).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'}</td>
+                            <td>
+                              <button type="button" className="trash-orden-icon" onClick={() => eliminarProducto(p.id)}>
+                                <FontAwesomeIcon icon={faTrash} />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+
                     </tbody>
                   </table>
                 </div>
 
               <label>Notas (opcional)</label>
-              <textarea className="input-register area-order" placeholder="Escribe alguna nota..." />
+              <textarea className="input-register area-order" value={notas} onChange={(e) => setNotas(e.target.value)} placeholder="Escribe alguna nota..." />
 
-              <button id="last-btn" type="button" onClick={crearOrden}>Crear orden</button>
+              <button id="last-btn" className="btn-step1" type="button" onClick={crearOrden}>Crear orden</button>
+              <button type='button' onClick={cancelarPedido} className="btn-cancel-order">Cancelar pedido</button>
             </div>
           )}
         </form>

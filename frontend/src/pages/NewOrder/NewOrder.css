@@ -47,7 +47,7 @@
 }
 
 .btn-step1{
-    margin-bottom: 20px !important;
+    margin-bottom: 0 !important;
 }
 
 .new-customer-container{
@@ -198,3 +198,18 @@ td .product-quantity-table{
     height: 100px;
 }
 
+.btn-cancel-order{
+    background-color: red !important;
+    margin-top: 5px !important;
+    margin-bottom: 20px !important;
+}
+
+
+.trash-orden-icon{
+    background-color: transparent !important;
+    color: red !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0px !important;
+}
