@@ -69,6 +69,8 @@ export default function Plans() {
 
       const data = await res.json();
       if (data.init_point) {
+        localStorage.setItem('lastPaymentId', data.paymentId);
+        localStorage.setItem('purchasedPlanId', plan.id);
         window.location.href = data.init_point;
       } else {
         setAlertConfig({
@@ -109,36 +111,42 @@ export default function Plans() {
       </div>
 
       <div className="plans-container">
-        {plans.map((plan) => (
-          <div key={plan.id} className="plan-card">
-            {plan.name.toLowerCase() === 'premium' && (
-              <div className="plan-badge">Popular</div>
-            )}
+        {plans.map((plan) =>{ 
+          
+          const purchasedPlanId = localStorage.getItem('purchasedPlanId');
+          const isPurchased = purchasedPlanId === plan.id;
 
-            <div className="plan-content">
-              <h2 className="plan-title">{plan.name}</h2>
-              <div className="plan-price">
-                <span className="amount">${Number(plan.price).toFixed(2)}</span>
-                <span className="per-month">/mes</span>
+          
+          return (
+            <div key={plan.id} className="plan-card">
+              {plan.name.toLowerCase() === 'premium' && (
+                <div className="plan-badge">Popular</div>
+              )}
+
+              <div className="plan-content">
+                <h2 className="plan-title">{plan.name}</h2>
+                <div className="plan-price">
+                  <span className="amount">${Number(plan.price).toFixed(2)}</span>
+                  <span className="per-month">/mes</span>
+                </div>
+                <ul className="plan-features">
+                  {plan.features?.map((feature, i) => (
+                    <li key={i} className="plan-feature-item">
+                      <FontAwesomeIcon className='check-icon' icon={faCheck} />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  className={`plan-button ${plan.name.toLowerCase() === 'premium' ? 'primary' : 'outline'}`}
+                  onClick={() => handleBuy(plan)}
+                  disabled={loadingPayment === plan.id || isPurchased}
+                >
+                  {loadingPayment === plan.id ? 'Redirigiendo...' : 'Elegir Plan'}
+                </button>
               </div>
-              <ul className="plan-features">
-                {plan.features?.map((feature, i) => (
-                  <li key={i} className="plan-feature-item">
-                    <FontAwesomeIcon className='check-icon' icon={faCheck} />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                className={`plan-button ${plan.name.toLowerCase() === 'premium' ? 'primary' : 'outline'}`}
-                onClick={() => handleBuy(plan)}
-                disabled={loadingPayment === plan.id}
-              >
-                {loadingPayment === plan.id ? 'Redirigiendo...' : 'Elegir Plan'}
-              </button>
             </div>
-          </div>
-        ))}
+        )})}
       </div>
       <Footer />
     </div>
