@@ -123,10 +123,14 @@ export class OrdersService {
   }
 
   async getOrderById(id: number): Promise<Order> {
-    const order = await this.orderRepo.findOne({ where: { id } });
-    if (!order) throw new NotFoundException('Pedido no encontrado');
-    return order;
-  }
+  const order = await this.orderRepo.findOne({
+    where: { id },
+    relations: ['provider', 'customer', 'user', 'items'],
+  });
+
+  if (!order) throw new NotFoundException('Pedido no encontrado');
+  return order;
+}
 
   async update(id: number, dto: UpdateOrderDto): Promise<Order> {
     const order = await this.getOrderById(id);
