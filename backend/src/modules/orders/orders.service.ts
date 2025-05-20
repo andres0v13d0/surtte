@@ -25,8 +25,8 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class OrdersService {
   private readonly s3 = new S3Client({ region: 'us-east-2' });
-  private readonly bucket = 'surtte-orders';
-  private readonly folder = 'pdfs';
+  private readonly bucket = 'surtte-provider-requests';
+  private readonly folder = 'solicitudes';
   private readonly cloudfrontUrl = 'https://cdn.surtte.com';
 
   constructor(
