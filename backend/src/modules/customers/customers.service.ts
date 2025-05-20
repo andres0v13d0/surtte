@@ -91,4 +91,33 @@ export class CustomersService {
     customer.isExclusive = false;
     return this.customerRepo.save(customer);
   }
+
+  async createManual(dto: CreateCustomerDto): Promise<Customer> {
+    const provider = await this.providerRepo.findOne({ where: { id: dto.providerId } });
+    if (!provider) throw new NotFoundException('Proveedor no encontrado');
+
+    const existing = await this.customerRepo.findOne({
+      where: {
+        celular: dto.celular,
+        provider: { id: dto.providerId },
+      },
+    });
+
+    if (existing) {
+      throw new BadRequestException('Ya existe un cliente con ese número para este proveedor');
+    }
+
+    const customer = this.customerRepo.create({
+      provider,
+      user: null,
+      nombre: dto.nombre.trim(),
+      celular: dto.celular.trim(),
+      direccion: dto.direccion.trim(),
+      ciudad: dto.ciudad.trim(),
+      departamento: dto.departamento.trim(),
+    });
+
+    return this.customerRepo.save(customer);
+  }
+
 }

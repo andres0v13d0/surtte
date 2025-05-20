@@ -13,7 +13,7 @@ import {
 import { Type } from 'class-transformer';
 import { OrderStatus } from '../entities/order.entity';
 
-
+// DTO para cada ítem del pedido
 export class OrderItemDto {
   @IsUUID()
   productId: string;
@@ -27,7 +27,7 @@ export class OrderItemDto {
   quantity: number;
 
   @IsString()
-  unity: string; 
+  unity: string; // unidad: unidad, docena, etc.
 
   @IsNumber()
   unitPrice: number;
@@ -45,6 +45,7 @@ export class OrderItemDto {
   imageSnapshot?: string;
 }
 
+// DTO para crear una orden
 export class CreateOrderDto {
   @IsNotEmpty()
   @IsNumber()
@@ -71,7 +72,7 @@ export class CreateOrderDto {
   items: OrderItemDto[];
 }
 
-
+// DTO para actualizar una orden
 export class UpdateOrderDto {
   @IsOptional()
   @IsEnum(OrderStatus)
@@ -86,7 +87,7 @@ export class UpdateOrderDto {
   notes?: string;
 }
 
-
+// DTO para filtrar órdenes
 export class FilterOrdersDto {
   @IsOptional()
   @IsNumber()
@@ -108,3 +109,37 @@ export class FilterOrdersDto {
   @Type(() => Date)
   endDate?: Date;
 }
+
+export class UpdateOrderPdfDto {
+  @IsString()
+  pdfUrl: string;
+}
+
+
+export class CreateManualOrderDto {
+  @IsNotEmpty()
+  @IsNumber()
+  providerId: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  customerId: number;
+
+  @IsNumber()
+  totalPrice: number;
+
+  @IsOptional()
+  @IsString()
+  shippingAddress?: string;
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
+  items: OrderItemDto[];
+}
+
+

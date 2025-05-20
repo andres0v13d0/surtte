@@ -1,55 +1,73 @@
-import {
-    IsNumber,
-    IsOptional,
-    IsString,
-} from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
-
 export class CreateCustomerDto {
-    @IsNumber()
-    userId: number;
+  @IsOptional()
+  @IsNumber()
+  userId?: number;
 
-    @IsNumber()
-    providerId: number;
+  @IsNumber()
+  providerId: number;
+
+  @IsString()
+  nombre: string;
+
+  @IsString()
+  celular: string;
+
+  @IsString()
+  direccion: string;
+
+  @IsString()
+  ciudad: string;
+
+  @IsString()
+  departamento: string;
 }
 
 export class FilterCustomersDto {
-    @IsOptional()
-    @IsString()
-    searchName?: string;
+  @IsOptional()
+  @IsString()
+  searchName?: string;
 
-    @IsOptional()
-    @Type(() => Date)
-    startDate?: Date;
+  @IsOptional()
+  @Type(() => Date)
+  startDate?: Date;
 
-    @IsOptional()
-    @Type(() => Date)
-    endDate?: Date;
+  @IsOptional()
+  @Type(() => Date)
+  endDate?: Date;
 
-    @IsOptional()
-    isExclusive: boolean;
+  @IsOptional()
+  isExclusive?: boolean;
 }
 
 export class CustomerResponseDto {
-    @IsNumber()
-    id: number;
+  @IsNumber()
+  id: number;
 
-    @IsNumber()
-    userId: number;
+  @IsOptional()
+  @IsNumber()
+  userId?: number;
 
-    @IsString()
-    userName: string;
+  @IsString()
+  nombre: string;
 
-    @IsString()
-    userEmail: string;
+  @IsString()
+  celular: string;
 
-    @IsString()
-    userTelefono: string;
+  @IsString()
+  direccion: string;
 
-    @IsString()
-    createdAt: string;
+  @IsString()
+  ciudad: string;
 
-    @IsOptional()
-    isExclusive: boolean;
+  @IsString()
+  departamento: string;
+
+  @IsString()
+  createdAt: string;
+
+  @IsOptional()
+  isExclusive: boolean;
 }

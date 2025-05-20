@@ -16,14 +16,36 @@ export class Customer {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.customers, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => User, (user) => user.customers, {
+    onDelete: 'CASCADE',
+    eager: true,
+    nullable: true,
+  })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: User | null;
 
-  @ManyToOne(() => Provider, (provider) => provider.customers, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => Provider, (provider) => provider.customers, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   @JoinColumn({ name: 'provider_id' })
   provider: Provider;
-  
+
+  @Column()
+  nombre: string;
+
+  @Column()
+  celular: string;
+
+  @Column()
+  direccion: string;
+
+  @Column()
+  ciudad: string;
+
+  @Column()
+  departamento: string;
+
   @Column({ default: false })
   isExclusive: boolean;
 

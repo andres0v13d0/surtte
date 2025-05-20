@@ -11,7 +11,12 @@ import {
   Query,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateOrderDto, FilterOrdersDto } from './dto/order.dto';
+import {
+  CreateOrderDto,
+  CreateManualOrderDto,
+  UpdateOrderDto,
+  FilterOrdersDto,
+} from './dto/order.dto';
 import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -26,6 +31,26 @@ export class OrdersController {
   async create(@Body() dto: CreateOrderDto, @Req() req) {
     dto.userId = req.userDB.id;
     return this.ordersService.create(dto);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RolUsuario.PROVEEDOR)
+  @Post('manual')
+  async createManual(@Body() dto: CreateManualOrderDto, @Req() req) {
+    dto.providerId = req.userDB.proveedorInfo?.id;
+    if (!dto.providerId) throw new Error('No tienes proveedor asociado');
+    return this.ordersService.createManual(dto);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RolUsuario.PROVEEDOR)
+  @Get('pdf-upload/:orderId')
+  async getPdfSignedUrl(
+    @Param('orderId', ParseIntPipe) orderId: number,
+    @Query('mime') mime: string,
+    @Query('filename') filename: string
+  ) {
+    return this.ordersService.generatePdfUploadUrl(orderId, mime, filename);
   }
 
   @Get('my')

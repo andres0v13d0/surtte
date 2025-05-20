@@ -12,26 +12,38 @@ import {
 import { User } from '../../users/entity/user.entity';
 import { Provider } from '../../providers/entity/provider.entity';
 import { OrderItem } from './order-item.entity';
+import { Customer } from '../../customers/entity/customer.entity';
 
 export enum OrderStatus {
-  PENDING = 'pending',       
-  PROCESSING = 'processing',  
-  SHIPPED = 'shipped',          
-  DELIVERED = 'delivered',   
-  CANCELED = 'canceled',   
+  PENDING = 'pending',
+  PROCESSING = 'processing',
+  SHIPPED = 'shipped',
+  DELIVERED = 'delivered',
+  CANCELED = 'canceled',
 }
 
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn()
-  @Generated('increment') 
+  @Generated('increment')
   id: number;
 
-  @ManyToOne(() => User, (user) => user.orders, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.orders, {
+    eager: true,
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: User | null;
 
-  @ManyToOne(() => Provider, (provider) => provider.orders, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Customer, { eager: true, nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'customer_id' })
+  customer: Customer | null;
+
+  @ManyToOne(() => Provider, (provider) => provider.orders, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'provider_id' })
   provider: Provider;
 
@@ -47,12 +59,18 @@ export class Order {
   @Column({ type: 'text', nullable: true })
   notes: string;
 
+  @Column({ type: 'varchar', length: 300, nullable: true })
+  pdfUrl: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @OneToMany(() => OrderItem, (item) => item.order, { cascade: true, eager: true })
+  @OneToMany(() => OrderItem, (item) => item.order, {
+    cascade: true,
+    eager: true,
+  })
   items: OrderItem[];
 }
