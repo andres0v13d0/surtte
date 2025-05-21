@@ -20,7 +20,7 @@ import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 
 @Injectable()
 export class PaymentsService implements OnModuleInit {
-    private subscriptionsService: SubscriptionsService; // ✅ declarar fuera del constructor
+    private subscriptionsService: SubscriptionsService; 
 
     constructor(
         @InjectRepository(Payment)
@@ -52,7 +52,6 @@ export class PaymentsService implements OnModuleInit {
             throw new BadRequestException('Monto inválido para el plan.');
         }
 
-        const providerEmail = user.email;
         const externalReference = `payment-${Date.now()}-${user.id}`;
 
         const payment = this.paymentRepository.create({

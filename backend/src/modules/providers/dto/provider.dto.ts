@@ -12,12 +12,12 @@ export class CreateProviderDto {
   nombre_empresa: string;
 
   @IsString()
-  @IsNotEmpty()
-  rut: string;
+  @IsOptional()
+  rut?: string;
 
   @IsString()
-  @IsNotEmpty()
-  camara_comercio: string;
+  @IsOptional()
+  camara_comercio?: string;
 
   @IsString()
   @IsOptional()
@@ -48,5 +48,5 @@ export class CreateProviderDto {
   proveedorConfiable?: boolean;
 }
 
-export class UpdateProviderDto extends PartialType(CreateProviderDto) {}
+export class UpdateProviderDto extends PartialType(CreateProviderDto) { }
 

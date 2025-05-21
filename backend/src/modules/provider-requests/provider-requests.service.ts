@@ -39,7 +39,7 @@ export class ProviderRequestsService {
 
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
-  ) {}
+  ) { }
 
   async generateSignedUrl(
     mimeType: string,

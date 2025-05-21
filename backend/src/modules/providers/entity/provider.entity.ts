@@ -17,10 +17,10 @@ export class Provider {
   @Column({ type: 'varchar', length: 255 })
   nombre_empresa: string;
 
-  @Column({ type: 'varchar', length: 50, unique: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   rut: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   camara_comercio: string;
 
   @Column({ type: 'text', nullable: true })
@@ -32,19 +32,19 @@ export class Provider {
   @Column({ default: 'pendiente' })
   estadoVerificacion: EstadoVerificacion;
 
-  @Column({ default: false })
+  @Column({ default: true })
   pagoVerificacion: boolean;
 
-  @Column({ default: false })
+  @Column({ default: true })
   documentosCompletos: boolean;
 
-  @Column({ type: 'float', default: 0 })
+  @Column({ type: 'float', default: 5 })
   calificacion: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 100 })
   cantidadPedidos: number;
 
-  @Column({ default: false })
+  @Column({ default: true })
   proveedorConfiable: boolean;
 
   @OneToMany(() => Order, (order) => order.provider)
