@@ -26,7 +26,7 @@ export default function PaymentStatus() {
           console.log('➡️ Intentando confirmar pago con:', {
             mercadoPagoId,
             paymentId,
-            status: urlStatus,
+            status: backendStatus,
           });
 
 
