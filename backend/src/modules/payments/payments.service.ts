@@ -2,6 +2,9 @@ import {
     Injectable,
     NotFoundException,
     BadRequestException,
+    forwardRef,
+    OnModuleInit,
+    Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -16,7 +19,9 @@ import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 
 
 @Injectable()
-export class PaymentsService {
+export class PaymentsService implements OnModuleInit {
+    private subscriptionsService: SubscriptionsService; // ✅ declarar fuera del constructor
+
     constructor(
         @InjectRepository(Payment)
         private readonly paymentRepository: Repository<Payment>,
@@ -24,8 +29,13 @@ export class PaymentsService {
         private readonly providersService: ProvidersService,
         private readonly plansService: PlansService,
         private readonly providerRequestsService: ProviderRequestsService,
-        private readonly subscriptionsService: SubscriptionsService,
+        @Inject(forwardRef(() => SubscriptionsService))
+        private readonly injectedSubscriptionService: SubscriptionsService,
     ) { }
+
+    onModuleInit() {
+        this.subscriptionsService = this.injectedSubscriptionService; // ✅ aquí se asigna
+    }
 
     async create(
         dto: CreatePaymentDto,
