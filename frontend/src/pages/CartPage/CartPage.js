@@ -7,10 +7,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Alert from '../../components/Alert/Alert';
 import Loader from '../../components/Loader/Loader';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../config/firebase';
+import { secureFetch } from '../../utils/secureFetch';
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
-  const [alertType, setAlertType] = useState(null); 
+  const [alertType, setAlertType] = useState(null);
   const [alertMessage, setAlertMessage] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -41,7 +44,7 @@ const CartPage = () => {
     const fetchCart = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('https://api.surtte.com/cart', {
+        const res = await secureFetch('https://api.surtte.com/cart', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const items = await res.json();
@@ -60,17 +63,24 @@ const CartPage = () => {
       } catch (err) {
         console.error('Error al cargar el carrito:', err);
         setCartItems([]);
-      } finally{
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchCart();
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchCart();
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const onUpdateQuantity = async (id, quantity) => {
     const token = localStorage.getItem('token');
-    await fetch(`https://api.surtte.com/cart/${id}`, {
+    await secureFetch(`https://api.surtte.com/cart/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -86,7 +96,7 @@ const CartPage = () => {
 
   const onToggleCheck = async (id, isChecked) => {
     const token = localStorage.getItem('token');
-    await fetch(`https://api.surtte.com/cart/${id}/check`, {
+    await secureFetch(`https://api.surtte.com/cart/${id}/check`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -101,7 +111,7 @@ const CartPage = () => {
 
   const onDeleteItem = async (id) => {
     const token = localStorage.getItem('token');
-    await fetch(`https://api.surtte.com/cart/${id}`, {
+    await secureFetch(`https://api.surtte.com/cart/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -138,17 +148,17 @@ const CartPage = () => {
     items
       .filter((item) => item.isChecked)
       .reduce((sum, item) => sum + calculateSubtotal(item), 0);
-  
+
   const calculateTotalGlobal = () =>
     cartItems
-        .filter((item) => item.isChecked)
-        .reduce((sum, item) => sum + calculateSubtotal(item), 0);
+      .filter((item) => item.isChecked)
+      .reduce((sum, item) => sum + calculateSubtotal(item), 0);
 
   const handleRequestByProvider = async (providerId, items) => {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     const token = localStorage.getItem('token');
     const userId = usuario.id;
-  
+
     const checkedItems = items.filter((item) => item.isChecked);
     if (checkedItems.length === 0) {
       setAlertType('error');
@@ -156,7 +166,7 @@ const CartPage = () => {
       setShowAlert(true);
       return;
     }
-  
+
     const orderItems = checkedItems.map((item) => ({
       productId: item.product.id,
       productName: item.productNameSnapshot,
@@ -167,11 +177,11 @@ const CartPage = () => {
       size: item.sizeSnapshot,
       imageSnapshot: item.imageUrlSnapshot,
     }));
-  
+
     const totalPrice = orderItems.reduce((sum, item) => sum + (item.unitPrice / 12) * item.quantity, 0);
-  
+
     try {
-      const res = await fetch('https://api.surtte.com/orders', {
+      const res = await secureFetch('https://api.surtte.com/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -185,20 +195,20 @@ const CartPage = () => {
           notes: 'Hola, he colocado un pedido desde la tienda.',
         }),
       });
-  
+
       if (!res.ok) throw new Error('Error al crear el pedido');
-  
+
       for (const item of checkedItems) {
-        await fetch(`https://api.surtte.com/cart/${item.id}`, {
+        await secureFetch(`https://api.surtte.com/cart/${item.id}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },
         });
       }
-  
+
       setCartItems((prev) =>
         prev.filter((item) => item.providerId !== providerId || !item.isChecked)
       );
-  
+
       setAlertType('success');
       setAlertMessage('Orden agregada con éxito.');
       setShowAlert(true);
@@ -209,23 +219,23 @@ const CartPage = () => {
       setShowAlert(true);
     }
   };
-  
-  
+
+
 
   const handleRequestAll = async () => {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     const token = localStorage.getItem('token');
     const userId = usuario.id;
-  
+
     try {
       for (const [provider, items] of Object.entries(grouped)) {
         const checkedItems = items.filter((item) => item.isChecked);
         if (checkedItems.length === 0) continue;
 
         console.log(provider);
-  
+
         const providerId = checkedItems[0].product.providerId;
-  
+
         const orderItems = checkedItems.map((item) => ({
           productId: item.product.id,
           productName: item.productNameSnapshot,
@@ -236,10 +246,10 @@ const CartPage = () => {
           size: item.sizeSnapshot,
           imageSnapshot: item.imageUrlSnapshot,
         }));
-  
+
         const totalPrice = orderItems.reduce((sum, item) => sum + (item.unitPrice / 12) * item.quantity, 0);
-  
-        const res = await fetch('https://api.surtte.com/orders', {
+
+        const res = await secureFetch('https://api.surtte.com/orders', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -253,9 +263,9 @@ const CartPage = () => {
             notes: 'Hola, he colocado un pedido desde la tienda.',
           }),
         });
-  
+
         if (!res.ok) throw new Error('Error al crear el pedido');
-  
+
         for (const item of checkedItems) {
           await fetch(`https://api.surtte.com/cart/${item.id}`, {
             method: 'DELETE',
@@ -263,7 +273,7 @@ const CartPage = () => {
           });
         }
       }
-  
+
       setCartItems((prev) => prev.filter((item) => !item.isChecked));
       setAlertType('success');
       setAlertMessage('Orden agregada con éxito.');
@@ -275,8 +285,8 @@ const CartPage = () => {
       setShowAlert(true);
     }
   };
-  
-  
+
+
   if (loading) return <Loader />;
 
   if (!loading && cartItems.length === 0) {
@@ -296,33 +306,33 @@ const CartPage = () => {
   return (
     <>
       {showAlert && (
-          <Alert
-            type={alertType}
-            message={alertMessage}
-            onClose={() => setShowAlert(null)}
-            redirectTo={alertType === 'success' ? '/' : null}
-          />
+        <Alert
+          type={alertType}
+          message={alertMessage}
+          onClose={() => setShowAlert(null)}
+          redirectTo={alertType === 'success' ? '/mis-pedidos' : null}
+        />
       )}
       <Header />
       <div className="cart-page">
-          
-          <div className="request-all">
-            <div className="total-global">
-              <p>Total general</p>
-              <div className='prices-shower'>
-                <h1>COP</h1>
-                <h2>{calculateTotalGlobal().toLocaleString('es-CO')}</h2>
-              </div>
-            </div>
-            <p>Ordenar todos los pedidos de todos los proveedores</p>
-            <button className="request-all-btn" onClick={handleRequestAll}>
-              Solicitar todos los pedidos
-            </button>
-          </div>
 
-          <button className='trash-all-btn' onClick={toggleSelectAll}>
-            {selectAll ? 'No seleccionar nada' : 'Seleccionar todo'}
+        <div className="request-all">
+          <div className="total-global">
+            <p>Total general</p>
+            <div className='prices-shower'>
+              <h1>COP</h1>
+              <h2>{calculateTotalGlobal().toLocaleString('es-CO')}</h2>
+            </div>
+          </div>
+          <p>Ordenar todos los pedidos de todos los proveedores</p>
+          <button className="request-all-btn" onClick={handleRequestAll}>
+            Solicitar todos los pedidos
           </button>
+        </div>
+
+        <button className='trash-all-btn' onClick={toggleSelectAll}>
+          {selectAll ? 'No seleccionar nada' : 'Seleccionar todo'}
+        </button>
 
         {Object.entries(grouped).map(([provider, items]) => (
           <fieldset key={provider} className="provider-group">
@@ -331,7 +341,7 @@ const CartPage = () => {
               const applicablePrice = getApplicablePrice(item);
               const unitPrice = parseFloat(applicablePrice?.price || 0);
               return (
-                <div key={item.id} className={`cart-item ${item.isChecked ? 'checked' : ''}`}>                  
+                <div key={item.id} className={`cart-item ${item.isChecked ? 'checked' : ''}`}>
                   <div className="item-info">
                     <div className="item-image">
                       <input
@@ -380,7 +390,7 @@ const CartPage = () => {
                       {[...new Set(item.prices.flatMap(p => p.quantity?.split(',') || []))]
                         .map(q => q.trim()).filter(q => q).map((q, i) => (
                           <option key={i} value={parseInt(q)}>{q}</option>
-                      ))}
+                        ))}
                     </select>
                     <FontAwesomeIcon id="item-delete" icon={faTrash} onClick={() => onDeleteItem(item.id)} />
                   </div>
@@ -391,7 +401,7 @@ const CartPage = () => {
               Subtotal: COP {calculateProviderTotal(items).toLocaleString('es-CO')}
             </div>
             <button
-              className="request-btn" 
+              className="request-btn"
               onClick={() =>
                 handleRequestByProvider(items[0].product.providerId, items)
               }
@@ -402,8 +412,8 @@ const CartPage = () => {
           </fieldset>
         ))}
       </div>
-      <NavInf />
-      <Footer navinf={true}/>
+      <NavInf selected={"cart"} />
+      <Footer navinf={true} />
     </>
   );
 };

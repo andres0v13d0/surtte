@@ -3,6 +3,9 @@ import Select from 'react-select';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../config/firebase';
+import secureAxios from '../../utils/secureAxios';
 import axios from 'axios';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
@@ -35,7 +38,7 @@ const NewOrder = () => {
     const fetchProductosDelProveedor = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`https://api.surtte.com/products/by-provider/${providerId}`, {
+        const res = await secureAxios.get(`https://api.surtte.com/products/by-provider/${providerId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setMisProductos(res.data);
@@ -44,7 +47,14 @@ const NewOrder = () => {
       }
     };
 
-    fetchProductosDelProveedor();
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchProductosDelProveedor();
+      }
+    });
+
+    return () => unsubscribe();
   }, [providerId]);
 
 
@@ -52,7 +62,7 @@ const NewOrder = () => {
     const fetchClientes = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('https://api.surtte.com/customers', {
+        const res = await secureAxios.get('https://api.surtte.com/customers', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setClientes(res.data);
@@ -61,7 +71,14 @@ const NewOrder = () => {
       }
     };
 
-    fetchClientes();
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchClientes();
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
 
@@ -175,7 +192,7 @@ const NewOrder = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('https://api.surtte.com/customers/manual', {
+      const res = await secureAxios.post('https://api.surtte.com/customers/manual', {
         nombre: `${nuevoCliente.nombre} ${nuevoCliente.apellido}`,
         celular: nuevoCliente.celular,
         direccion: nuevoCliente.direccion,
@@ -219,18 +236,18 @@ const NewOrder = () => {
   };
 
   const cerrarModalNuevoCliente = () => {
-  setNuevoCliente({
-    nombre: '',
-    apellido: '',
-    celular: '',
-    direccion: '',
-    departamento: '',
-    ciudad: ''
-  });
-  setSelectedDept(null);
-  setSelectedCity(null);
-  setMostrarNuevoCliente(false);
-};
+    setNuevoCliente({
+      nombre: '',
+      apellido: '',
+      celular: '',
+      direccion: '',
+      departamento: '',
+      ciudad: ''
+    });
+    setSelectedDept(null);
+    setSelectedCity(null);
+    setMostrarNuevoCliente(false);
+  };
 
 
   const filtrarProductos = (texto) => {
@@ -289,7 +306,7 @@ const NewOrder = () => {
         totalPrice,
       };
 
-      const res = await axios.post('https://api.surtte.com/orders/manual', body, {
+      const res = await secureAxios.post('https://api.surtte.com/orders/manual', body, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -366,72 +383,72 @@ const NewOrder = () => {
               {mostrarNuevoCliente && (
 
                 <div className="new-customer-container">
-                    <h1>Ingresar nuevo cliente</h1>
-                    <div className="customer-data">
+                  <h1>Ingresar nuevo cliente</h1>
+                  <div className="customer-data">
                     <div className="data-names">
-                        <div>
+                      <div>
                         <label>Nombre</label>
                         <input
-                            type="text"
-                            placeholder="Carlos"
-                            value={nuevoCliente.nombre}
-                            onChange={(e) => setNuevoCliente({ ...nuevoCliente, nombre: e.target.value })}
+                          type="text"
+                          placeholder="Carlos"
+                          value={nuevoCliente.nombre}
+                          onChange={(e) => setNuevoCliente({ ...nuevoCliente, nombre: e.target.value })}
                         />
-                        </div>
-                        <div>
+                      </div>
+                      <div>
                         <label>Apellido</label>
                         <input
-                            type="text"
-                            placeholder="Pérez"
-                            value={nuevoCliente.apellido}
-                            onChange={(e) => setNuevoCliente({ ...nuevoCliente, apellido: e.target.value })}
+                          type="text"
+                          placeholder="Pérez"
+                          value={nuevoCliente.apellido}
+                          onChange={(e) => setNuevoCliente({ ...nuevoCliente, apellido: e.target.value })}
                         />
-                        </div>
+                      </div>
                     </div>
 
                     <label>Celular</label>
                     <input
-                        type="text"
-                        placeholder="3101234567"
-                        value={nuevoCliente.celular}
-                        onChange={(e) => setNuevoCliente({ ...nuevoCliente, celular: e.target.value })}
+                      type="text"
+                      placeholder="3101234567"
+                      value={nuevoCliente.celular}
+                      onChange={(e) => setNuevoCliente({ ...nuevoCliente, celular: e.target.value })}
                     />
 
                     <label>Dirección</label>
                     <input
-                        type="text"
-                        placeholder="Cra 10 #20-30"
-                        value={nuevoCliente.direccion}
-                        onChange={(e) => setNuevoCliente({ ...nuevoCliente, direccion: e.target.value })}
+                      type="text"
+                      placeholder="Cra 10 #20-30"
+                      value={nuevoCliente.direccion}
+                      onChange={(e) => setNuevoCliente({ ...nuevoCliente, direccion: e.target.value })}
                     />
 
                     <label>Departamento</label>
                     <Select
-                        options={departments.map(d => ({ value: d.departamento, label: d.departamento }))}
-                        value={selectedDept ? { value: selectedDept, label: selectedDept } : null}
-                        onChange={handleDeptChange}
-                        placeholder="Selecciona un departamento"
+                      options={departments.map(d => ({ value: d.departamento, label: d.departamento }))}
+                      value={selectedDept ? { value: selectedDept, label: selectedDept } : null}
+                      onChange={handleDeptChange}
+                      placeholder="Selecciona un departamento"
                     />
 
                     <label>Ciudad</label>
                     <Select
-                        options={ciudades}
-                        value={selectedCity ? { value: selectedCity, label: selectedCity } : null}
-                        onChange={(selected) => setSelectedCity(selected?.value || null)}
-                        placeholder="Selecciona una ciudad"
+                      options={ciudades}
+                      value={selectedCity ? { value: selectedCity, label: selectedCity } : null}
+                      onChange={(selected) => setSelectedCity(selected?.value || null)}
+                      placeholder="Selecciona una ciudad"
                     />
 
                     <div className="buttons-customer">
-                        <button type='button' onClick={cerrarModalNuevoCliente}>Cancelar</button>
+                      <button type='button' onClick={cerrarModalNuevoCliente}>Cancelar</button>
 
-                        <button type="button" onClick={() => {
-                            guardarNuevoCliente();
-                            cerrarModalNuevoCliente();
-                        }}>Guardar cliente</button>
+                      <button type="button" onClick={() => {
+                        guardarNuevoCliente();
+                        cerrarModalNuevoCliente();
+                      }}>Guardar cliente</button>
                     </div>
-                    </div>
+                  </div>
                 </div>
-                )}
+              )}
 
               <button type="button" className="btn-step1" onClick={() => setStep(2)}>Siguiente</button>
               <button type='button' onClick={cancelarPedido} className="btn-cancel-order">Cancelar pedido</button>
@@ -473,67 +490,67 @@ const NewOrder = () => {
                   </div>
                 </div>
               )}
-                <div className="list-products-container">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Ref.</th>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Valor Unitario</th>
-                        <th>Valor total</th>
-                        <th>Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {productosSeleccionados.map((p) => {
-                        const precioAplicable = p.productPrices?.find(price =>
-                          price.quantity.split(',').map(q => parseInt(q.trim())).includes(p.cantidad)
-                        );
+              <div className="list-products-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Ref.</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Valor Unitario</th>
+                      <th>Valor total</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {productosSeleccionados.map((p) => {
+                      const precioAplicable = p.productPrices?.find(price =>
+                        price.quantity.split(',').map(q => parseInt(q.trim())).includes(p.cantidad)
+                      );
 
-                        return (
-                          <tr key={p.id}>
-                            <td>{p.reference || 'N/A'}</td>
-                            <td>
-                              <div className="product-name-table">
-                                <p>{p.nombre}</p>
-                                <p>Talla: {p.talla}</p>
-                                <p>Color: {p.color}</p>
-                              </div>
-                            </td>
-                            <td>
-                              <div className='product-quantity-table'>
-                                <select
-                                  value={p.cantidad}
-                                  onChange={(e) => cambiarCantidad(p.id, e.target.value)}
-                                >
-                                  {p.productPrices?.flatMap(price =>
-                                    price.quantity.split(',').map(qty => {
-                                      const val = parseInt(qty.trim());
-                                      return (
-                                        <option key={val} value={val}>
-                                          {val}
-                                        </option>
-                                      );
-                                    })
-                                  )}
-                                </select>
-                              </div>
-                            </td>
-                            <td>{Number(precioAplicable?.price).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'}</td>
-                            <td>{Number(precioAplicable?.price * p.cantidad).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'}</td>
-                            <td>
-                              <button type="button" className="trash-orden-icon" onClick={() => eliminarProducto(p.id)}>
-                                <FontAwesomeIcon icon={faTrash} />
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      return (
+                        <tr key={p.id}>
+                          <td>{p.reference || 'N/A'}</td>
+                          <td>
+                            <div className="product-name-table">
+                              <p>{p.nombre}</p>
+                              <p>Talla: {p.talla}</p>
+                              <p>Color: {p.color}</p>
+                            </div>
+                          </td>
+                          <td>
+                            <div className='product-quantity-table'>
+                              <select
+                                value={p.cantidad}
+                                onChange={(e) => cambiarCantidad(p.id, e.target.value)}
+                              >
+                                {p.productPrices?.flatMap(price =>
+                                  price.quantity.split(',').map(qty => {
+                                    const val = parseInt(qty.trim());
+                                    return (
+                                      <option key={val} value={val}>
+                                        {val}
+                                      </option>
+                                    );
+                                  })
+                                )}
+                              </select>
+                            </div>
+                          </td>
+                          <td>{Number(precioAplicable?.price).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'}</td>
+                          <td>{Number(precioAplicable?.price * p.cantidad).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'}</td>
+                          <td>
+                            <button type="button" className="trash-orden-icon" onClick={() => eliminarProducto(p.id)}>
+                              <FontAwesomeIcon icon={faTrash} />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
 
-                    </tbody>
-                  </table>
-                </div>
+                  </tbody>
+                </table>
+              </div>
 
               <label>Notas (opcional)</label>
               <textarea className="input-register area-order" value={notas} onChange={(e) => setNotas(e.target.value)} placeholder="Escribe alguna nota..." />

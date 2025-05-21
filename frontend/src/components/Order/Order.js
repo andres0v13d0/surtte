@@ -3,6 +3,9 @@ import './Order.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../config/firebase'; 
+import { secureFetch } from '../../utils/secureFetch';
 
 const statusLabels = {
   pending: 'Pendiente',
@@ -23,7 +26,7 @@ const Order = ({ id, status, total, cantidad, images }) => {
     const fetchDatosOrden = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${API_BASE_URL}/orders/${id}`, {
+        const res = await secureFetch(`${API_BASE_URL}/orders/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -53,7 +56,14 @@ const Order = ({ id, status, total, cantidad, images }) => {
       }
     };
 
-    fetchDatosOrden();
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchDatosOrden();
+      }
+    });
+
+    return () => unsubscribe();
   }, [id]);
 
   return (

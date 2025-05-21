@@ -5,7 +5,8 @@ import './AddProduct.css';
 import InputImages from '../../components/InputImages/InputImages';
 import InputInfoProduct from '../../components/InputInfoProduct/InputInfoProduct';
 import InputPrices from '../../components/InputPrices/InputPrices';
-import Alert from '../../components/Alert/Alert'; 
+import Alert from '../../components/Alert/Alert';
+import { secureFetch } from '../../utils/secureFetch'
 
 const AddProduct = () => {
   const [variantList, setVariantList] = useState([]);
@@ -180,7 +181,7 @@ const AddProduct = () => {
         }
       }
 
-      const createRes = await fetch('https://api.surtte.com/products', {
+      const createRes = await secureFetch('https://api.surtte.com/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -202,7 +203,7 @@ const AddProduct = () => {
         const mimeType = file.type;
         const filename = file.name;
 
-        const signedRes = await fetch('https://api.surtte.com/images/signed-url', {
+        const signedRes = await secureFetch('https://api.surtte.com/images/signed-url', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mimeType, filename, productId }),
@@ -211,7 +212,7 @@ const AddProduct = () => {
         const { signedUrl, finalUrl } = await signedRes.json();
         await fetch(signedUrl, { method: 'PUT', body: file });
 
-        await fetch('https://api.surtte.com/images/register', {
+        await secureFetch('https://api.surtte.com/images/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ productId, imageUrl: finalUrl, temporal: false }),
@@ -229,7 +230,7 @@ const AddProduct = () => {
 
         const description = `Aplica ${quantity} unidades`;
 
-        await fetch('https://api.surtte.com/product-prices', {
+        await secureFetch('https://api.surtte.com/product-prices', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -7,6 +7,9 @@ import './MyProducts.css';
 import { useNavigate } from 'react-router-dom';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../config/firebase';
+import { secureFetch } from '../../utils/secureFetch';
 
 function MyProducts() {
   const navigate = useNavigate();
@@ -21,7 +24,7 @@ function MyProducts() {
           return;
         }
 
-        const res = await fetch(`https://api.surtte.com/products/by-provider/${user.proveedorInfo.id}`);
+        const res = await secureFetch(`https://api.surtte.com/products/by-provider/${user.proveedorInfo.id}`);
         const data = await res.json();
 
         const parsed = await Promise.all(data.map(async (prod) => {
@@ -56,8 +59,14 @@ function MyProducts() {
         console.error("Error al obtener productos del proveedor:", err);
       }
     };
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchProductos();
+      }
+    });
 
-    fetchProductos();
+    return () => unsubscribe();
   }, []);
 
   const addProduct = () => {

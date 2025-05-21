@@ -4,6 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faCartPlus, faPen, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import './Product.css';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../config/firebase';
+import { secureFetch } from '../../utils/secureFetch';
 
 const Product = ({
     uuid,
@@ -26,7 +29,7 @@ const Product = ({
     useEffect(() => {
         const fetchFavorites = async () => {
             try {
-                const res = await fetch(`https://api.surtte.com/favorites/${userId}`);
+                const res = await secureFetch(`https://api.surtte.com/favorites/${userId}`);
                 const data = await res.json();
                 const exists = data.some(fav => fav.product.id === uuid);
                 setIsFavorite(exists);
@@ -36,7 +39,14 @@ const Product = ({
         };
 
         if (effectiveFavorites && userId) {
-            fetchFavorites();
+            
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    fetchFavorites();
+                }
+            });
+
+            return () => unsubscribe();
         }
     }, [effectiveFavorites, uuid, userId]);
 
@@ -47,12 +57,12 @@ const Product = ({
 
         try {
             if (isFavorite) {
-                await fetch(`https://api.surtte.com/favorites/${userId}/${uuid}`, {
+                await secureFetch(`https://api.surtte.com/favorites/${userId}/${uuid}`, {
                     method: 'DELETE',
                 });
                 setIsFavorite(false);
             } else {
-                await fetch('https://api.surtte.com/favorites', {
+                await secureFetch('https://api.surtte.com/favorites', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userId, productId: uuid }),
@@ -134,8 +144,8 @@ const Product = ({
                         <p className="price-note">{mainPrice.condition}</p>
                     </div>
                     <button className="add-to-cart-button" onClick={handleAddToCartClick}>
-                        <FontAwesomeIcon 
-                            icon={isOwnProduct ? faPen : faCartPlus} 
+                        <FontAwesomeIcon
+                            icon={isOwnProduct ? faPen : faCartPlus}
                             className={isOwnProduct ? 'edit-icon' : ''}
                         />
                     </button>

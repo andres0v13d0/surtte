@@ -8,6 +8,7 @@ import NavInf from '../../components/NavInf/NavInf';
 import Footer from '../../components/Footer/Footer';
 import Alert from '../../components/Alert/Alert';
 import './EditProduct.css';
+import { secureFetch } from '../../utils/secureFetch';
 
 const EditProduct = () => {
   const { uuid } = useParams();
@@ -107,7 +108,7 @@ const EditProduct = () => {
     for (const file of newImages) {
       const mimeType = file.type;
       const filename = file.name;
-      const signedRes = await fetch('https://api.surtte.com/images/signed-url', {
+      const signedRes = await secureFetch('https://api.surtte.com/images/signed-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mimeType, filename, productId }),
@@ -115,7 +116,7 @@ const EditProduct = () => {
       const { signedUrl, finalUrl } = await signedRes.json();
       await fetch(signedUrl, { method: 'PUT', body: file });
 
-      await fetch('https://api.surtte.com/images/register', {
+      await secureFetch('https://api.surtte.com/images/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productId, imageUrl: finalUrl, temporal: false })
@@ -123,7 +124,7 @@ const EditProduct = () => {
     }
 
     for (const image of imagesToDelete) {
-      await fetch(`https://api.surtte.com/images/${image.id}`, { method: 'DELETE' });
+      await secureFetch(`https://api.surtte.com/images/${image.id}`, { method: 'DELETE' });
     }
 
     setInitialImages(images);
@@ -155,7 +156,7 @@ const EditProduct = () => {
       else if (type === 'talla') variant.values.forEach(t => sizes.push({ name: t }));
     }
 
-    await fetch(`https://api.surtte.com/products/${uuid}`, {
+    await secureFetch(`https://api.surtte.com/products/${uuid}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -196,7 +197,7 @@ const EditProduct = () => {
     const deleted = initialPriceBlocks.filter(b => !priceBlocks.find(p => p.id === b.id));
 
     for (const block of created) {
-      await fetch('https://api.surtte.com/product-prices', {
+      await secureFetch('https://api.surtte.com/product-prices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -210,7 +211,7 @@ const EditProduct = () => {
     }
 
     for (const block of updated) {
-      await fetch(`https://api.surtte.com/product-prices/${block.id}`, {
+      await secureFetch(`https://api.surtte.com/product-prices/${block.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -223,7 +224,7 @@ const EditProduct = () => {
     }
 
     for (const block of deleted) {
-      await fetch(`https://api.surtte.com/product-prices/${block.id}`, {
+      await secureFetch(`https://api.surtte.com/product-prices/${block.id}`, {
         method: 'DELETE' });
     }
 
@@ -239,7 +240,7 @@ const EditProduct = () => {
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`https://api.surtte.com/products/${uuid}`, { method: 'DELETE' });
+      const res = await secureFetch(`https://api.surtte.com/products/${uuid}`, { method: 'DELETE' });
       if (res.ok) {
         setAlertType('success');
         setAlertMessage('Producto eliminado exitosamente.');

@@ -3,7 +3,7 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #001634; 
+    background-color: #001634;
     color: white;
     display: flex;
     justify-content: center;
@@ -38,7 +38,7 @@
 }
 
 .navInf a:hover {
-    background-color: transparent; 
+    background-color: transparent;
     color: #fa7e17;
 }
 
@@ -53,4 +53,8 @@
 
 .navInf a.selected {
     color: #fa7e17;
+}
+
+.navInf a.selected .navInf-icon .cart #icon-cart {
+    color: #fa7e17 !important;
 }

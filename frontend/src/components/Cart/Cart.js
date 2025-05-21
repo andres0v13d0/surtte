@@ -2,22 +2,17 @@ import React, { useEffect, useState } from 'react';
 import './Cart.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import { secureFetch } from '../../utils/secureFetch';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../config/firebase'; // ajusta ruta si es necesario
 
 const Cart = () => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     const fetchCartCount = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
       try {
-        const res = await fetch('https://api.surtte.com/cart/count', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
+        const res = await secureFetch('https://api.surtte.com/cart/count');
         if (!res.ok) throw new Error('Error al obtener cantidad');
 
         const data = await res.json();
@@ -27,7 +22,13 @@ const Cart = () => {
       }
     };
 
-    fetchCartCount();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchCartCount();
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   return (

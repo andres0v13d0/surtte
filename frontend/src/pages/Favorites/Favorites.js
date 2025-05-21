@@ -4,6 +4,9 @@ import Header from '../../components/Header/Header';
 import NavInf from '../../components/NavInf/NavInf';
 import Product from '../../components/Product/Product';
 import './Favorites.css';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../config/firebase';
+import { secureFetch } from '../../utils/secureFetch';
 
 function Favorites() {
   const [products, setProducts] = useState([]);
@@ -14,7 +17,7 @@ function Favorites() {
       if (!userId) return;
 
       try {
-        const res = await fetch(`https://api.surtte.com/favorites/${userId}`);
+        const res = await secureFetch(`https://api.surtte.com/favorites/${userId}`);
         const data = await res.json();
 
         const productosFormateados = await Promise.all(
@@ -37,15 +40,15 @@ function Favorites() {
               image: images?.[0]?.imageUrl || '/default.jpg',
               prices: Array.isArray(prices) && prices.length > 0
                 ? prices.map(p => ({
-                    amount: parseFloat(p?.pricePerUnit || '0').toLocaleString('es-CO', {
-                      minimumFractionDigits: 0
-                    }),
-                    condition: p?.minQuantity ?? 'Sin condición'
-                  }))
+                  amount: parseFloat(p?.pricePerUnit || '0').toLocaleString('es-CO', {
+                    minimumFractionDigits: 0
+                  }),
+                  condition: p?.minQuantity ?? 'Sin condición'
+                }))
                 : [{
-                    amount: '0',
-                    condition: 'Sin condición'
-                  }]
+                  amount: '0',
+                  condition: 'Sin condición'
+                }]
             };
           })
         );
@@ -56,7 +59,13 @@ function Favorites() {
       }
     };
 
-    fetchFavoritos();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchFavoritos();
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   return (

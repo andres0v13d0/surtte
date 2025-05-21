@@ -28,6 +28,7 @@ import OrderInfo from './pages/OrderInfo/OrderInfo';
 import NewOrder from './pages/NewOrder/NewOrder';
 import PDF from './pages/PDF/PDF';
 import PaymentStatus from './pages/PaymentStatus/PaymentStatus';
+import useSessionManager from './hooks/useSessionManager';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -64,14 +65,15 @@ const TitleUpdater = () => {
 };
 
 function App() {
+  useSessionManager();
   return (
     <Router>
       <TitleUpdater />
       <Routes>
-        <Route path="/" element={<Home />} />    
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/logout" element={<Logout   />} />
-        <Route path="/register" element={<Register   />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/messages" element={<Chat />} />
@@ -94,7 +96,7 @@ function App() {
         <Route path="/politica" element={<PrivacyPolicy />} />
         <Route path="/orden/:uuid" element={<OrderInfo />} />
         <Route path='/nueva-orden' element={<NewOrder />} />
-        <Route path='/orden/pdf/:orderId' element={<PDF />} /> 
+        <Route path='/orden/pdf/:orderId' element={<PDF />} />
         <Route path="/planes/:status" element={<PaymentStatus />} />
       </Routes>
     </Router>

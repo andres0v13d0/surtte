@@ -8,6 +8,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Product from '../../components/Product/Product';
 import Alert from '../../components/Alert/Alert';
 import Loader from '../../components/Loader/Loader';
+import { secureFetch } from '../../utils/secureFetch';
 
 const ProductInfo = () => {
   const navigate = useNavigate();
@@ -180,7 +181,7 @@ const ProductInfo = () => {
         sizeSnapshot: sizes.length > 0 ? document.querySelector('.selectors select[name="size"]')?.value : null,
       };
   
-      const res = await fetch('https://api.surtte.com/cart', {
+      const res = await secureFetch('https://api.surtte.com/cart', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
