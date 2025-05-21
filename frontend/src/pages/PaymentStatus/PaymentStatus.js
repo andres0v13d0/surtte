@@ -24,7 +24,7 @@ export default function PaymentStatus() {
           console.error('Error al confirmar pago:', error);
         } finally {
           setTimeout(() => {
-            navigate('/planes');
+            navigate('/plans');
           }, 1500); // Espera breve antes de redirigir
         }
       } else {
@@ -36,7 +36,7 @@ export default function PaymentStatus() {
     };
 
     processPayment();
-  }, [status]);
+  }, [status, searchParams, navigate]);
 
   return <Loader />;
 }
