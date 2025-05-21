@@ -4,7 +4,7 @@ import axios from 'axios';
 import Loader from '../../components/Loader/Loader';
 
 export default function PaymentStatus() {
-  const { status } = useParams();
+  const { status: urlStatus } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -13,19 +13,21 @@ export default function PaymentStatus() {
       const mercadoPagoId = searchParams.get('payment_id');
       const paymentId = localStorage.getItem('lastPaymentId');
 
-      console.log('➡️ Intentando confirmar pago con:', {
-        mercadoPagoId,
-        paymentId,
-        status,
-      });
+      
 
-      if (status === 'success' && mercadoPagoId && paymentId) {
+      if (urlStatus === 'success' && mercadoPagoId && paymentId) {
         try {
           const token = localStorage.getItem('token');
 
           let backendStatus = 'pending';
-          if (status === 'success') backendStatus = 'approved';
-          else if (status === 'failure') backendStatus = 'rejected';
+          if (urlStatus === 'success') backendStatus = 'approved';
+          else if (urlStatus === 'failure') backendStatus = 'rejected';
+
+          console.log('➡️ Intentando confirmar pago con:', {
+            mercadoPagoId,
+            paymentId,
+            status: urlStatus,
+          });
 
 
           await axios.post('https://api.surtte.com/payments/mark-success', {
@@ -55,7 +57,7 @@ export default function PaymentStatus() {
     };
 
     processPayment();
-  }, [status, searchParams, navigate]);
+  }, [urlStatus, searchParams, navigate]);
 
   return <Loader />;
 }

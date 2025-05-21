@@ -163,3 +163,10 @@
 }
 
 
+.plan-button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  background-color: #ccc !important;
+  color: #666 !important;
+  border: 1px solid #aaa !important;
+}
