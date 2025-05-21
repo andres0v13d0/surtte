@@ -25,7 +25,7 @@ export class ProviderRequest {
   @Column({ type: 'text', nullable: true })
   descripcion: string;
 
-  @Column({ type: 'text' }) // este es obligatorio ahora
+  @Column({ type: 'text', nullable: true }) // este es obligatorio ahora
   logoEmpresa: string;
 
   @Column({ type: 'text', nullable: true })
