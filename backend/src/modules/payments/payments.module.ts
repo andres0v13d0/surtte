@@ -25,7 +25,7 @@ import { UsersModule } from '../users/users.module';
     PlansModule,
     ProvidersModule,
     UsersModule,
-    ProviderRequestsModule, 
+    forwardRef(() => ProviderRequestsModule),
     forwardRef(() => SubscriptionsModule),
   ],
   controllers: [PaymentsController],

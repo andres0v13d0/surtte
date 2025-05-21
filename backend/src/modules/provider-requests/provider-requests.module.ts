@@ -14,5 +14,6 @@ import { UsersModule } from '../users/users.module';
   ],
   controllers: [ProviderRequestsController],
   providers: [ProviderRequestsService],
+  exports: [ProviderRequestsService],
 })
 export class ProviderRequestsModule {}
