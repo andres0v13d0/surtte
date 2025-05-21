@@ -13,6 +13,13 @@ export default function PaymentStatus() {
       const mercadoPagoId = searchParams.get('payment_id');
       const paymentId = localStorage.getItem('lastPaymentId');
 
+      console.log('➡️ Intentando confirmar pago con:', {
+        mercadoPagoId,
+        paymentId,
+        status,
+      });
+
+
       if (status === 'success' && mercadoPagoId && paymentId) {
         try {
           await axios.post('https://api.surtte.com/payments/mark-success', {
