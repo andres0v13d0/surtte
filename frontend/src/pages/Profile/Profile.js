@@ -84,7 +84,7 @@ const Profile = () => {
                                 </span>
                             </Link>
 
-                            <Link to="/profile" className="user-button">
+                            <Link to="/servicio" className="user-button">
                                 <span className="icon-left">
                                     <FontAwesomeIcon icon={faHeadset} />
                                 </span>

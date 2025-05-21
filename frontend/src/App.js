@@ -30,6 +30,7 @@ import PDF from './pages/PDF/PDF';
 import PaymentStatus from './pages/PaymentStatus/PaymentStatus';
 import MyCustomers from './pages/MyCustomers/MyCustomers';
 import useSessionManager from './hooks/useSessionManager';
+import ServicioCliente from './pages/ServicioCliente/ServicioCliente';
 
 const titles = {
   '/': 'Inicio - SURTTE',
@@ -53,6 +54,7 @@ const titles = {
   '/orden': 'Información de pedido - SURTTE',
   '/nueva-orden': 'Nueva orden - SURTTE',
   '/my-customers': 'Mis clientes - SURTTE',
+  '/servicio': 'Servicio al cliente - SURTTE',
 };
 
 const TitleUpdater = () => {
@@ -101,6 +103,7 @@ function App() {
         <Route path='/orden/pdf/:orderId' element={<PDF />} />
         <Route path="/planes/:status" element={<PaymentStatus />} />
         <Route path='/my-customers' element={<MyCustomers />} />
+        <Route path='/servicio' element={<ServicioCliente />} />
       </Routes>
     </Router>
   );

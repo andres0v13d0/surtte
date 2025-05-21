@@ -17,7 +17,7 @@ const ProviderRequest = () => {
   const [logoPreview, setLogoPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const [alertType, setAlertType] = useState(null); 
+  const [alertType, setAlertType] = useState(null);
   const [alertMessage, setAlertMessage] = useState('');
   const [showAlert, setShowAlert] = useState(false);
 
@@ -38,6 +38,12 @@ const ProviderRequest = () => {
   };
 
   const nextStep = () => {
+    if (!logoFile) {
+      setAlertType('error');
+      setAlertMessage('Debes subir el logo de tu empresa.');
+      setShowAlert(true);
+      return;
+    }
     setStep(2);
   };
 
@@ -69,6 +75,7 @@ const ProviderRequest = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.nombre_empresa.trim()) {
       setAlertType('error');
       setAlertMessage('Debes ingresar el nombre de la empresa.');
@@ -76,21 +83,25 @@ const ProviderRequest = () => {
       return;
     }
 
+    if (!logoFile) {
+      setAlertType('error');
+      setAlertMessage('Debes subir el logo de tu empresa.');
+      setShowAlert(true);
+      return;
+    }
+
     try {
       setLoading(true);
-      const archivoRUTUrl = await subirArchivo(formData.archivoRUT);
-      const archivoCamaraUrl = await subirArchivo(formData.archivoCamaraComercio);
+
       const logoUrl = await subirArchivo(logoFile);
 
       const token = localStorage.getItem('token');
       await axios.post(
         'https://api.surtte.com/provider-requests',
         {
-          nombre_empresa: formData.nombre_empresa,
-          descripcion: formData.descripcion,
-          archivoRUT: archivoRUTUrl,
-          archivoCamaraComercio: archivoCamaraUrl,
-          logoEmpresa: logoUrl,
+          nombre_empresa: formData.nombre_empresa.trim(),
+          descripcion: formData.descripcion.trim(),
+          logo: logoUrl,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -100,7 +111,6 @@ const ProviderRequest = () => {
       setAlertType('success');
       setAlertMessage('¡Solicitud enviada con éxito!');
       setShowAlert(true);
-      window.location.href = '/plans';
     } catch (err) {
       console.error(err);
       setAlertType('error');
@@ -118,7 +128,7 @@ const ProviderRequest = () => {
           type={alertType}
           message={alertMessage}
           onClose={() => setShowAlert(false)}
-          redirectTo={alertType === 'success' ? '/my-products' : null}
+          redirectTo={alertType === 'success' ? '/plans' : null}
         />
       )}
       <Header minimal={true} />
@@ -146,9 +156,7 @@ const ProviderRequest = () => {
                 ) : (
                   <div
                     className="preview-box"
-                    onClick={() =>
-                      document.getElementById('hidden-file-input').click()
-                    }
+                    onClick={() => document.getElementById('hidden-file-input').click()}
                   >
                     <span className="add-image">
                       <FontAwesomeIcon icon={faPlus} />
@@ -156,7 +164,7 @@ const ProviderRequest = () => {
                     <input
                       id="hidden-file-input"
                       type="file"
-                      accept="image/png, image/jpeg"
+                      accept="image/png, image/jpeg, image/webp"
                       onChange={handleLogoUpload}
                       style={{ display: 'none' }}
                     />
@@ -200,8 +208,8 @@ const ProviderRequest = () => {
                 className="input-provider"
               />
 
-              <button type="button" onClick={handleSubmit}>
-                {loading ? 'Convertirse en proveedor' : 'Enviando'}
+              <button type="button" onClick={handleSubmit} disabled={loading}>
+                {loading ? 'Enviando...' : 'Convertirse en proveedor'}
               </button>
             </div>
           )}
