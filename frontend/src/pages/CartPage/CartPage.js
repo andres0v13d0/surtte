@@ -241,7 +241,7 @@ const CartPage = () => {
           productName: item.productNameSnapshot,
           quantity: item.quantity,
           unity: 'unidad',
-          unitPrice: parseFloat(getApplicablePrice(item)?.price || '0'),
+          unitPrice: (parseFloat(getApplicablePrice(item)?.price || '0')) / 12,
           color: item.colorSnapshot,
           size: item.sizeSnapshot,
           imageSnapshot: item.imageUrlSnapshot,

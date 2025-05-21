@@ -352,6 +352,7 @@ const ProductInfo = () => {
                           cantidad: quantity,
                           precio: applicablePrice?.price || 0,
                           productPrices: prices,
+                          image: mainImage,
                         }
                       }
                     });

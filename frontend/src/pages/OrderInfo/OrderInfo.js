@@ -1,154 +1,171 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './OrderInfo.css';
 import Header from '../../components/Header/Header';
 import NavInf from '../../components/NavInf/NavInf';
 import Footer from '../../components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronLeft, faMoneyBill, faShop, faUser } from '@fortawesome/free-solid-svg-icons';
-import ListProducts from '../../components/ListProducts/ListProducts';
-
-const mockOrder = {
-  id: 1001,
-  status: 'En proceso',
-  totalPrice: 149.99,
-  shippingAddress: 'Av. Siempre Viva 742, Springfield',
-  notes: 'Entregar solo en horario laboral',
-  createdAt: '2025-05-17T10:15:00',
-  updatedAt: '2025-05-17T12:00:00',
-  user: {
-    nombre: 'Jonathan Oviedo',
-    email: 'oviedojonathan2001@gmail.com',
-  },
-  provider: {
-    nombre: 'Proveedor Ejemplo',
-    email: 'proveedor@surtte.com',
-  },
-  items: [
-    {
-      id: 'item1',
-      productId: 'p1',
-      productName: 'Camiseta Negra',
-      quantity: 2,
-      unity: 'unidad',
-      unitPrice: 25.00,
-      color: 'Negro',
-      size: 'M',
-      imageSnapshot: '/camiseta.avif',
-    },
-    {
-      id: 'item2',
-      productId: 'p2',
-      productName: 'Pantalón Jeans',
-      quantity: 1,
-      unity: 'unidad',
-      unitPrice: 99.99,
-      color: 'Azul',
-      size: '32',
-      imageSnapshot: '/camiseta.avif',
-    },
-  ],
-};
+import { useParams } from 'react-router-dom';
+import secureAxios from '../../utils/secureAxios';
+import Alert from '../../components/Alert/Alert';
+import Loader from '../../components/Loader/Loader';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 
 const OrderInfo = () => {
-  const [showDetails, setShowDetails] = useState(false);
-  return (
-    <>
-        <Header minimal={true} searchBar={true} backOn={true}/>
-        <div className="order-container">
-            <h2 className='order-num'>Orden #{mockOrder.id}</h2>
-            
-            <div className='line order'></div>
+    const { uuid } = useParams();
+    const [order, setOrder] = useState(null);
+    const [error, setError] = useState(null);
+    const [showCustomerDetails, setShowCustomerDetails] = useState(false);
+    const [showProviderDetails, setShowProviderDetails] = useState(false);
 
-            <div className='order-status'>
-                <div className='info-status'>
-                    <p><strong>Estado:</strong></p>
-                    <p><strong>●</strong>{mockOrder.status}</p>
+    useEffect(() => {
+        const fetchOrder = async () => {
+            try {
+                const { data } = await secureAxios.get(`/orders/${uuid}`);
+                setOrder(data);
+            } catch (err) {
+                console.error('Error al obtener la orden:', err);
+                setError('Error al cargar la orden.');
+            }
+        };
+        
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchOrder();
+            }
+        });
+
+        return () => unsubscribe();
+    }, [uuid]);
+
+    if (error) {
+        return (
+            <>
+                <Header minimal={true} searchBar={true} backOn={true} />
+                <div className="order-container">
+                    <Alert message={error} type="error" />
                 </div>
-                <p className='date-update'><strong>Última Actualización:</strong> {new Date(mockOrder.updatedAt).toLocaleString()}</p>
-            </div>
+                <NavInf />
+                <Footer />
+            </>
+        );
+    }
 
-            <div className='line'></div>
+    if (!order) {
+        return (
+            <>
+                <Header minimal={true} searchBar={true} backOn={true} />
+                <Loader />
+                <NavInf />
+                <Footer />
+            </>
+        );
+    }
 
-            <div className="order-details-wrapper">
-                <button
-                    className="toggle-button"
-                    onClick={() => setShowDetails(!showDetails)}
-                >
-                    <div>
-                        <FontAwesomeIcon icon={faUser} />
-                        <p> {mockOrder.user.nombre}</p>
+    return (
+        <>
+            <Header minimal={true} searchBar={true} backOn={true} />
+            <div className="order-container">
+                <h2 className='order-num'>Orden #{order.id}</h2>
+                <div className='line order'></div>
+
+                <div className='order-status'>
+                    <div className='info-status'>
+                        <p><strong>Estado:</strong></p>
+                        <p><strong>●</strong>{{
+                            pending: "Pendiente",
+                            processing: "En proceso",
+                            delivered: "Entregado",
+                            canceled: "Cancelado"
+                        }[order.status] || order.status}</p>
+
                     </div>
-                    <FontAwesomeIcon className='icon-details' icon={showDetails ? faChevronDown : faChevronLeft} />
-                </button>
-
-                <div className={`order-details ${showDetails ? 'open' : 'closed'}`}>
-                    <p>{mockOrder.shippingAddress}</p>
-                    <p>{mockOrder.notes || 'Sin notas'}</p>
-                    <p>{mockOrder.user.email}</p>
-                    <p>+573101234567</p>
+                    <p className='date-update'><strong>Última Actualización:</strong> {new Date(order.updatedAt).toLocaleString()}</p>
                 </div>
-            </div>
 
-            <div className='space'></div>
+                <div className='line'></div>
 
-            <h3 className='quantity-product-d'>{mockOrder.items.length} artículos</h3>
-            <div className="order-items">
-                {mockOrder.items.map((item) => (
-                    <div key={item.id} className="order-item-card">
-                        <img src={item.imageSnapshot} alt={item.productName} />
-                        <div className='item-info-cont'>
-                            <div className='item-order-info'>
-                                <p>{item.productName}</p>
-                                <p>${item.unitPrice}</p>
-                            </div>
-                            <div className='item-order-info'>
-                                <p className='info-variants'>
-                                    {item.color && <span>Color: {item.color}</span>}
-                                    /
-                                    {item.size && <span>Talla: {item.size}</span>}
-                                </p>
-                                <p>x{item.quantity} {item.unity}</p>
+                {/* Detalles del cliente */}
+                <div className="order-details-wrapper">
+                    <button className="toggle-button" onClick={() => setShowCustomerDetails(!showCustomerDetails)}>
+                        <div>
+                            <FontAwesomeIcon icon={faUser} />
+                            <p>{order.customer?.nombre || 'Cliente'}</p>
+                        </div>
+                        <FontAwesomeIcon className='icon-details' icon={showCustomerDetails ? faChevronDown : faChevronLeft} />
+                    </button>
+
+                    <div className={`order-details ${showCustomerDetails ? 'open' : 'closed'}`}>
+                        {order.customer ? (
+                            <>
+                                <p>{order.customer.direccion}</p>
+                                <p>{order.customer.ciudad}</p>
+                                <p>{order.customer.departamento}</p>
+                            </>
+                        ) : (
+                            <p>Dirección no registrada</p>
+                        )}
+                        <p>+57 {order.customer.celular}</p>
+                    </div>
+                </div>
+
+                <div className='space'></div>
+
+                <h3 className='quantity-product-d'>{order.items.length} artículos</h3>
+                <div className="order-items">
+                    {order.items.map((item) => (
+                        <div key={item.id} className="order-item-card">
+                            <img src={item.imageSnapshot} alt={item.productName} />
+                            <div className='item-info-cont'>
+                                <div className='item-order-info'>
+                                    <p>{item.productName}</p>
+                                    <p>{Number(item.unitPrice).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'} </p>
+                                </div>
+                                <div className='item-order-info'>
+                                    <p className='info-variants'>
+                                        {item.color && <span>Color: {item.color}</span>}
+                                        {item.color && item.size && ' / '}
+                                        {item.size && <span>Talla: {item.size}</span>}
+                                    </p>
+                                    <p>x{item.quantity} {item.unity}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
-
-            <div className='space'></div> 
-
-            <div className='order-total-price'>
-                <div>
-                    <FontAwesomeIcon icon={faMoneyBill} />
-                    <p>Monto total a pagar</p>
+                    ))}
                 </div>
-                <p><strong>${mockOrder.totalPrice}</strong></p>
-            </div>
 
-            <div className="order-details-wrapper">
-                <button
-                    className="toggle-button"
-                    onClick={() => setShowDetails(!showDetails)}
-                >
+                <div className='space'></div>
+
+                <div className='order-total-price'>
                     <div>
-                        <FontAwesomeIcon icon={faShop} />
-                        <p>{mockOrder.provider.nombre}</p>
+                        <FontAwesomeIcon icon={faMoneyBill} />
+                        <p>Monto total a pagar</p>
                     </div>
-                    <FontAwesomeIcon className='icon-details' icon={showDetails ? faChevronDown : faChevronLeft} />
-                </button>
-
-                <div className={`order-details ${showDetails ? 'open' : 'closed'}`}>
-                    <p><strong>Calificación: </strong>⭐⭐⭐⭐⭐</p>
-                    <p>{mockOrder.provider.email}</p>
-                    <p>+573101234567</p>
+                    <p><strong>{(Math.floor(Number(order.totalPrice) / 100) * 100).toLocaleString('es-CO') || '—'}</strong></p>
                 </div>
+
+                <div className="order-details-wrapper">
+                    <button className="toggle-button" onClick={() => setShowProviderDetails(!showProviderDetails)}>
+                        <div>
+                            <FontAwesomeIcon icon={faShop} />
+                            <p>{order.provider?.nombre_empresa || 'Proveedor'}</p>
+                        </div>
+                        <FontAwesomeIcon className='icon-details' icon={showProviderDetails ? faChevronDown : faChevronLeft} />
+                    </button>
+
+                    <div className={`order-details ${showProviderDetails ? 'open' : 'closed'}`}>
+                        <p><strong>Calificación:</strong> {order.provider.calificacion}</p>
+
+                    </div>
+                </div>
+
+                <div className='space'></div>
             </div>
-            <div className='space'></div>
-        </div>
-        <ListProducts />
-        <NavInf />
-        <Footer />
-    </>
-  );
+            <NavInf />
+            <Footer />
+        </>
+    );
 };
 
 export default OrderInfo;

@@ -290,19 +290,22 @@ const NewOrder = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const totalPrice = productosSeleccionados.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
+      const totalPrice = productosSeleccionados.reduce((acc, p) => acc + ((p.precio / 12) * p.cantidad), 0);
 
       const body = {
         providerId: providerId,
         customerId: clienteSeleccionado.id,
         items: productosSeleccionados.map(p => ({
           productId: p.id,
+          productName: p.nombre,
           quantity: p.cantidad,
           unitPrice: p.precio / 12,
-          productName: p.nombre,
-          unity: 'unidad'
+          unity: 'unidad',
+          color: p.color || null,
+          size: p.talla || null,
+          imageSnapshot: p.image || null,
         })),
-        notes: notas, // Puedes obtenerlo del textarea si deseas
+        notes: notas,
         totalPrice,
       };
 

@@ -92,7 +92,7 @@ const Order = ({ id, status, total, cantidad, images }) => {
         </div>
 
         <div className="order-quantity">
-          <p>COP {parseFloat(total).toLocaleString('es-CO')}</p>
+          <p>COP {(Math.floor(Number(total) / 100) * 100).toLocaleString('es-CO') || '—'}</p>
           <p>{cantidad} productos</p>
         </div>
         <button className="order-button">
