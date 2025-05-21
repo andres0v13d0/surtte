@@ -47,7 +47,7 @@ const NewOrder = () => {
       }
     };
 
-    
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         fetchProductosDelProveedor();
@@ -71,7 +71,7 @@ const NewOrder = () => {
       }
     };
 
-    
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         fetchClientes();
@@ -298,7 +298,7 @@ const NewOrder = () => {
         items: productosSeleccionados.map(p => ({
           productId: p.id,
           quantity: p.cantidad,
-          unitPrice: p.precio,
+          unitPrice: p.precio / 12,
           productName: p.nombre,
           unity: 'unidad'
         })),
@@ -316,10 +316,9 @@ const NewOrder = () => {
       setAlertMessage('¡Orden creada con éxito!');
       setShowAlert(true);
 
-      // Limpieza y redirección
       setTimeout(() => {
         sessionStorage.removeItem('clienteTemporal');
-        localStorage.removeItem('productosTemporal'); // <--- Agregado
+        localStorage.removeItem('productosTemporal');
         setStep(1);
         setClienteSeleccionado(null);
         setClienteBuscado('');
@@ -537,8 +536,8 @@ const NewOrder = () => {
                               </select>
                             </div>
                           </td>
-                          <td>{Number(precioAplicable?.price).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'}</td>
-                          <td>{Number(precioAplicable?.price * p.cantidad).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'}</td>
+                          <td>{(Number(precioAplicable?.price) / 12).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'}</td>
+                          <td>{(((Number(precioAplicable?.price)) / 12) * (Number(p.cantidad))).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || '—'}</td>
                           <td>
                             <button type="button" className="trash-orden-icon" onClick={() => eliminarProducto(p.id)}>
                               <FontAwesomeIcon icon={faTrash} />

@@ -28,6 +28,7 @@ import OrderInfo from './pages/OrderInfo/OrderInfo';
 import NewOrder from './pages/NewOrder/NewOrder';
 import PDF from './pages/PDF/PDF';
 import PaymentStatus from './pages/PaymentStatus/PaymentStatus';
+import MyCustomers from './pages/MyCustomers/MyCustomers';
 import useSessionManager from './hooks/useSessionManager';
 
 const titles = {
@@ -51,6 +52,7 @@ const titles = {
   '/politica': 'Política de privacidad - SURTTE',
   '/orden': 'Información de pedido - SURTTE',
   '/nueva-orden': 'Nueva orden - SURTTE',
+  '/my-customers': 'Mis clientes - SURTTE',
 };
 
 const TitleUpdater = () => {
@@ -98,6 +100,7 @@ function App() {
         <Route path='/nueva-orden' element={<NewOrder />} />
         <Route path='/orden/pdf/:orderId' element={<PDF />} />
         <Route path="/planes/:status" element={<PaymentStatus />} />
+        <Route path='/my-customers' element={<MyCustomers />} />
       </Routes>
     </Router>
   );

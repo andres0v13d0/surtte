@@ -43,7 +43,7 @@ const ProviderMenu = ({ providerName, isOpen, toggleMenu, currentPage }) => {
   const menuItems = [
     { label: 'Mis productos', path: '/my-products', key: 'products' },
     { label: 'Mis pedidos', path: '/my-orders', key: 'orders' },
-    { label: 'Mis clientes', path: '/my-costumers', key: 'costumers' },
+    { label: 'Mis clientes', path: '/my-customers', key: 'customers' },
   ];
 
   return (

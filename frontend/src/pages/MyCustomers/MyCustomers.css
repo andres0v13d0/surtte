@@ -1,0 +1,38 @@
+.customers-container{
+    padding: 20px;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.customers-container h1{
+    font-size: 20px;
+}
+
+.list-products-container.costumer{
+    border: none;
+    height: 100vh;
+    margin: 0;
+}
+
+
+.list-products-container.costumer th{
+    background-color: #001634;
+    color: white;
+}
+
+.exclusive{
+    background-color: #fa7d177c;
+}
+
+.check-exclusive{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.check-exclusive input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  accent-color: #001634;
+  cursor: pointer;
+  margin-right: 8px;
+}
