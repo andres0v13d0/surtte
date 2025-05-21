@@ -23,10 +23,15 @@ export default function PaymentStatus() {
         try {
           const token = localStorage.getItem('token');
 
+          let backendStatus = 'pending';
+          if (status === 'success') backendStatus = 'approved';
+          else if (status === 'failure') backendStatus = 'rejected';
+
+
           await axios.post('https://api.surtte.com/payments/mark-success', {
             mercadoPagoId,
             paymentId,
-            status: 'approved',
+            status: backendStatus,
           }, {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -36,6 +41,7 @@ export default function PaymentStatus() {
         } catch (error) {
           console.error('Error al confirmar pago:', error);
         } finally {
+          localStorage.removeItem('lastPaymentId');
           setTimeout(() => {
             navigate('/plans');
           }, 1500); // Espera breve antes de redirigir
@@ -43,7 +49,7 @@ export default function PaymentStatus() {
       } else {
         // Casos: pending o failure
         setTimeout(() => {
-          navigate('/planes');
+          navigate('/plans');
         }, 1500);
       }
     };

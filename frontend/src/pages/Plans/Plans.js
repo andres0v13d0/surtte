@@ -9,11 +9,47 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 export default function Plans() {
+  const [activePlanId, setActivePlanId] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingPayment, setLoadingPayment] = useState(null);
   const [alertConfig, setAlertConfig] = useState(null); 
   const location = useLocation();
+
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch('https://api.surtte.com/subscriptions/mine', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.ok) {
+          const subscriptions = await res.json();
+          const now = new Date();
+
+          const activeSub = subscriptions.find(sub => {
+            return (
+              sub.status === 'active' &&
+              new Date(sub.endDate) > now &&
+              sub.plan?.id
+            );
+          });
+
+          if (activeSub) {
+            setActivePlanId(activeSub.plan.id);
+          }
+        }
+      } catch (error) {
+        console.error('Error al consultar suscripciones:', error);
+      }
+    };
+
+    fetchSubscriptions();
+  }, []);
+
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -113,8 +149,7 @@ export default function Plans() {
       <div className="plans-container">
         {plans.map((plan) =>{ 
           
-          const purchasedPlanId = localStorage.getItem('purchasedPlanId');
-          const isPurchased = purchasedPlanId === plan.id;
+          const isPurchased = activePlanId === plan.id;
 
           
           return (
