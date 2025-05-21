@@ -19,14 +19,20 @@ export default function PaymentStatus() {
         status,
       });
 
-
       if (status === 'success' && mercadoPagoId && paymentId) {
         try {
+          const token = localStorage.getItem('token');
+
           await axios.post('https://api.surtte.com/payments/mark-success', {
             mercadoPagoId,
             paymentId,
             status: 'approved',
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           });
+
         } catch (error) {
           console.error('Error al confirmar pago:', error);
         } finally {
