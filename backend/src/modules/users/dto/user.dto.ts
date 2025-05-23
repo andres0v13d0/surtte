@@ -21,4 +21,19 @@ export class CreateUserDto {
     rol?: RolUsuario;
 }
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {}
+
+export class CompleteProfileDto {
+    @IsString()
+    nombre: string;
+
+    @IsString()
+    telefono: string;
+
+    @IsString()
+    departamento: string;
+
+    @IsString()
+    ciudad: string;
+}
+
+export class UpdateUserDto extends PartialType(CreateUserDto) { }

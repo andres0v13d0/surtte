@@ -3,7 +3,7 @@ import { Provider } from '../../providers/entity/provider.entity';
 import { CartItem } from '../../cart/entity/cart.entity';
 import { Order } from '../../orders/entities/order.entity';
 import { Customer } from 'src/modules/customers/entity/customer.entity';
- 
+
 export enum RolUsuario {
     ADMIN = 'admin',
     VERIFICADOR = 'verificador',
@@ -13,7 +13,7 @@ export enum RolUsuario {
     COMERCIANTE = 'comerciante',
     VENDEDOR = 'vendedor',
 }
-  
+
 
 @Entity('usuarios')
 export class User {
@@ -31,6 +31,12 @@ export class User {
 
     @Column({ nullable: true })
     telefono: string;
+
+    @Column({ nullable: true })
+    departamento: string; // ✅ nuevo campo
+
+    @Column({ nullable: true })
+    ciudad: string; // ✅ nuevo campo
 
     @Column({
         type: 'enum',

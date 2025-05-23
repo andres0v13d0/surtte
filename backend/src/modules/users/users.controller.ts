@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Req, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { CreateUserDto, UpdateUserDto, CompleteProfileDto } from './dto/user.dto';
 import { User } from './entity/user.entity';
 import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -9,7 +9,7 @@ import { RolUsuario } from './entity/user.entity';
 
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService) {}
+    constructor(private readonly usersService: UsersService) { }
 
     @UseGuards(FirebaseAuthGuard, RolesGuard)
     @Roles(RolUsuario.ADMIN)
@@ -63,5 +63,11 @@ export class UsersController {
         } catch (err) {
             return { exists: false };
         }
+    }
+
+    @Post('complete-profile')
+    @UseGuards(FirebaseAuthGuard)
+    async completeProfile(@Req() req, @Body() dto: CompleteProfileDto) {
+        return this.usersService.completeProfile(req.userDB, dto);
     }
 }

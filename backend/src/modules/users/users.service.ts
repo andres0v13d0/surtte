@@ -2,14 +2,14 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, RolUsuario } from './entity/user.entity';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { CreateUserDto, UpdateUserDto, CompleteProfileDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-    ) {}
+    ) { }
 
     async createUser(createUserDto: CreateUserDto): Promise<User> {
         const user = this.userRepository.create({
@@ -74,4 +74,16 @@ export class UsersService {
     async findAll(): Promise<User[]> {
         return await this.userRepository.find({ relations: ['proveedorInfo'] });
     }
+
+    async completeProfile(user: User, dto: CompleteProfileDto) {
+        user.nombre = dto.nombre;
+        user.telefono = dto.telefono;
+        user.departamento = dto.departamento;
+        user.ciudad = dto.ciudad;
+
+        await this.userRepository.save(user);
+
+        return { message: 'Perfil actualizado correctamente' };
+    }
+
 }
