@@ -11,15 +11,55 @@ import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import Alert from '../../components/Alert/Alert';
 
+const sendEmailVerificationCode = async (email) => {
+  return axios.post('https://api.surtte.com/notifications/verify', {
+    channel: 'email',
+    type: 'verify_email',
+    email
+  });
+};
+
+const confirmEmailCode = async (email, code) => {
+  return axios.post('https://api.surtte.com/notifications/verify/confirm', {
+    channel: 'email',
+    type: 'verify_email',
+    email,
+    code
+  });
+};
+
+const sendPhoneVerificationCode = async (phoneNumber) => {
+  return axios.post('https://api.surtte.com/notifications/verify', {
+    channel: 'whatsapp',
+    type: 'verify_phone',
+    phoneNumber,
+  });
+};
+
+const confirmPhoneCode = async (phoneNumber, code) => {
+  return axios.post('https://api.surtte.com/notifications/verify/confirm', {
+    channel: 'whatsapp',
+    type: 'verify_phone',
+    phoneNumber,
+    code,
+  });
+};
+
+
+
 const Register = () => {
   const [departments, setDepartments] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [filteredCities, setFilteredCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState(null);
 
-  const [alertType, setAlertType] = useState(null); 
+  const [alertType, setAlertType] = useState(null);
   const [alertMessage, setAlertMessage] = useState('');
   const [showAlert, setShowAlert] = useState(false);
+
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendInterval, setResendInterval] = useState(null);
+
 
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -53,18 +93,48 @@ const Register = () => {
     hasMinLength: formData.password.length >= 10,
   };
 
-  const nextStep = () => {
-    if (step === 1 && !formData.email) {
-      setAlertType('error');
-      setAlertMessage('Por favor ingresa tu correo.');
-      setShowAlert(true);
+  const nextStep = async () => {
+    if (step === 1) {
+      if (!formData.email.trim()) {
+        setAlertType('error');
+        setAlertMessage('Por favor ingresa tu correo.');
+        setShowAlert(true);
+        return;
+      }
+
+      try {
+        await sendEmailVerificationCode(formData.email.trim());
+        setAlertType('success');
+        setAlertMessage('¡Listo! Te enviamos un código de verificación a tu correo. Revisa tu bandeja de entrada o spam.');
+        setShowAlert(true);
+        setStep(2);
+      } catch (error) {
+        setAlertType('error');
+        setAlertMessage('No se pudo enviar el código de verificación.');
+        setShowAlert(true);
+      }
       return;
     }
-    if (step === 1) {
-      setAlertType('success');
-      setAlertMessage('¡Listo! Te enviamos un código de verificación a tu correo. Revisa tu bandeja de entrada o correo no deseado.');
-      setShowAlert(true);
+
+    if (step === 2) {
+      if (!formData.code.trim()) {
+        setAlertType('error');
+        setAlertMessage('Debes ingresar el código de verificación.');
+        setShowAlert(true);
+        return;
+      }
+
+      try {
+        await confirmEmailCode(formData.email.trim(), formData.code.trim());
+        setStep(3);
+      } catch (error) {
+        setAlertType('error');
+        setAlertMessage('Código incorrecto o expirado.');
+        setShowAlert(true);
+      }
+      return;
     }
+
     if (step === 3) {
       if (!formData.password.trim() || !formData.repeatPassword.trim()) {
         setAlertType('error');
@@ -79,9 +149,58 @@ const Register = () => {
         setShowAlert(true);
         return;
       }
+
+      if (!passwordValidation.hasLetter || !passwordValidation.hasNumberOrSymbol || !passwordValidation.hasMinLength) {
+        setAlertType('error');
+        setAlertMessage('La contraseña no cumple con los requisitos.');
+        setShowAlert(true);
+        return;
+      }
     }
+
     setStep(step + 1);
   };
+
+  const handleSendPhoneCode = async () => {
+    if (!formData.cell.trim()) {
+      setAlertType('error');
+      setAlertMessage('Debes ingresar tu número de celular con + y código de país.');
+      setShowAlert(true);
+      return;
+    }
+
+    try {
+      await sendPhoneVerificationCode(formData.cell.trim());
+      setAlertType('success');
+      setAlertMessage('Te enviamos un código a WhatsApp. Revísalo y escríbelo aquí.');
+      setShowAlert(true);
+
+      setResendCooldown(60); // inicia en 60 segundos
+      const interval = setInterval(() => {
+        setResendCooldown(prev => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      setResendInterval(interval);
+
+    } catch (err) {
+      setAlertType('error');
+      setAlertMessage('No se pudo enviar el código por WhatsApp.');
+      setShowAlert(true);
+    }
+  };
+
+
+  useEffect(() => {
+    return () => {
+      if (resendInterval) clearInterval(resendInterval);
+    };
+  }, [resendInterval]);
+
 
   const prevStep = () => setStep(step - 1);
 
@@ -91,12 +210,12 @@ const Register = () => {
         'https://api.surtte.com/auth/login',
         { token }
       );
-  
+
       const userData = response.data;
-  
+
       localStorage.setItem('usuario', JSON.stringify(userData));
       localStorage.setItem('token', token);
-  
+
       console.log('Usuario autenticado:', userData);
       navigate('/');
     } catch (error) {
@@ -112,6 +231,29 @@ const Register = () => {
       }
     }
   };
+
+  const completeUserProfile = async (token) => {
+    try {
+      await axios.post(
+        'https://api.surtte.com/users/complete-profile',
+        {
+          nombre: `${formData.firstName} ${formData.lastName}`,
+          telefono: formData.cell,
+          departamento: selectedDepartment,
+          ciudad: selectedCity,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      console.log('✅ Perfil completado');
+    } catch (error) {
+      console.error('Error al completar el perfil:', error);
+    }
+  };
+
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('registerEmail');
@@ -143,7 +285,7 @@ const Register = () => {
     }
   };
 
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -168,19 +310,30 @@ const Register = () => {
       setShowAlert(true);
       return;
     }
-    
+
+    try {
+      await confirmPhoneCode(formData.cell.trim(), formData.confirmCellCode.trim());
+    } catch (err) {
+      setAlertType('error');
+      setAlertMessage('El código de verificación del celular es incorrecto o ha expirado.');
+      setShowAlert(true);
+      return;
+    }
+
+
     try {
       const result = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      
+
       await updateProfile(result.user, {
         displayName: `${formData.firstName} ${formData.lastName}`
       });
 
       await result.user.reload();
-      
+
       const token = await result.user.getIdToken(true);
 
       await sendTokenToBackend(token);
+      await completeUserProfile(token);
       setAlertType('success');
       setAlertMessage('Registro existoso.');
       setShowAlert(true);
@@ -191,7 +344,7 @@ const Register = () => {
       setShowAlert(true);
     }
   };
-  
+
 
   return (
     <>
@@ -226,7 +379,7 @@ const Register = () => {
               <button type="button" onClick={nextStep}>Siguiente</button>
               <span id='link-terms'>Al continuar, aceptas los <a href="/condiciones">Términos y condiciones</a></span>
               <div className='line'></div>
-              <span id='link-login'>¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></span>  
+              <span id='link-login'>¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></span>
             </div>
           )}
 
@@ -247,6 +400,7 @@ const Register = () => {
                 <div className="pass-wrapper">
                   <input
                     type='text'
+                    name="code"
                     value={formData.code}
                     onChange={handleChange}
                     placeholder='Ej.: 123456'
@@ -354,19 +508,27 @@ const Register = () => {
                 type="text"
                 name="cell"
                 placeholder="Ej.: +573101234567"
-                value={formData.lastName}
+                value={formData.cell}
                 onChange={handleChange}
                 className='input-register'
               />
 
-              <button className='send-code' type="button" onClick={nextStep}>Enviar código de confirmación</button>
+              <button
+                className='send-code'
+                type="button"
+                onClick={handleSendPhoneCode}
+                disabled={resendCooldown > 0}
+              >
+                {resendCooldown > 0 ? `Reenviar en ${resendCooldown}s` : 'Enviar código de confirmación'}
+              </button>
+
 
               <label className='label-register' htmlFor="cell">Código de confirmación de celular</label>
               <input
                 type="text"
-                name="cell"
+                name="confirmCellCode"
                 placeholder="Ej.: 123456"
-                value={formData.lastName}
+                value={formData.confirmCellCode}
                 onChange={handleChange}
                 className='input-register last-name'
               />
