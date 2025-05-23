@@ -13,7 +13,16 @@ export function buildVerifyCodeTemplate(to: string, data: { code: string }) {
             { type: 'text', text: data.code },
           ],
         },
+        {
+          type: 'button',
+          sub_type: 'url',
+          index: '0',
+          parameters: [
+            { type: 'text', text: 'https://surtte.com/' } // 🔁 cualquier URL válida
+          ]
+        }
       ],
     },
   };
 }
+
