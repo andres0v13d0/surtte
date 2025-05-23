@@ -18,7 +18,7 @@ export function buildVerifyCodeTemplate(to: string, data: { code: string }) {
           sub_type: 'url',
           index: '0',
           parameters: [
-            { type: 'text', text: 'https://surtte.com/' } // 🔁 cualquier URL válida
+            { type: 'text', text: data.code } // 🔁 cualquier URL válida
           ]
         }
       ],
