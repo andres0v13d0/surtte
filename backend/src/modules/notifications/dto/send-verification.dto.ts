@@ -20,6 +20,6 @@ export class SendVerificationDto {
     email?: string;
 
     @ValidateIf((o) => o.channel === VerificationChannel.WHATSAPP)
-    @IsPhoneNumber('EC') // Cambia el país si lo necesitas
+    @IsPhoneNumber('CO') // Cambia el país si lo necesitas
     phoneNumber?: string;
 }
