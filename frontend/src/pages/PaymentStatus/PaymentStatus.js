@@ -1,39 +1,32 @@
 import { useEffect } from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loader from '../../components/Loader/Loader';
 
 export default function PaymentStatus() {
-  const { status: urlStatus } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     const processPayment = async () => {
-      const mercadoPagoId = searchParams.get('payment_id');
-      const paymentId = localStorage.getItem('lastPaymentId');
+      const wompiPaymentId = searchParams.get('id'); // nuevo ID de Wompi
+      const env = searchParams.get('env');
+      const localPaymentId = localStorage.getItem('lastPaymentId'); // nuestro ID interno
 
-      
-
-      if (urlStatus === 'success' && mercadoPagoId && paymentId) {
+      if (wompiPaymentId && localPaymentId) {
         try {
           const token = localStorage.getItem('token');
 
-          let backendStatus = 'pending';
-          if (urlStatus === 'success') backendStatus = 'approved';
-          else if (urlStatus === 'failure') backendStatus = 'rejected';
-
-          console.log('➡️ Intentando confirmar pago con:', {
-            mercadoPagoId,
-            paymentId,
-            status: backendStatus,
+          console.log('✅ Confirmando pago con:', {
+            wompiPaymentId,
+            localPaymentId,
+            env,
           });
 
-
           await axios.post('https://api.surtte.com/payments/mark-success', {
-            mercadoPagoId,
-            paymentId,
-            status: backendStatus,
+            mercadoPagoId: wompiPaymentId, // reusamos el campo, aunque es Wompi
+            paymentId: localPaymentId,
+            status: 'approved', // siempre 'approved' si llegó aquí
           }, {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -41,23 +34,18 @@ export default function PaymentStatus() {
           });
 
         } catch (error) {
-          console.error('Error al confirmar pago:', error);
+          console.error('❌ Error al confirmar pago:', error);
         } finally {
           localStorage.removeItem('lastPaymentId');
-          setTimeout(() => {
-            navigate('/plans');
-          }, 1500); // Espera breve antes de redirigir
+          setTimeout(() => navigate('/plans'), 1500);
         }
       } else {
-        // Casos: pending o failure
-        setTimeout(() => {
-          navigate('/plans');
-        }, 1500);
+        setTimeout(() => navigate('/plans'), 1500);
       }
     };
 
     processPayment();
-  }, [urlStatus, searchParams, navigate]);
+  }, [searchParams, navigate]);
 
   return <Loader />;
 }
