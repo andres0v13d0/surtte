@@ -8,7 +8,7 @@ export function buildNewOrderTemplate(
     type: 'template',
     template: {
       name: 'nuevo_pedido_proveedor',
-      language: { code: 'es_ES' },
+      language: { code: 'es_CO' },
       components: [
         {
           type: 'body',
