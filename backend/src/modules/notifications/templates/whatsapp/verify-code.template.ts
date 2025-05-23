@@ -5,7 +5,7 @@ export function buildVerifyCodeTemplate(to: string, data: { code: string }) {
     type: 'template',
     template: {
       name: 'verificacion_codigo',
-      language: { code: 'es_ES' },
+      language: { code: 'es_CO' },
       components: [
         {
           type: 'body',
