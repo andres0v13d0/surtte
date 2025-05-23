@@ -131,7 +131,7 @@ export class SubCategoriesService {
         id: sub.id,
         name: sub.name,
         slug: sub.slug,
-        imageUrl: product?.images?.[0]?.imageUrl || '/camiseta.avif',
+        imageUrl: product?.images?.[0]?.imageUrl || 'https://cdn.surtte.com/uploads/logoblanco.webp',
       };
     }));
 
