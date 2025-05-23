@@ -369,6 +369,11 @@ const Register = () => {
 
       await sendTokenToBackend(token);
       await completeUserProfile(token);
+
+
+      localStorage.removeItem('registerStep');
+      localStorage.removeItem('registerEmail');
+
       setAlertType('success');
       setAlertMessage('Registro existoso.');
       setShowAlert(true);
