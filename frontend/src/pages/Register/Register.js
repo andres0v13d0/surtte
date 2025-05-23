@@ -28,14 +28,6 @@ const confirmEmailCode = async (email, code) => {
   });
 };
 
-const sendPhoneVerificationCode = async (phoneNumber) => {
-  return axios.post('https://api.surtte.com/notifications/verify', {
-    channel: 'whatsapp',
-    type: 'verify_phone',
-    phoneNumber,
-  });
-};
-
 const confirmPhoneCode = async (phoneNumber, code) => {
   return axios.post('https://api.surtte.com/notifications/verify/confirm', {
     channel: 'whatsapp',
@@ -45,6 +37,21 @@ const confirmPhoneCode = async (phoneNumber, code) => {
   });
 };
 
+const resendEmailVerificationCode = async (email) => {
+  return axios.post('https://api.surtte.com/notifications/verify/resend', {
+    channel: 'email',
+    type: 'verify_email',
+    email,
+  });
+};
+
+const resendPhoneVerificationCode = async (phoneNumber) => {
+  return axios.post('https://api.surtte.com/notifications/verify/resend', {
+    channel: 'whatsapp',
+    type: 'verify_phone',
+    phoneNumber,
+  });
+};
 
 
 const Register = () => {
@@ -78,14 +85,26 @@ const Register = () => {
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('registerEmail');
+    const savedStep = parseInt(localStorage.getItem('registerStep'), 10);
+
     if (savedEmail) {
       setFormData(prev => ({ ...prev, email: savedEmail }));
+    }
+
+    if (!isNaN(savedStep) && savedStep >= 1 && savedStep <= 4) {
+      setStep(savedStep);
     }
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'email') {
+      localStorage.setItem('registerEmail', value);
+    }
   };
+
 
   const passwordValidation = {
     hasLetter: /[a-zA-Z]/.test(formData.password),
@@ -158,7 +177,9 @@ const Register = () => {
       }
     }
 
-    setStep(step + 1);
+    const newStep = step + 1;
+    setStep(newStep);
+    localStorage.setItem('registerStep', newStep.toString());
   };
 
   const handleSendPhoneCode = async () => {
@@ -170,12 +191,20 @@ const Register = () => {
     }
 
     try {
-      await sendPhoneVerificationCode(formData.cell.trim());
+      if (resendCooldown > 0) {
+        // Cooldown activo, no reenvíes
+        return;
+      }
+
+      // Si el backend ya tiene un código válido, esto solo lo reenvía
+      await resendPhoneVerificationCode(formData.cell.trim());
+
       setAlertType('success');
-      setAlertMessage('Te enviamos un código a WhatsApp. Revísalo y escríbelo aquí.');
+      setAlertMessage('Te reenviamos el código por WhatsApp. Revisa tu celular.');
       setShowAlert(true);
 
-      setResendCooldown(60); // inicia en 60 segundos
+      // Cooldown de 60s
+      setResendCooldown(60);
       const interval = setInterval(() => {
         setResendCooldown(prev => {
           if (prev <= 1) {
@@ -188,11 +217,13 @@ const Register = () => {
       setResendInterval(interval);
 
     } catch (err) {
+      console.error(err);
       setAlertType('error');
       setAlertMessage('No se pudo enviar el código por WhatsApp.');
       setShowAlert(true);
     }
   };
+
 
 
   useEffect(() => {
@@ -202,7 +233,11 @@ const Register = () => {
   }, [resendInterval]);
 
 
-  const prevStep = () => setStep(step - 1);
+  const prevStep = () => {
+    const newStep = step - 1;
+    setStep(newStep);
+    localStorage.setItem('registerStep', newStep.toString());
+  };
 
   const sendTokenToBackend = async (token) => {
     try {
@@ -407,7 +442,25 @@ const Register = () => {
                   />
                 </div>
 
-                <button className='send-code' type="button" onClick={nextStep}>Volver a enviar código</button>
+                <button
+                  className='send-code'
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await resendEmailVerificationCode(formData.email.trim());
+                      setAlertType('info');
+                      setAlertMessage('Código reenviado con éxito.');
+                      setShowAlert(true);
+                    } catch (error) {
+                      setAlertType('error');
+                      setAlertMessage('No se pudo reenviar el código.');
+                      setShowAlert(true);
+                    }
+                  }}
+                >
+                  Volver a enviar código
+                </button>
+
 
                 <button id="last-btn" type="button" onClick={nextStep}>Siguiente</button>
 

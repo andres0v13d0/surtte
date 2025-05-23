@@ -28,7 +28,7 @@ const Categories = () => {
                     const imageMatch = imagesData.find(img => img.id === sub.id);
                     return {
                         ...sub,
-                        imageUrl: imageMatch?.imageUrl || '/camiseta.avif',
+                        imageUrl: imageMatch?.imageUrl || 'https://cdn.surtte.com/uploads/logoblanco.webp',
                     };
                 });
 
