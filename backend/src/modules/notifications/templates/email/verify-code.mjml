@@ -1,6 +1,11 @@
 <mjml>
   <mj-head>
     <mj-title>Confirmación de correo</mj-title>
+
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+
     <mj-style inline="inline">
       .footer-links a {
         color: white;
@@ -13,7 +18,7 @@
     </mj-style>
   </mj-head>
 
-  <mj-body background-color="#f4f4f4" font-family="Helvetica, Arial, sans-serif">
+  <mj-body background-color="#f4f4f4">
 
     <!-- Header -->
     <mj-section background-color="#001634" padding="30px 20px">
@@ -42,7 +47,7 @@
         <mj-text align="center">
           <table align="center" role="presentation" cellpadding="0" cellspacing="0">
             <tr>
-              <td style="background:#f0f0f0; padding:15px 30px; border-radius:6px; font-size:24px; font-weight:bold; color:#001634; letter-spacing:3px;">
+              <td style="background:#f0f0f0; padding:15px 30px; border-radius:6px; font-size:24px; font-weight:bold; color:#001634; letter-spacing:3px; font-family: Helvetica, Arial, sans-serif;">
                 {{code}}
               </td>
             </tr>
@@ -50,7 +55,7 @@
         </mj-text>
 
         <mj-text align="center" color="#555555" font-size="16px" line-height="1.5">
-          Este código es válido solo por unos minutos. ¡No lo compartas con nadie!<br /><br />
+          Este código es válido solo por cinco minutos. ¡No lo compartas con nadie!<br /><br />
           Si no solicitaste este código, puedes ignorar este mensaje.
         </mj-text>
 

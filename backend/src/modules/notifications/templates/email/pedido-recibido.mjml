@@ -1,6 +1,11 @@
 <mjml>
   <mj-head>
     <mj-title>Nuevo pedido recibido</mj-title>
+
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+
     <mj-style inline="inline">
       .footer-links a {
         color: white;
@@ -13,7 +18,7 @@
     </mj-style>
   </mj-head>
 
-  <mj-body background-color="#f4f4f4" font-family="Helvetica, Arial, sans-serif">
+  <mj-body background-color="#f4f4f4">
 
     <!-- Header -->
     <mj-section background-color="#001634" padding="30px 20px">
