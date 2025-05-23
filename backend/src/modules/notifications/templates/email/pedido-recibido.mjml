@@ -1,0 +1,76 @@
+<mjml>
+  <mj-head>
+    <mj-title>Nuevo pedido recibido</mj-title>
+    <mj-style inline="inline">
+      .footer-links a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .footer-links a:hover {
+        text-decoration: underline;
+      }
+    </mj-style>
+  </mj-head>
+
+  <mj-body background-color="#f4f4f4" font-family="Helvetica, Arial, sans-serif">
+
+    <!-- Header -->
+    <mj-section background-color="#001634" padding="30px 20px">
+      <mj-column>
+        <mj-text font-size="28px" font-weight="bold" align="left" color="#ffffff">
+          <a href="https://surtte.com" style="color: white; text-decoration: none;">
+            Sur<span style="color: #fa7e17;">tt</span>e
+          </a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Cuerpo principal -->
+    <mj-section background-color="#ffffff" padding="30px 20px" border-radius="8px">
+      <mj-column>
+
+        <mj-text align="center" font-size="20px" font-weight="bold" color="#333333">
+          ¡Hola {{nombre_empresa}}! 🎉
+        </mj-text>
+
+        <mj-text align="center" color="#555555" font-size="16px" line-height="1.5">
+          Te informamos con gusto que has recibido un nuevo pedido a través de la plataforma de Surtte.
+        </mj-text>
+
+        <mj-divider border-color="#fa7e17" border-width="2px" width="20%" />
+
+        <mj-text align="center" color="#001634" font-size="18px" font-weight="bold">
+          Detalles del pedido:
+        </mj-text>
+
+        <mj-text align="center" color="#555555" font-size="16px" line-height="1.6">
+          <b>Cliente:</b> {{nombre_cliente}}<br/>
+          <b>Número de orden:</b> #{{numero_orden}}<br/>
+        </mj-text>
+
+        <mj-button href="{{url_pedido}}" background-color="#fa7e17" color="white" font-size="16px" padding="10px 25px" border-radius="6px">
+          Ver pedido completo
+        </mj-button>
+
+        <mj-text align="center" color="#555555" font-size="15px" line-height="1.5" padding-top="20px">
+          Por favor atiende este pedido lo más pronto posible para mantener una excelente experiencia para el cliente.
+        </mj-text>
+
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section background-color="#141c24" padding="20px">
+      <mj-column>
+        <mj-text align="center" color="white" font-size="14px">
+          &copy; 2025 Todos los derechos reservados | Surtte®
+        </mj-text>
+        <mj-text align="center" css-class="footer-links" font-size="14px" color="white">
+          <a href="https://surtte.com/condiciones">Condiciones de uso</a> | <a href="https://surtte.com/politica">Política de privacidad</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+  </mj-body>
+</mjml>
