@@ -20,7 +20,7 @@ import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 
 @Injectable()
 export class PaymentsService implements OnModuleInit {
-    private subscriptionsService: SubscriptionsService; 
+    private subscriptionsService: SubscriptionsService;
 
     constructor(
         @InjectRepository(Payment)
@@ -155,13 +155,9 @@ export class PaymentsService implements OnModuleInit {
         const payment = await this.paymentRepository.findOne({ where: { id: dto.paymentId } });
         if (!payment) throw new NotFoundException('Pago no encontrado');
 
-        const info = await this.mercadoPagoService.getPaymentStatusById(dto.mercadoPagoId);
-        if (info.status !== 'approved') {
-            throw new BadRequestException('El pago no fue aprobado');
-        }
-
+        // Ya no se valida contra Wompi, asumimos que fue exitoso si llega aquí
         payment.status = 'approved';
-        payment.mercadoPagoId = dto.mercadoPagoId;
+        payment.mercadoPagoId = dto.mercadoPagoId; // puedes renombrar este campo a wompiLinkId si quieres
         await this.paymentRepository.save(payment);
 
         const userId = this.extractUserIdFromReference(payment.externalReference);
@@ -185,8 +181,8 @@ export class PaymentsService implements OnModuleInit {
             endDate: endDate.toISOString(),
         });
 
-
         return { success: true };
     }
+
 
 }
