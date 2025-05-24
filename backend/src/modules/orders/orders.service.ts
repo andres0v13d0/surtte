@@ -17,7 +17,8 @@ import {
 import { User } from '../users/entity/user.entity';
 import { Provider } from '../providers/entity/provider.entity';
 import { Customer } from '../customers/entity/customer.entity';
-import fetch from 'node-fetch';
+import * as sharp from 'sharp';
+import axios from 'axios';
 
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -181,18 +182,27 @@ export class OrdersService {
 
   async getImageAsBase64FromCDN(url: string): Promise<string> {
     try {
-      const response = await fetch(url);
-
-      if (!response.ok) {
+      const response = await axios.get(url, { responseType: 'arraybuffer' });
+  
+      if (response.status !== 200) {
         throw new BadRequestException('No se pudo obtener la imagen del CDN');
       }
-
-      const contentType = response.headers.get('content-type') || 'image/webp';
-      const buffer = await response.buffer();
-      const base64 = buffer.toString('base64');
-
-      return `data:${contentType};base64,${base64}`;
+  
+      const contentType = response.headers['content-type'] || 'image/webp';
+      const originalBuffer = Buffer.from(response.data);
+  
+      let finalBuffer = originalBuffer;
+      let finalMime = contentType;
+  
+      // Si es webp, convertir a jpeg (compatible con @react-pdf/renderer)
+      if (contentType === 'image/webp') {
+        finalBuffer = await sharp(originalBuffer).jpeg().toBuffer();
+        finalMime = 'image/jpeg';
+      }
+  
+      return `data:${finalMime};base64,${finalBuffer.toString('base64')}`;
     } catch (error) {
+      console.error('Error al convertir imagen a base64:', error.message);
       throw new BadRequestException('Error al convertir la imagen');
     }
   }
