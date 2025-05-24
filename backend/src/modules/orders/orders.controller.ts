@@ -86,8 +86,9 @@ export class OrdersController {
 
   @Get('image-base64')
   async getImageBase64(@Query('imageUrl') imageUrl: string) {
+    const decodedUrl = decodeURIComponent(imageUrl); // 👈 esta es la clave
     return {
-      base64: await this.ordersService.getImageAsBase64FromCDN(imageUrl),
+      base64: await this.ordersService.getImageAsBase64FromCDN(decodedUrl),
     };
   }
 }
