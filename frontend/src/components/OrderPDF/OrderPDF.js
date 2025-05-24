@@ -14,10 +14,11 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     width: 350,
-    border: '2px solid #ccc',
+    borderWidth: 2,
+    borderColor: '#ccc',
     borderRadius: 10,
     padding: 10,
-    alignItems: 'left',
+    alignItems: 'flex-start',
   },
   logo: {
     width: 50,
@@ -26,7 +27,8 @@ const styles = StyleSheet.create({
   },
   orderBox: {
     width: 200,
-    border: '2px solid #ccc',
+    borderWidth: 2,
+    borderColor: '#ccc',
     borderRadius: 10,
     padding: 10,
     display: 'flex',
@@ -36,15 +38,18 @@ const styles = StyleSheet.create({
   },
   section: {
     marginTop: 10,
-    fontSize: '10px',
+    fontSize: 10,
   },
   table: {
-    border: '2px solid #ccc',
-    borderCollapse: 'collapse',
+    borderWidth: 2,
+    borderColor: '#ccc',
+    borderStyle: 'solid',
   },
   tableRow: {
     flexDirection: 'row',
-    borderBottom: '2px solid #ccc',
+    borderBottomWidth: 2,
+    borderBottomColor: '#ccc',
+    paddingVertical: 3,
   },
   tableHeader: {
     backgroundColor: '#f0f0f0',
@@ -73,15 +78,17 @@ const styles = StyleSheet.create({
   },
   totalText: {
     width: 145,
-    border: '2px solid #ccc',
+    borderWidth: 2,
+    borderColor: '#ccc',
     padding: 5,
     textAlign: 'center',
     fontWeight: 'bold',
   },
   totalValue: {
     width: 150,
-    border: '2px solid #ccc',
-    borderLeft: 'none',
+    borderWidth: 2,
+    borderLeftWidth: 0,
+    borderColor: '#ccc',
     padding: 5,
     textAlign: 'center',
     fontWeight: 'bold',
@@ -93,18 +100,25 @@ const OrderPDF = ({ content }) => (
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
         <View style={styles.infoBox}>
-          <Image style={styles.logo} src={content.logo}/>
+          {content.logo && (
+            <Image style={styles.logo} src={content.logo} />
+          )}
           <Text style={{ fontWeight: 'bold', textAlign: 'center' }}>Diverso Sport</Text>
-          <Text style={{marginTop: '5px', fontSize: '10px'}}><Text style={{fontWeight: 'bold'}}>Nombre del cliente: </Text> {content.nombre_cliente || 'No hay nombre'}</Text>
-          <Text style={{ fontSize: '10px'}}><Text style={{fontWeight: 'bold'}}>Número de celular:</Text> +57 {content.celular || 'Sin celular'}</Text>
-          <Text style={{fontWeight: 'bold', fontSize: '10px'}}>Dirección:</Text>
-          <Text style={{ fontSize: '10px' }}>{content.direccion || 'No registra dirección'}</Text>
-          <Text style={{fontWeight: 'bold', fontSize: '10px'}}>Notas:</Text>
-          <Text style={{ fontSize: '10px' }}>{content.notas || 'No registra notas'}</Text>
+          <Text style={{ marginTop: 5, fontSize: 10 }}>
+            <Text style={{ fontWeight: 'bold' }}>Nombre del cliente: </Text>
+            {content.nombre_cliente || 'No hay nombre'}
+          </Text>
+          <Text style={{ fontSize: 10 }}>
+            <Text style={{ fontWeight: 'bold' }}>Número de celular:</Text> +57 {content.celular || 'Sin celular'}
+          </Text>
+          <Text style={{ fontWeight: 'bold', fontSize: 10 }}>Dirección:</Text>
+          <Text style={{ fontSize: 10 }}>{content.direccion || 'No registra dirección'}</Text>
+          <Text style={{ fontWeight: 'bold', fontSize: 10 }}>Notas:</Text>
+          <Text style={{ fontSize: 10 }}>{content.notas || 'No registra notas'}</Text>
         </View>
 
         <View style={styles.orderBox}>
-          <Text style={{ fontSize: '20px', fontWeight: 'bold' }}>Pedido # {content.orden_num || '1001'}</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Pedido # {content.orden_num || '1001'}</Text>
           <Text>Fecha: {content.fecha || '01/01/2025'}</Text>
         </View>
       </View>
@@ -118,28 +132,39 @@ const OrderPDF = ({ content }) => (
           <Text style={[styles.cell, styles.unitCell]}>Valor unitario</Text>
           <Text style={[styles.cell, styles.totalCell]}>Valor total</Text>
         </View>
-        {content.items?.map((item, index) => (
-          <View key={index} style={styles.tableRow}>
-            <View style={[styles.cell, styles.imgCell]}>
-              <Image src={item.imagen || ''} style={{ width: 40, height: 40 }} />
+
+        {content.items?.map((item, index) => {
+          const valorUnitario = Number(item.precio).toLocaleString('es-CO', { maximumFractionDigits: 0 });
+          const totalItem = (Number(item.precio || 0) * Number(item.cantidad || 0)).toLocaleString('es-CO');
+
+          return (
+            <View key={index} style={styles.tableRow}>
+              <View style={[styles.cell, styles.imgCell]}>
+                {item.imagen ? (
+                  <Image src={item.imagen} style={{ width: 40, height: 40 }} />
+                ) : (
+                  <Text style={{ fontSize: 8, textAlign: 'center' }}>Sin imagen</Text>
+                )}
+              </View>
+              <Text style={[styles.cell, styles.refCell]}>{item.referencia || ''}</Text>
+              <View style={[styles.cell, styles.nameCell]}>
+                <Text>{item.nombre_producto || ''}</Text>
+                {item.talla && <Text>Talla: {item.talla}</Text>}
+                {item.color && <Text>Color: {item.color}</Text>}
+              </View>
+              <Text style={[styles.cell, styles.qtyCell]}>{item.cantidad || 0}</Text>
+              <Text style={[styles.cell, styles.unitCell]}>{valorUnitario}</Text>
+              <Text style={[styles.cell, styles.totalCell]}>{totalItem}</Text>
             </View>
-            <Text style={[styles.cell, styles.refCell]}>{item.referencia || ''}</Text>
-            <View style={[styles.cell, styles.nameCell]}>
-              <Text>{item.nombre_producto || ''}</Text>
-              {item.talla && <Text>Talla: {item.talla}</Text>}
-              {item.color && <Text>Color: {item.color}</Text>}
-            </View>
-            <Text style={[styles.cell, styles.qtyCell]}>{item.cantidad || 0}</Text>
-            <Text style={[styles.cell, styles.unitCell]}>{Number(item.precio).toLocaleString('es-CO', { maximumFractionDigits: 0 })}</Text>
-            <Text style={[styles.cell, styles.totalCell]}>
-              {(Number(item.precio || 0) * Number(item.cantidad || 0)).toLocaleString('es-CO')}
-            </Text>
-          </View>
-        ))}
+          );
+        })}
+
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}></Text>
           <Text style={styles.totalText}>Total:</Text>
-          <Text style={styles.totalValue}>{Number(content.total).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || 0}</Text>
+          <Text style={styles.totalValue}>
+            {Number(content.total).toLocaleString('es-CO', { maximumFractionDigits: 0 }) || 0}
+          </Text>
         </View>
       </View>
     </Page>

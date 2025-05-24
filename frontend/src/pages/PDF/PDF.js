@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { pdf } from '@react-pdf/renderer';
 import OrderPDF from '../../components/OrderPDF/OrderPDF';
 import Loader from '../../components/Loader/Loader';
+import axios from 'axios';
 
 const API_BASE_URL = 'https://api.surtte.com';
 
@@ -35,24 +36,37 @@ export default function PDF() {
         console.log(data);
 
         // Función para convertir imágenes remotas a base64
+        const isBase64Webp = (base64) => base64.startsWith('data:image/webp');
+
         const convertImageToBase64 = async (url) => {
           try {
-            const res = await fetch(url);
-            const blob = await res.blob();
-            return await new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result);
-              reader.onerror = reject;
-              reader.readAsDataURL(blob);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${API_BASE_URL}/orders/image-base64`, {
+              params: { imageUrl: url },
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             });
-          } catch (err) {
-            console.warn('⚠️ Error al convertir imagen:', url);
+
+            const base64 = response.data.base64 || '';
+
+            if (isBase64Webp(base64)) {
+              console.warn('❌ Imagen sigue siendo webp (no válida para PDF):', url);
+              return '';
+            }
+
+            return base64;
+          } catch (error) {
+            console.warn('❌ Error al convertir imagen:', url, error.response?.data || error.message);
             return '';
           }
         };
 
         // Convertir logo a base64
         const logoBase64 = await convertImageToBase64('https://cdn.surtte.com/solicitudes/perfil_1_11zon.webp');
+
+        console.log('🧪 Imagen logo:', logoBase64.slice(0, 100));
+        
 
         // Convertir imágenes de los productos
         const itemsConImagenesBase64 = await Promise.all(
@@ -71,6 +85,8 @@ export default function PDF() {
             };
           })
         );
+
+        console.log('🧪 Primera imagen producto:', itemsConImagenesBase64[0]?.imagen?.slice(0, 100));
 
         const content = {
           logo: logoBase64,
