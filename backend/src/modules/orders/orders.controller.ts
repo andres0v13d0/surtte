@@ -33,6 +33,14 @@ export class OrdersController {
     return this.ordersService.create(dto);
   }
 
+  @Get('image-base64')
+  async getImageBase64(@Query('imageUrl') imageUrl: string) {
+    const decodedUrl = decodeURIComponent(imageUrl); // 👈 esta es la clave
+    return {
+      base64: await this.ordersService.getImageAsBase64FromCDN(decodedUrl),
+    };
+  }
+
   @UseGuards(RolesGuard)
   @Roles(RolUsuario.PROVEEDOR)
   @Post('manual')
@@ -82,13 +90,5 @@ export class OrdersController {
   @Get()
   async filterOrders(@Query() dto: FilterOrdersDto) {
     return this.ordersService.filter(dto);
-  }
-
-  @Get('image-base64')
-  async getImageBase64(@Query('imageUrl') imageUrl: string) {
-    const decodedUrl = decodeURIComponent(imageUrl); // 👈 esta es la clave
-    return {
-      base64: await this.ordersService.getImageAsBase64FromCDN(decodedUrl),
-    };
   }
 }
