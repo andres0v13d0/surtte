@@ -27,92 +27,22 @@ export default function PDF() {
     const generatePdf = async () => {
       try {
         const token = localStorage.getItem('token');
-
-        const res = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+        const response = await fetch(`${API_BASE_URL}/orders/pdf-preview/${orderId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const data = await res.json();
-        console.log(data);
+        if (!response.ok) throw new Error('No se pudo obtener el PDF');
 
-        // Función para convertir imágenes remotas a base64
-        const isBase64Webp = (base64) => base64.startsWith('data:image/webp');
-
-        const convertImageToBase64 = async (url) => {
-          try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/orders/image-base64`, {
-              params: { imageUrl: url },
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-
-            const base64 = response.data.base64 || '';
-
-            if (isBase64Webp(base64)) {
-              console.warn('❌ Imagen sigue siendo webp (no válida para PDF):', url);
-              return '';
-            }
-
-            return base64;
-          } catch (error) {
-            console.warn('❌ Error al convertir imagen:', url, error.response?.data || error.message);
-            return '';
-          }
-        };
-
-        // Convertir logo a base64
-        const logoBase64 = await convertImageToBase64('https://cdn.surtte.com/solicitudes/perfil_1_11zon.webp');
-
-        console.log('🧪 Imagen logo:', logoBase64.slice(0, 100));
-        
-
-        // Convertir imágenes de los productos
-        const itemsConImagenesBase64 = await Promise.all(
-          data.items.map(async (item) => {
-            const imagenBase64 = item.imageSnapshot
-              ? await convertImageToBase64(item.imageSnapshot)
-              : '';
-            return {
-              imagen: imagenBase64,
-              referencia: item.productCode || '',
-              nombre_producto: item.productName || '',
-              talla: item.size || '',
-              color: item.color || '',
-              cantidad: item.quantity,
-              precio: item.unitPrice,
-            };
-          })
-        );
-
-        console.log('🧪 Primera imagen producto:', itemsConImagenesBase64[0]?.imagen?.slice(0, 100));
-
-        const content = {
-          logo: logoBase64,
-          nombre_cliente: data.customer?.nombre || 'Sin nombre',
-          celular: data.customer?.celular || 'Sin celular',
-          direccion: [
-            data.customer?.direccion,
-            data.customer?.ciudad,
-            data.customer?.departamento
-          ].filter(Boolean).join(', ') || 'Sin dirección',
-          notas: data.notes || 'Sin notas',
-          orden_num: data.id,
-          fecha: new Date(data.createdAt).toLocaleDateString('es-CO'),
-          total: data.totalPrice,
-          items: itemsConImagenesBase64,
-        };
-
-        const blob = await pdf(<OrderPDF content={content} />).toBlob();
+        const blob = await response.blob();
         const url = URL.createObjectURL(blob);
-        setPdfUrl({ blob, url, content, providerId: data.provider.id });
+
+        setPdfUrl({ url });
         setLoading(false);
       } catch (err) {
-        console.error('Error generando el PDF:', err);
+        console.error('Error obteniendo PDF del backend:', err);
       }
     };
-
+    
     generatePdf();
   }, [orderId]);
 
