@@ -85,9 +85,9 @@ export class OrdersController {
   }
 
   @Get('image-base64')
-  async getImageBase64(@Query('url') url: string) {
+  async getImageBase64(@Query('imageUrl') imageUrl: string) {
     return {
-      base64: await this.ordersService.getImageAsBase64FromCDN(url),
+      base64: await this.ordersService.getImageAsBase64FromCDN(imageUrl),
     };
   }
 }
