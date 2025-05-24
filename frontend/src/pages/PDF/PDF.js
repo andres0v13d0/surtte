@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { pdf } from '@react-pdf/renderer';
-import OrderPDF from '../../components/OrderPDF/OrderPDF';
 import Loader from '../../components/Loader/Loader';
-import axios from 'axios';
 
 const API_BASE_URL = 'https://api.surtte.com';
 
